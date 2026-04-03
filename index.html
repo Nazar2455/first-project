@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Переход к главному плану</title>
+  <meta http-equiv="refresh" content="0; url=30d-main-tasks.html">
+  <script>
+    window.location.replace('30d-main-tasks.html');
+  </script>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #0f0f1e, #1a0a2e, #16213e);
+      color: #eaf2ff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 24px;
+    }
+    a {
+      color: #ffed4e;
+      font-weight: 700;
+    }
+    .card {
+      max-width: 560px;
+      padding: 28px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 215, 0, 0.35);
+      background: rgba(19, 28, 46, 0.88);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      text-decoration: none;
+      border: 1px solid rgba(255, 215, 0, 0.45);
+      background: rgba(255, 215, 0, 0.12);
+      color: #ffed4e;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Главная страница проекта</h1>
+    <p>Если редирект не сработал автоматически, откройте основной план вручную.</p>
+    <a class="btn" href="30d-main-tasks.html">Открыть основной план</a>
+  </main>
+</body>
+</html>
