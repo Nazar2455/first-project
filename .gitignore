@@ -18,6 +18,10 @@ env/
 .env.*
 !.env.example
 
+# Local databases
+*.db
+*.sqlite3
+
 # Logs
 *.log
 
