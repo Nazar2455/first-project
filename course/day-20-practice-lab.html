@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Модуль 20 · Практикум (outreach pipeline)</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');body{font-family:'Montserrat',sans-serif;background:linear-gradient(135deg,#0f0f1e,#1a0a2e,#16213e);color:#eaf2ff;min-height:100vh;padding:20px}.wrap{max-width:1100px;margin:0 auto}.card{background:rgba(19,28,46,.86);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:18px;margin-bottom:14px}h1{color:#ffed4e;margin-bottom:8px}h2{color:#56e8ff;font-size:1.14em;margin-bottom:8px}h3{color:#9ec0ff;font-size:1em;margin:10px 0 7px}p,li{color:#d7e6ff;line-height:1.6}ul,ol{margin-left:20px;margin-top:8px}.hint{border-left:3px solid #ffd700;background:rgba(255,215,0,.08);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.92em}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.btn{display:inline-block;text-decoration:none;border:1px solid rgba(255,215,0,.45);border-radius:10px;background:rgba(255,215,0,.12);color:#ffed4e;font-weight:700;padding:9px 12px;cursor:pointer}.btn.alt{border-color:rgba(86,232,255,.55);color:#56e8ff;background:rgba(86,232,255,.12)}.codebox{margin-top:10px;border:1px solid rgba(102,126,234,.35);border-radius:10px;overflow:hidden;background:#0b1220}.codebox-title{background:rgba(102,126,234,.12);color:#9ec0ff;font-size:.8em;font-weight:700;padding:8px 10px;border-bottom:1px solid rgba(102,126,234,.25)}textarea{width:100%;min-height:190px;border:none;resize:vertical;padding:12px;font-family:Consolas,'Courier New',monospace;font-size:.88em;line-height:1.45;color:#e7f1ff;background:#0b1220;outline:none}.checks{margin-top:10px;display:grid;gap:6px;font-size:.92em}.ok{color:#6ff3a3}.bad{color:#ff8f8f}.warn{color:#ffd78a}.result{margin-top:10px;border-radius:10px;padding:10px 12px;font-size:.92em;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03)}.status-pill{display:inline-block;margin-top:8px;border:1px solid rgba(255,215,0,.45);border-radius:999px;padding:4px 10px;color:#ffed4e;font-size:.8em;font-weight:700;background:rgba(255,215,0,.1)}</style>
+  <link rel="stylesheet" href="course-tools.css"/>
+</head>
+<body>
+  <div class="wrap">
+    <section class="card">
+      <h1>🧪 Модуль 20 · Практикум</h1>
+      <p>Выстраиваем системный поток откликов: персонализация, воронка, follow-up и конверсия.</p>
+      <div class="actions"><a class="btn" href="day-20-index.html">← Теория Модуля 20</a><a class="btn alt" href="index.html">Ко всем модулям</a><a class="btn" href="day-21-index.html">День 21 →</a></div>
+      <div class="course-top-tools"><button id="readToggleBtn" class="read-toggle-btn" type="button">📘 Отметить день как прочитанный</button><span class="status-pill">Практика дня 20</span></div>
+    </section>
+
+    <section class="card">
+      <h2>🤖 БОТЫ: outreach + funnel</h2>
+      <p><strong>Цель:</strong> построить повторяемый процесс откликов, где каждый шаг измеряется и улучшает конверсию.</p>
+      <p><strong>Связь с теорией дня 20:</strong> тренируешь персонализацию оффера, воронку продаж и follow-up как систему, а не «ручную магию».</p>
+      <div class="hint"><strong>Фокус на смысл:</strong> ценность не в количестве сообщений, а в контролируемой конверсии по стадиям <code>reply → call → deal</code>.</div>
+      <h3>Что нужно сделать (конкретно)</h3>
+      <ol><li>Есть <code>build_outreach</code> с task/case/eta/CTA.</li><li>Есть таблица воронки (reply/call/deal).</li><li>Есть stats/reply-rate.</li><li>Есть follow-up стратегия.</li></ol>
+      <h3>Критерии готовности (Definition of Done)</h3>
+      <ul><li>Отклик содержит конкретную пользу и следующий шаг.</li><li>По логам можно посчитать ответ/созвон/сделку.</li><li>Есть хотя бы два follow-up сценария (например, 24h/48h).</li></ul>
+      <h3>Что сдать на проверку</h3>
+      <ul><li>Код outreach helper + воронка.</li><li>Логи отправок и расчёт конверсии.</li></ul>
+      <div class="codebox"><div class="codebox-title">Код outreach helper</div><textarea id="botCode"></textarea></div>
+      <div class="codebox"><div class="codebox-title">Логи отправок</div><textarea id="botOutput"></textarea></div>
+      <div class="actions"><button class="btn" id="checkBotBtn" type="button">Проверить БОТЫ</button></div><div class="result" id="botResult">Пока не проверяли.</div><div class="checks" id="botChecks"></div>
+    </section>
+
+    <section class="card">
+      <h2>🕷️ ПАРСИНГ: KPI-offer + conversion report</h2>
+      <p><strong>Цель:</strong> упаковать parsing-оффер через KPI и показать управляемую воронку от отклика до сделки.</p>
+      <p><strong>Связь с теорией дня 20:</strong> переводишь технические метрики в коммерческий язык: что клиент получит и как измерим результат.</p>
+      <div class="hint"><strong>Фокус на смысл:</strong> оффер должен объяснять, какие бизнес-метрики улучшатся, а не просто перечислять техдетали.</div>
+      <h3>Что нужно сделать (конкретно)</h3>
+      <ol><li>Есть <code>build_parsing_outreach</code> с output/frequency/KPI.</li><li>Есть <code>conversion_report</code>.</li><li>Есть reply/deal rates.</li><li>Есть follow-up шаблоны 24/48h.</li></ol>
+      <h3>Критерии готовности (Definition of Done)</h3>
+      <ul><li>В оффере есть метрики качества и прогноз результата.</li><li>В отчёте считаются коэффициенты ответа и сделки.</li><li>Follow-up шаблоны подхватывают KPI и контекст клиента.</li></ul>
+      <h3>Что сдать на проверку</h3>
+      <ul><li>Код parsing outreach + отчёт конверсии.</li><li>Логи с примерами первого отклика и follow-up.</li></ul>
+      <div class="codebox"><div class="codebox-title">Код parsing outreach</div><textarea id="parserCode"></textarea></div>
+      <div class="codebox"><div class="codebox-title">Логи конверсии</div><textarea id="parserOutput"></textarea></div>
+      <div class="actions"><button class="btn" id="checkParserBtn" type="button">Проверить ПАРСИНГ</button></div><div class="result" id="parserResult">Пока не проверяли.</div><div class="checks" id="parserChecks"></div>
+    </section>
+  </div>
+
+  <script src="course-tools.js"></script>
+  <script>const LAB_KEY='course_day20_practice_lab_v1';const has=(t,p)=>p.test(t);const norm=t=>String(t||'').replace(/\r\n/g,'\n').toLowerCase();const lines=t=>String(t||'').split('\n').map(x=>x.trim()).filter(Boolean).length;function rc(id,it){document.getElementById(id).innerHTML=it.map(i=>`<div class="${i.level==='warn'?'warn':(i.ok?'ok':'bad')}">${i.level==='warn'?'⚠️':(i.ok?'✅':'❌')} ${i.label}${i.note?` — ${i.note}`:''}</div>`).join('')}function sm(id,c){const f=c.filter(x=>x.required&&!x.ok);const s=c.reduce((a,x)=>a+(x.ok?(x.weight||1):0),0);const m=c.reduce((a,x)=>a+(x.weight||1),0);const p=m?Math.round(s*100/m):0;document.getElementById(id).innerHTML=`<strong>${s}/${m}</strong> баллов (${p}%). ${f.length===0&&p>=75?'✅ Зачёт.':'❌ Пока не зачёт.'}${f.length?`<br><span class="bad">Недочёты: ${f.map(x=>x.short||x.label).join(', ')}</span>`:''}`}function checkBot(){const c=norm(botCode.value),o=norm(botOutput.value);const k=[{label:'Достаточный объём',short:'мало кода',ok:lines(c)>=14,required:true,weight:2,note:`${lines(c)} строк`},{label:'Есть build_outreach',short:'нет генератора отклика',ok:has(c,/build_outreach|task|case_link|eta/),required:true,weight:3},{label:'Есть funnel таблица',short:'нет трекинга стадий',ok:has(c,/funnel|status|reply|call|deal/),required:true,weight:3},{label:'Есть stats/report',short:'нет метрик воронки',ok:has(c,/stats|reply|calls|deals|rate/),required:true,weight:3},{label:'Есть CTA',short:'нет следующего шага',ok:has(c,/демо|созвон|план|cta|готов/),required:true,weight:2},{label:'Есть follow-up логика',short:'нет follow-up',ok:has(c,/follow-up|follow_up|24|48/),required:true,weight:2},{label:'Логи отправок добавлены',ok:o.trim().length>0,required:false,level:'warn',weight:1,note:o.trim()?'добавлены':'не добавлены'}];rc('botChecks',k);sm('botResult',k);ps()}function checkParser(){const c=norm(parserCode.value),o=norm(parserOutput.value);const k=[{label:'Достаточный объём',short:'мало кода',ok:lines(c)>=14,required:true,weight:2,note:`${lines(c)} строк`},{label:'Есть build_parsing_outreach',short:'нет offer helper',ok:has(c,/build_parsing_outreach|output|frequency|kpi/),required:true,weight:3},{label:'Есть conversion_report',short:'нет отчёта конверсии',ok:has(c,/conversion_report|reply_rate|deal_rate/),required:true,weight:3},{label:'Есть KPI в оффере',short:'нет кейс-метрик',ok:has(c,/total|valid|new|kpi/),required:true,weight:3},{label:'Есть response/deal rate',short:'нет коэффициентов',ok:has(c,/reply_rate|deal_rate|%/),required:true,weight:2},{label:'Есть follow-up 24/48h',short:'нет follow-up сценария',ok:has(c,/24|48|follow-up|follow_up/),required:true,weight:2},{label:'Логи конверсии добавлены',ok:o.trim().length>0,required:false,level:'warn',weight:1,note:o.trim()?'добавлены':'не добавлены'}];rc('parserChecks',k);sm('parserResult',k);ps()}function ps(){localStorage.setItem(LAB_KEY,JSON.stringify({botCode:botCode.value,botOutput:botOutput.value,parserCode:parserCode.value,parserOutput:parserOutput.value}))}function rs(){try{const s=JSON.parse(localStorage.getItem(LAB_KEY)||'{}');if(s.botCode)botCode.value=s.botCode;if(s.botOutput)botOutput.value=s.botOutput;if(s.parserCode)parserCode.value=s.parserCode;if(s.parserOutput)parserOutput.value=s.parserOutput}catch{}}checkBotBtn.addEventListener('click',checkBot);checkParserBtn.addEventListener('click',checkParser);['botCode','botOutput','parserCode','parserOutput'].forEach(id=>document.getElementById(id).addEventListener('input',ps));rs();CourseTools.initModulePage(20);</script>
+</body>
+</html>

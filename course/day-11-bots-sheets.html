@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>День 11 · БОТЫ — Интеграция Google Sheets</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+    body{font-family:'Montserrat',sans-serif;background:linear-gradient(135deg,#0f0f1e,#1a0a2e,#16213e);color:#eaf2ff;min-height:100vh;padding:20px}
+    .wrap{max-width:1100px;margin:0 auto}.card{background:rgba(19,28,46,.86);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px;margin-bottom:12px}
+    h1{color:#ffed4e;margin-bottom:8px}h2{color:#56e8ff;font-size:1.12em;margin-bottom:8px}h3{color:#96b7ff;margin:10px 0 6px}
+    p,li{line-height:1.6;color:#d6e4ff}.actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{display:inline-block;text-decoration:none;border:1px solid rgba(255,215,0,.45);border-radius:10px;background:rgba(255,215,0,.12);color:#ffed4e;font-weight:700;padding:9px 12px}
+    .btn.alt{border-color:rgba(86,232,255,.55);color:#56e8ff;background:rgba(86,232,255,.12)}
+    .code{margin-top:8px;border-radius:10px;overflow:hidden;border:1px solid rgba(102,126,234,.35);background:#0b1220}.code-title{background:rgba(102,126,234,.12);color:#9ec0ff;font-size:.78em;font-weight:700;padding:8px 10px;border-bottom:1px solid rgba(102,126,234,.25)}
+    pre{margin:0;padding:12px;overflow-x:auto;font-size:.84em;line-height:1.45}code{font-family:Consolas,'Courier New',monospace;color:#e7f1ff}
+    .note{border-left:3px solid #ffd700;background:rgba(255,215,0,.08);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.9em}
+  </style>
+  <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+<div class="wrap">
+  <section class="card">
+    <h1>День 11 · 🤖 БОТЫ</h1>
+    <p>Тема: дублируем лиды в Google Sheets, чтобы клиент/менеджер видел заявки сразу в таблице.</p>
+    <div class="actions">
+      <a class="btn" href="day-11-index.html">← День 11 (выбор трека)</a>
+      <a class="btn alt" href="day-11-parsing-sheets.html">Переключиться на ПАРСИНГ</a>
+      <a class="btn" href="day-12-index.html">День 12 →</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>1) Подготовка service account</h2>
+    <ol>
+      <li>Создай проект в Google Cloud.</li>
+      <li>Включи Google Sheets API.</li>
+      <li>Создай Service Account и JSON-ключ.</li>
+      <li>Поделись таблицей с email сервисного аккаунта.</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>2) Код записи лида в таблицу</h2>
+    <div class="code"><div class="code-title">services/google_sheets.py</div><pre><code>import gspread
+from google.oauth2.service_account import Credentials
+from datetime import datetime
+
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+
+
+def get_sheet():
+    creds = Credentials.from_service_account_file("service-account.json", scopes=SCOPES)
+    client = gspread.authorize(creds)
+    return client.open("Leads CRM").worksheet("leads")
+
+
+def save_lead_to_sheets(name: str, phone: str, comment: str):
+    ws = get_sheet()
+    ws.append_row([
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        name,
+        phone,
+        comment
+    ])</code></pre></div>
+    <div class="note">В проде ключ лучше хранить вне репозитория и задавать путь через переменную окружения.</div>
+  </section>
+
+  <section class="card">
+    <h2>3) Интеграция в FSM-финал</h2>
+    <p>После сохранения в SQLite вызывай <code>save_lead_to_sheets(...)</code>. Если Sheets временно недоступен — не роняй бота, логируй ошибку и отвечай пользователю штатно.</p>
+  </section>
+
+  <section class="card">
+    <h2>4) Практика</h2>
+    <ol>
+      <li>Отправь 3 тестовые заявки через бота.</li>
+      <li>Проверь, что все 3 строки появились в Google Sheets.</li>
+      <li>Добавь столбец <code>source=telegram</code>.</li>
+      <li>Сделай скрин таблицы для портфолио кейса.</li>
+    </ol>
+  </section>
+</div>
+</body>
+</html>

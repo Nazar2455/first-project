@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>День 7 · БОТЫ — Упаковка кейса</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+    body{font-family:'Montserrat',sans-serif;background:linear-gradient(135deg,#0f0f1e,#1a0a2e,#16213e);color:#eaf2ff;min-height:100vh;padding:20px}
+    .wrap{max-width:1100px;margin:0 auto}.card{background:rgba(19,28,46,.86);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px;margin-bottom:12px}
+    h1{color:#ffed4e;margin-bottom:8px}h2{color:#56e8ff;font-size:1.12em;margin-bottom:8px}h3{color:#96b7ff;margin:10px 0 6px}
+    p,li{line-height:1.6;color:#d6e4ff}.actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{display:inline-block;text-decoration:none;border:1px solid rgba(255,215,0,.45);border-radius:10px;background:rgba(255,215,0,.12);color:#ffed4e;font-weight:700;padding:9px 12px}
+    .btn.alt{border-color:rgba(86,232,255,.55);color:#56e8ff;background:rgba(86,232,255,.12)}
+    .code{margin-top:8px;border-radius:10px;overflow:hidden;border:1px solid rgba(102,126,234,.35);background:#0b1220}.code-title{background:rgba(102,126,234,.12);color:#9ec0ff;font-size:.78em;font-weight:700;padding:8px 10px;border-bottom:1px solid rgba(102,126,234,.25)}
+    pre{margin:0;padding:12px;overflow-x:auto;font-size:.84em;line-height:1.45}code{font-family:Consolas,'Courier New',monospace;color:#e7f1ff}
+    .note{border-left:3px solid #ffd700;background:rgba(255,215,0,.08);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.9em}
+  </style>
+  <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+<div class="wrap">
+  <section class="card">
+    <h1>День 7 · 🤖 БОТЫ</h1>
+    <p>Тема: оформить бота так, чтобы клиент захотел купить. Это день про «упаковку результата», а не про новый код ради кода.</p>
+    <div class="actions">
+      <a class="btn" href="day-07-index.html">← День 7 (выбор трека)</a>
+      <a class="btn alt" href="day-07-parsing-showcase-portfolio.html">Переключиться на ПАРСИНГ</a>
+      <a class="btn" href="day-08-index.html">День 8 →</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>1) Что хочет увидеть клиент в кейсе бота</h2>
+    <ul>
+      <li>Проблема: «лиды теряются, заявки неструктурированы».</li>
+      <li>Решение: «бот собирает, хранит, экспортирует, уведомляет».</li>
+      <li>Результат: экономия времени и прозрачность заявок.</li>
+    </ul>
+    <div class="note">Формула кейса: Проблема → Что сделал → Что получил клиент.</div>
+  </section>
+
+  <section class="card">
+    <h2>2) Шаблон продающего README</h2>
+    <div class="code"><div class="code-title">README.md (каркас)</div><pre><code># Lead Bot for Telegram
+
+## Что решает
+Бот автоматизирует сбор заявок из Telegram и сохраняет их в базу.
+
+## Функции
+- /start, /help
+- форма заявки (FSM)
+- админ-команды /admin и /export
+- экспорт лидов в CSV
+
+## Стек
+Python 3.11, aiogram 3, aiosqlite, python-dotenv
+
+## Быстрый запуск
+1. Создать .env
+2. Установить зависимости: pip install -r requirements.txt
+3. Запустить: python main.py
+
+## Результат для бизнеса
+- меньше ручной рутины
+- выше скорость ответа
+- прозрачная история заявок</code></pre></div>
+  </section>
+
+  <section class="card">
+    <h2>3) Сценарий видео-демо (60–90 сек)</h2>
+    <ol>
+      <li>5 сек: название проекта + что решает.</li>
+      <li>25 сек: путь пользователя (/start → форма → подтверждение).</li>
+      <li>20 сек: путь администратора (/admin → /export).</li>
+      <li>10 сек: итог в CSV + выгода для клиента.</li>
+      <li>5 сек: «готов адаптировать под ваш сценарий».</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>4) GitHub Release и кейс в портфолио</h2>
+    <div class="code"><div class="code-title">Текст релиза (пример)</div><pre><code>v1.0.0 — Lead Bot MVP
+
+Добавлено:
+- базовые команды /start /help
+- FSM-форма заявки
+- SQLite-хранилище
+- /admin и /export для администратора
+
+Known limits:
+- пока нет webhook-режима
+- нет мультиязычности</code></pre></div>
+    <p>В портфолио-карточке добавь: ссылку на репозиторий, демо-видео, скриншоты диалога и пример CSV.</p>
+  </section>
+
+  <section class="card">
+    <h2>5) Практика + готовый отклик клиенту</h2>
+    <h3>Практика</h3>
+    <ol>
+      <li>Обнови README по шаблону выше.</li>
+      <li>Запиши короткое демо-видео.</li>
+      <li>Создай GitHub release v1.0.0.</li>
+      <li>Собери 1 карточку кейса в портфолио.</li>
+    </ol>
+    <h3>Отклик (шаблон)</h3>
+    <div class="code"><div class="code-title">Сообщение клиенту</div><pre><code>Здравствуйте! Сделал Telegram-бота для сбора заявок:
+- форма заявки (FSM)
+- хранение в БД
+- админ-панель и экспорт в CSV
+
+Вот демо и репозиторий:
+[ссылка на видео]
+[ссылка на GitHub]
+
+Могу адаптировать под ваши поля и бизнес-процесс за 1–2 дня.</code></pre></div>
+  </section>
+</div>
+</body>
+</html>

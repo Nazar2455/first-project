@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Модуль 2 · День 2 — Интерфейс и данные</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(135deg, #0f0f1e, #1a0a2e, #16213e);
+      color: #eaf2ff;
+      min-height: 100vh;
+    }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .side {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      height: 100vh;
+      overflow-y: auto;
+      background: rgba(10, 16, 30, 0.95);
+      border-right: 2px solid rgba(255,215,0,0.25);
+      padding: 18px 14px;
+    }
+    .side h2 { color: #ffed4e; font-size: 1.02em; margin-bottom: 10px; }
+    .side a {
+      display: block;
+      text-decoration: none;
+      color: #d9e8ff;
+      font-size: 0.86em;
+      padding: 8px 9px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 7px;
+    }
+    .side a:hover { color: #ffed4e; border-color: rgba(255,215,0,0.55); }
+    .content { padding: 24px; max-width: 1100px; }
+    .hero {
+      background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(102,126,234,0.15));
+      border: 2px solid rgba(255,215,0,0.3);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 14px;
+    }
+    .hero h1 { color: #ffed4e; margin-bottom: 8px; }
+    .hero p { color: #d5e6ff; line-height: 1.6; margin-bottom: 7px; }
+    .section {
+      margin-bottom: 14px;
+      background: rgba(19, 28, 46, 0.84);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .section h2 { color: #ffed4e; font-size: 1.22em; margin-bottom: 8px; }
+    .section h3 { color: #96b7ff; font-size: 1.02em; margin: 11px 0 7px; }
+    .section p, .section li { color: #d6e4ff; line-height: 1.6; font-size: 0.95em; }
+    .section ul, .section ol { margin-left: 20px; margin-top: 8px; }
+    .note {
+      border-left: 3px solid #ffd700;
+      background: rgba(255,215,0,0.08);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-top: 8px;
+      font-size: 0.9em;
+    }
+    .code {
+      margin-top: 9px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(102,126,234,0.35);
+      background: #0b1220;
+    }
+    .code-title {
+      background: rgba(102,126,234,0.12);
+      color: #9ec0ff;
+      font-size: 0.78em;
+      font-weight: 700;
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(102,126,234,0.25);
+    }
+    pre { margin: 0; padding: 12px; overflow-x: auto; font-size: 0.84em; line-height: 1.45; }
+    code { font-family: Consolas, 'Courier New', monospace; color: #e7f1ff; }
+    .check { display: grid; gap: 7px; margin-top: 9px; }
+    .check label { display: flex; gap: 8px; align-items: center; font-size: 0.9em; }
+    .check input { accent-color: #ffd700; }
+    .top-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,215,0,0.45);
+      border-radius: 10px;
+      background: rgba(255,215,0,0.12);
+      color: #ffed4e;
+      font-weight: 700;
+      padding: 9px 12px;
+      display: inline-block;
+      cursor: pointer;
+    }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .side { position: static; height: auto; border-right: none; border-bottom: 2px solid rgba(255,215,0,0.25); }
+      .content { padding: 14px; }
+    }
+    /* ===== ПАСХАЛКИ ===== */
+    .easter-egg {
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 215, 0, 0.15));
+      border: 2px solid rgba(255, 107, 107, 0.4);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 25px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+      line-height: 1.4;
+      position: relative;
+      overflow: hidden;
+      animation: easter-glow 3s ease-in-out infinite;
+    }
+    .easter-egg::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.2), transparent);
+      animation: easter-shine 3s infinite;
+      pointer-events: none;
+    }
+    .easter-egg-content {
+      position: relative;
+      z-index: 1;
+    }
+    .easter-egg-title {
+      color: #ff6b6b;
+      font-weight: 800;
+      margin-bottom: 10px;
+      font-size: 1.1em;
+    }
+    .easter-egg-text {
+      color: #ddd;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .easter-egg-code {
+      color: #4dae64;
+      margin: 8px 0;
+    }
+    .easter-egg-quote {
+      color: #ffd700;
+      font-style: italic;
+      font-weight: 600;
+      margin: 8px 0;
+    }
+    @keyframes easter-glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(255, 107, 107, 0.3); }
+      50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+    }
+    @keyframes easter-shine {
+      0% { left: -100%; }
+      50% { left: 100%; }
+      100% { left: 100%; }
+    }
+  </style>
+  <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="side">
+      <h2>День 2 · Оглавление</h2>
+      <a href="#goal">🎯 Цели дня</a>
+      <a href="#day-flow">🗺️ Как пройти день</a>
+      <a href="#read-logic">🔍 Как читать обработчики</a>
+      <a href="#micro-ui">🧪 Мини-примеры кнопок</a>
+      <a href="#bot-ui">🤖 UI бота: кнопки</a>
+      <a href="#reply-vs-inline">↔ Reply vs Inline</a>
+      <a href="#callback">🧩 Callback-архитектура</a>
+      <a href="#micro-callback">🧪 Мини-примеры callback_data</a>
+      <a href="#micro-data">🧪 Мини-примеры по данным</a>
+      <a href="#parser200">🕷️ Парсинг 200 + фильтры</a>
+      <a href="#csv">📄 Экспорт в CSV правильно</a>
+      <a href="#micro-csv">🧪 Мини-примеры CSV</a>
+      <a href="#demo">🎥 Демо, которое продаёт</a>
+      <a href="#qa">🧯 Типичные ошибки</a>
+      <a href="#lab">🏋️ Лабораторная</a>
+      <a href="day-02-practice-lab.html">🧪 Отдельный практикум Модуля 2</a>
+      <a href="#exam">📝 Самопроверка</a>
+      <a href="index.html">← К модулям</a>
+      <a href="../30d-main-tasks.html">← К плану</a>
+    </aside>
+
+    <main class="content">
+      <div class="top-actions">
+        <a class="btn" href="day-01-foundation.html">← День 1</a>
+        <a class="btn" href="day-02-practice-lab.html">🧪 Практикум Модуля 2</a>
+        <a class="btn" href="day-03-fsm-filters.html">День 3 →</a>
+        <a class="btn" href="index.html">К модулям</a>
+      </div>
+
+      <div class="course-top-tools">
+        <button id="readToggleBtn" class="read-toggle-btn" type="button">📘 Отметить день как прочитанный</button>
+        <div class="track-switch">
+          <button class="track-btn active" data-track="all" type="button">Все блоки</button>
+          <button class="track-btn" data-track="bots" type="button">🤖 Только БОТЫ</button>
+          <button class="track-btn" data-track="parsing" type="button">🕷️ Только ПАРСИНГ</button>
+        </div>
+      </div>
+
+      <section class="hero" id="goal">
+        <h1>Модуль 2 · День 2: интерфейс + данные = польза для клиента</h1>
+        <p>Вчера ты построил фундамент. Сегодня делаем первый «продуктовый» шаг: бот становится удобным, а парсер — полезным и читаемым для заказчика.</p>
+        <p>Результат дня: у тебя есть понятный интерфейс бота, экспорт данных в CSV и короткое видео-демо для портфолио.</p>
+      </section>
+
+      <section class="section" id="day-flow">
+        <h2>🗺️ Как пройти День 2 (чтобы реально усвоить)</h2>
+        <p>Сегодня важно не просто «проскроллить код», а пройти урок как тренировку:</p>
+        <ol>
+          <li><strong>Прочитал маленький пример</strong> → понял идею на 3-5 строках.</li>
+          <li><strong>Посмотрел большой блок</strong> → увидел, где эта идея живёт в реальном коде.</li>
+          <li><strong>Сделал руками</strong> → проверил в Telegram или CSV.</li>
+          <li><strong>Объяснил вслух</strong> (сам себе) → закрепил.</li>
+        </ol>
+        <div class="note">Если где-то «не доходит», вернись к мини-примеру. Это не откат назад, это правильный путь обучения.</div>
+      </section>
+
+      <section class="section" id="read-logic">
+        <h2>🔍 Как читать обработчики и не путаться</h2>
+        <p>У обработчиков есть простая модель: <strong>событие → фильтр → функция → ответ</strong>.</p>
+        <ol>
+          <li>Событие: пришло сообщение или callback.</li>
+          <li>Фильтр: подходит ли это событие под условие.</li>
+          <li>Функция: что мы делаем (сохраняем, считаем, отвечаем).</li>
+          <li>Ответ: что видит пользователь.</li>
+        </ol>
+        <h3>Мини-пример чтения обработчика «по шагам»</h3>
+        <div class="code">
+          <div class="code-title">Разбор структуры хендлера</div>
+          <pre><code>@router.message(Command("start"))
+async def cmd_start(message: Message):
+    await message.answer("Привет!")</code></pre>
+        </div>
+        <ul>
+          <li><strong>Событие:</strong> пришло сообщение.</li>
+          <li><strong>Фильтр:</strong> это именно команда <code>/start</code>.</li>
+          <li><strong>Функция:</strong> вызывается <code>cmd_start</code>.</li>
+          <li><strong>Ответ:</strong> пользователь получает «Привет!».</li>
+        </ul>
+        <div class="note">Если читать любой хендлер именно в таком порядке, код становится понятным даже новичку.</div>
+      </section>
+
+      <div class="easter-egg">
+        <div class="easter-egg-content">
+          <div class="easter-egg-title">💡 Интерфейс = Конверсия</div>
+          <div class="easter-egg-text">┌──────────────────────────────────┐
+│ Один клик = клиент не уйдёт    │
+│                                  │
+│ Без кнопок: /help /start /menu   │
+│ Люди забывают команды 50%        │
+│                                  │
+│ С кнопками: достаточно тапа      │
+│ Люди взаимодействуют 95%         │
+│                                  │
+│ Кнопка != деталь, это           │
+│ инструмент конверсии! 🎯        │
+└──────────────────────────────────┘</div>
+        </div>
+      </div>
+      <section class="section" id="micro-ui">
+        <h2>🧪 Мини-примеры кнопок перед большим кодом</h2>
+        <h3>Мини-пример 1: одна reply-кнопка</h3>
+        <div class="code">
+          <div class="code-title">ReplyKeyboardMarkup</div>
+          <pre><code>kb = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton(text="Привет")]],
+    resize_keyboard=True
+)</code></pre>
+        </div>
+        <p>Это «постоянная» клавиатура внизу чата. Хорошо для главного меню.</p>
+
+        <h3>Мини-пример 2: одна inline-кнопка</h3>
+        <div class="code">
+          <div class="code-title">InlineKeyboardMarkup</div>
+          <pre><code>ikb = InlineKeyboardMarkup(
+    inline_keyboard=[[InlineKeyboardButton(text="Открыть FAQ", callback_data="faq:open")]]
+)</code></pre>
+        </div>
+        <p>Это кнопка внутри конкретного сообщения. Хорошо для сценариев «действие на месте».</p>
+      </section>
+
+      <section class="section track-block" data-track="bots" id="bot-ui">
+        <h2>🤖 Интерфейс бота: зачем нужны кнопки</h2>
+        <p>Если пользователь видит только текст и команды, он теряется. Кнопки снижают трение и увеличивают вероятность, что бот реально будут использовать.</p>
+        <p>Простыми словами: ты строишь не «чат с командами», а маленький интерфейс приложения внутри Telegram.</p>
+
+        <h3>Структура файлов</h3>
+        <div class="code">
+          <div class="code-title">рекомендуемый layout</div>
+          <pre><code>lead-bot-v1/
+├── main.py
+├── keyboards/
+│   └── main_kb.py
+└── handlers/
+    └── start.py</code></pre>
+        </div>
+
+        <h3>Reply клавиатура (основное меню)</h3>
+        <div class="code">
+          <div class="code-title">keyboards/main_kb.py</div>
+          <pre><code>from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
+
+main_reply_kb = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="📝 Оставить заявку")],
+        [KeyboardButton(text="❓ FAQ"), KeyboardButton(text="📞 Контакты")]
+    ],
+    resize_keyboard=True,
+    input_field_placeholder="Выбери действие"
+)</code></pre>
+        </div>
+  <h3>Что тут важно понимать по строкам</h3>
+  <ul>
+    <li><code>keyboard=[[...], [...]]</code> — каждая вложенная строка это отдельный ряд кнопок.</li>
+    <li><code>resize_keyboard=True</code> — Telegram делает клавиатуру компактнее и удобнее.</li>
+    <li><code>input_field_placeholder</code> — подсказывает пользователю, что делать дальше.</li>
+  </ul>
+
+        <h3>Подключение клавиатуры в /start</h3>
+        <div class="code">
+          <div class="code-title">handlers/start.py</div>
+          <pre><code>from aiogram import Router
+from aiogram.filters import Command
+from aiogram.types import Message
+from keyboards.main_kb import main_reply_kb
+
+router = Router()
+
+@router.message(Command("start"))
+async def cmd_start(message: Message):
+    await message.answer(
+        "Привет! Я помогу принять заявку. Выбери действие ниже:",
+        reply_markup=main_reply_kb
+    )</code></pre>
+        </div>
+        <p>Логика простая: при входе в бота ты сразу даёшь человеку понятные варианты действий, вместо «угадай, какую команду ввести».</p>
+      </section>
+
+      <section class="section track-block" data-track="bots" id="reply-vs-inline">
+        <h2>↔ Reply vs Inline — когда что использовать</h2>
+        <ul>
+          <li><strong>Reply:</strong> большие постоянные действия (главное меню).</li>
+          <li><strong>Inline:</strong> действия внутри конкретного сообщения (например, «Подтвердить», «Отмена», «Подробнее»).</li>
+        </ul>
+        <h3>Мини-правило выбора</h3>
+        <p>Если действие относится ко <strong>всему боту</strong> — обычно Reply. Если действие относится к <strong>одному сообщению или шагу</strong> — обычно Inline.</p>
+
+        <h3>Inline пример</h3>
+        <div class="code">
+          <div class="code-title">keyboards/main_kb.py — inline</div>
+          <pre><code>from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
+lead_inline_kb = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton(text="🚀 Начать заявку", callback_data="lead:start")],
+        [InlineKeyboardButton(text="📚 FAQ", callback_data="faq:open")]
+    ]
+)</code></pre>
+        </div>
+
+        <div class="note">Принцип: callback_data должен быть короткий и предсказуемый. Например, формат `entity:action`.</div>
+      </section>
+
+      <div class="easter-egg">
+        <div class="easter-egg-content">
+          <div class="easter-egg-title">🔥 Callback = диалог с ботом</div>
+          <div class="easter-egg-quote">«Я нажал кнопку, и что? Бот тупо говорит в ответ?» Нет! Callback — это когда каждая кнопка ведёт сценарий дальше. Пользователь нажимает, состояние меняется, появляются новые кнопки. Это не чат, это приложение! 📱</div>
+        </div>
+      </div>
+
+      <section class="section track-block" data-track="bots" id="callback">
+        <h2>🧩 Callback-обработчики без хаоса</h2>
+        <div class="code">
+          <div class="code-title">handlers/callbacks.py</div>
+          <pre><code>from aiogram import Router, F
+from aiogram.types import CallbackQuery
+
+router = Router()
+
+@router.callback_query(F.data == "lead:start")
+async def lead_start_callback(call: CallbackQuery):
+    await call.message.answer("Окей, начинаем заполнение заявки 👇")
+    await call.answer()
+
+@router.callback_query(F.data == "faq:open")
+async def faq_open_callback(call: CallbackQuery):
+    await call.message.answer("FAQ:\n1) Сроки\n2) Стоимость\n3) Поддержка")
+    await call.answer()</code></pre>
+        </div>
+
+        <h3>Почему вызываем <code>call.answer()</code></h3>
+        <p>Чтобы Telegram понял, что callback обработан. Иначе у пользователя может «крутиться» индикатор загрузки.</p>
+      </section>
+
+      <div class="easter-egg">
+        <div class="easter-egg-content">
+          <div class="easter-egg-title">🔥 Callback = диалог с ботом</div>
+          <div class="easter-egg-quote">«Я нажал кнопку, и что? Бот тупо говорит в ответ?» Нет! Callback — это когда каждая кнопка ведёт сценарий дальше. Пользователь нажимает, состояние меняется, появляются новые кнопки. Это не чат, это приложение! 📱</div>
+        </div>
+      </div>
+
+      <section class="section track-block" data-track="bots" id="micro-callback">
+        <h2>🧪 Мини-примеры callback_data (маленькие, но важные)</h2>
+        <h3>Мини-пример 1: единый формат</h3>
+        <div class="code">
+          <div class="code-title">Шаблон callback_data</div>
+          <pre><code># entity:action
+"faq:open"
+"lead:start"
+"lead:cancel"</code></pre>
+        </div>
+        <p>Когда формат единый, тебе проще поддерживать проект и не искать, почему часть кнопок «не ловится».</p>
+
+        <h3>Мини-пример 2: разбор callback_data</h3>
+        <div class="code">
+          <div class="code-title">Разделить сущность и действие</div>
+          <pre><code>data = "lead:start"
+entity, action = data.split(":", maxsplit=1)
+print(entity)  # lead
+print(action)  # start</code></pre>
+        </div>
+        <p>Этот приём пригодится с Дня 3+, когда сценарии станут длиннее и callback-ов станет много.</p>
+      </section>
+
+      <section class="section" id="micro-data">
+        <h2>🧪 Мини-примеры по данным перед большим парсером</h2>
+        <h3>Мини-пример: очистка цены</h3>
+        <div class="code">
+          <div class="code-title">Чистим «12 990 ₽» до числа</div>
+          <pre><code>raw = "12 990 ₽"
+digits = ''.join(ch for ch in raw if ch.isdigit())
+price = int(digits) if digits else 0
+print(price)</code></pre>
+        </div>
+        <p>Без такой очистки фильтры по цене часто работают неверно.</p>
+
+        <h3>Мини-пример: простой фильтр</h3>
+        <div class="code">
+          <div class="code-title">Фильтрация списка словарей</div>
+          <pre><code>rows = [{"title": "A", "price": 100}, {"title": "B", "price": 500}]
+cheap = [r for r in rows if r["price"] <= 200]
+print(cheap)</code></pre>
+        </div>
+        <p>Смысл: сначала учимся на маленьком списке, потом применяем к реальным данным сайта.</p>
+      </section>
+
+      <section class="section track-block" data-track="parsing" id="parser200">
+        <h2>🕷️ Парсинг 200 объектов + фильтр по цене</h2>
+        <h3>Новая цель дня в парсере</h3>
+        <ul>
+          <li>Увеличить выборку до 200 объектов</li>
+          <li>Добавить простую фильтрацию по цене</li>
+          <li>Сохранить результат в CSV</li>
+        </ul>
+        <h3>Пошаговая схема обработки данных</h3>
+        <ol>
+          <li>Собираем сырые строки с сайта (цены ещё «грязные»).</li>
+          <li>Очищаем цену до числа.</li>
+          <li>Применяем фильтр min/max.</li>
+          <li>Сохраняем итог в CSV и проверяем глазами.</li>
+        </ol>
+
+        <div class="code">
+          <div class="code-title">Функция фильтра</div>
+          <pre><code>def parse_price(raw: str) -> int:
+    digits = ''.join(ch for ch in raw if ch.isdigit())
+    return int(digits) if digits else 0
+
+
+def filter_by_price(rows: list[dict], min_price: int = 0, max_price: int = 10**9) -> list[dict]:
+    result = []
+    for row in rows:
+        price = parse_price(row.get("price", "0"))
+        if min_price <= price <= max_price:
+            result.append(row)
+    return result</code></pre>
+        </div>
+
+        <div class="note">Даже такой простой фильтр уже делает скрипт «бизнесовым»: клиенту редко нужны «все подряд данные».</div>
+      </section>
+
+      <div class="easter-egg">
+        <div class="easter-egg-content">
+          <div class="easter-egg-title">💰 Парсер + фильтрация = Первый доход</div>
+          <div class="easter-egg-text">Знаешь, почему парсеры платят хорошо?
+
+1️⃣ Парсер БЕЗ фильтра → 500 сырых строк
+2️⃣ Клиенту нужны ещё их фильтровать
+3️⃣ Клиент расстроен, хочет уже готовое
+
+У тебя есть ответ:
+
+1️⃣ Парсер С фильтром + цены
+2️⃣ CSV уже под задачу клиента
+3️⃣ Клиент вообще не напрягается
+
+Разница = твой первый доход 🤑</div>
+        </div>
+      </div>
+
+      <div class="easter-egg">
+        <div class="easter-egg-content">
+          <div class="easter-egg-title">💰 Парсер + фильтрация = Первый доход</div>
+          <div class="easter-egg-text">Знаешь, почему парсеры платят хорошо?
+
+1️⃣ Парсер БЕЗ фильтра → 500 сырых строк
+2️⃣ Клиенту нужны ещё их фильтровать
+3️⃣ Клиент расстроен, хочет уже готовое
+
+У тебя есть ответ:
+
+1️⃣ Парсер С фильтром + цены
+2️⃣ CSV уже под задачу клиента
+3️⃣ Клиент вообще не напрягается
+
+Разница = твой первый доход 🤑</div>
+        </div>
+      </div>
+
+      <section class="section track-block" data-track="parsing" id="csv">
+        <h2>📄 Экспорт CSV так, чтобы клиенту было удобно</h2>
+        <h3>Рекомендуемые поля</h3>
+        <ul>
+          <li><code>title</code></li>
+          <li><code>price</code></li>
+          <li><code>url</code></li>
+          <li><code>parsed_at</code> (дата сбора)</li>
+        </ul>
+        <p>Эти поля закрывают базовый вопрос заказчика: <strong>что нашли, сколько стоит, где это лежит и когда собрано</strong>.</p>
+
+        <div class="code">
+          <div class="code-title">Сохранение с меткой времени</div>
+          <pre><code>from datetime import datetime
+
+for row in rows:
+    row["parsed_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+with open("result.csv", "w", newline="", encoding="utf-8") as f:
+    writer = csv.DictWriter(f, fieldnames=["title", "price", "url", "parsed_at"])
+    writer.writeheader()
+    writer.writerows(rows)</code></pre>
+        </div>
+
+        <p>Такая таблица сразу пригодна для отчёта клиенту и последующей аналитики.</p>
+      </section>
+
+      <section class="section track-block" data-track="parsing" id="micro-csv">
+        <h2>🧪 Мини-примеры CSV перед боевым экспортом</h2>
+        <h3>Мини-пример 1: одна строка</h3>
+        <div class="code">
+          <div class="code-title">Минимальная запись CSV</div>
+          <pre><code>import csv
+
+rows = [{"title": "Ноутбук A", "price": "12990"}]
+with open("mini.csv", "w", newline="", encoding="utf-8") as f:
+    writer = csv.DictWriter(f, fieldnames=["title", "price"])
+    writer.writeheader()
+    writer.writerows(rows)</code></pre>
+        </div>
+        <p>Это «скелет» любого CSV-экспорта: заголовок + список словарей.</p>
+
+        <h3>Мини-пример 2: защита от пустого списка</h3>
+        <div class="code">
+          <div class="code-title">Проверка перед сохранением</div>
+          <pre><code>if not rows:
+    print("Нет данных для сохранения")
+else:
+    print(f"Записываем {len(rows)} строк")</code></pre>
+        </div>
+        <p>Такой маленький guard спасает от «тихих» ошибок, когда файл создаётся, но в нём нет полезных данных.</p>
+      </section>
+
+      <section class="section" id="demo">
+        <h2>🎥 Видео-демо 30–60 секунд (ключ к продажам)</h2>
+        <h3>Сценарий демо для бота</h3>
+        <ol>
+          <li>Открываешь Telegram и вводишь /start.</li>
+          <li>Показываешь кнопки и 2-3 нажатия.</li>
+          <li>Показываешь, что бот отвечает корректно.</li>
+        </ol>
+
+        <h3>Сценарий демо для парсера</h3>
+        <ol>
+          <li>Запускаешь скрипт.</li>
+          <li>Показываешь лог «Сохранено N строк».</li>
+          <li>Открываешь CSV и листаешь первые строки.</li>
+        </ol>
+
+        <h3>Готовый шаблон речи для демо (можешь читать почти дословно)</h3>
+        <ul>
+          <li>«Это Telegram-бот для приёма заявок: вот старт, вот меню, вот обработка кнопок».</li>
+          <li>«Это парсер: запускаю, получаю N записей, выгружаю в CSV с нужными полями».</li>
+          <li>«Проект можно расширять: добавить БД, уведомления, интеграции».</li>
+        </ul>
+
+        <div class="note">Клиенты покупают глазами: маленькое живое демо часто эффективнее длинного текста.</div>
+      </section>
+
+      <div class="easter-egg">
+        <div class="easter-egg-content">
+          <div class="easter-egg-title">🚀 День 2 = День, когда ты становишься полезным</div>
+          <div class="easter-egg-quote">День 1 — можешь писать код. День 2 — код делает то, что нужно клиенту. Разница огромная! На День 2 ты перестаешь быть кодером, ты становишься разработчиком решений. 💪</div>
+        </div>
+      </div>
+
+      <section class="section" id="qa\">
+        <h2>🧯 Частые ошибки Дня 2</h2>
+        <ul>
+          <li><strong>Inline кнопки не работают:</strong> забыт callback handler или не подключён router.</li>
+          <li><strong>Кнопки не отображаются:</strong> keyboard не передаётся в `reply_markup`.</li>
+          <li><strong>Фильтр цены ломается:</strong> в цене есть символы валюты, пробелы, неочевидный формат.</li>
+          <li><strong>CSV пустой:</strong> фильтр слишком строгий, либо не те CSS-селекторы.</li>
+        </ul>
+        <h3>Быстрый чек-лист диагностики (1 минута)</h3>
+        <ol>
+          <li>Есть ли импорт нужного keyboard/router модуля?</li>
+          <li>Подключён ли router в <code>main.py</code>?</li>
+          <li>Что печатается в консоль до места ошибки?</li>
+          <li>Сколько строк до и после фильтра?</li>
+          <li>Открывается ли итоговый CSV в обычном редакторе таблиц?</li>
+        </ol>
+      </section>
+
+      <section class="section" id="lab">
+        <h2>🏋️ Лабораторная работа Дня 2</h2>
+        <h3>Часть A (бот)</h3>
+        <ol>
+          <li>Добавь inline-кнопку «📩 Отправить контакт».</li>
+          <li>Сделай callback на неё (пока просто текстовый ответ).</li>
+          <li>Добавь кнопку «⬅️ Назад в меню» и обработай её.</li>
+        </ol>
+
+        <h3>Часть B (парсер)</h3>
+        <ol>
+          <li>Добавь фильтры: min_price и max_price.</li>
+          <li>Добавь сортировку по цене (по возрастанию).</li>
+          <li>Сформируй CSV минимум на 200 строк или максимально доступный объём.</li>
+        </ol>
+
+        <h3>Критерии успешного выполнения</h3>
+        <div class="check">
+          <label><input type="checkbox" data-check /> Бот показывает reply и inline клавиатуры</label>
+          <label><input type="checkbox" data-check /> Все callback-кнопки обрабатываются без ошибок</label>
+          <label><input type="checkbox" data-check /> Парсер собирает и фильтрует данные по цене</label>
+          <label><input type="checkbox" data-check /> CSV выглядит аккуратно и читаемо</label>
+          <label><input type="checkbox" data-check /> Записано короткое демо</label>
+        </div>
+        <div style="margin-top: 12px;">
+          <a href="day-02-practice-lab.html" class="btn" style="border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Открыть отдельный практикум</a>
+        </div>
+        <div class="note">Порядок выполнения: сначала сделай Часть A полностью, потом Часть B. Так ты не смешиваешь два типа ошибок в одну кучу.</div>
+      </section>
+
+      <section class="section" id="exam">
+        <h2>📝 Самопроверка</h2>
+        <ol>
+          <li>Когда использовать Reply-клавиатуру, а когда Inline?</li>
+          <li>Почему callback_data лучше делать в едином формате?</li>
+          <li>Зачем очищать цену от лишних символов перед фильтрацией?</li>
+          <li>Какие 3 вещи должен увидеть клиент в твоём демо?</li>
+          <li>Как понять, что День 2 реально закрыт, а не «почти»?</li>
+        </ol>
+        <div class="note">Если можешь ответить уверенно и показать рабочий результат — ты растёшь как практик, а не просто как читатель.</div>
+      </section>
+
+      <div class="top-actions">
+        <a class="btn" href="day-01-foundation.html">← День 1</a>
+        <a class="btn" href="day-02-practice-lab.html">🧪 Практикум Модуля 2</a>
+        <a class="btn" href="day-03-fsm-filters.html">День 3 →</a>
+        <a class="btn" href="index.html">К модулям</a>
+      </div>
+    </main>
+  </div>
+
+  <script src="course-tools.js"></script>
+  <script>
+    const KEY = 'course_day2_checks';
+    function restoreChecks() {
+      const saved = JSON.parse(localStorage.getItem(KEY) || '[]');
+      document.querySelectorAll('input[data-check]').forEach((el, idx) => {
+        el.checked = Boolean(saved[idx]);
+        el.addEventListener('change', persistChecks);
+      });
+    }
+    function persistChecks() {
+      const values = Array.from(document.querySelectorAll('input[data-check]')).map(el => el.checked);
+      localStorage.setItem(KEY, JSON.stringify(values));
+    }
+    restoreChecks();
+    CourseTools.initModulePage(2);
+  </script>
+</body>
+</html>

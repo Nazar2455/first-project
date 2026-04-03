@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Модуль 4 · День 4 — SQLite и Google Sheets</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+    body { font-family: 'Montserrat', sans-serif; background: linear-gradient(135deg, #0f0f1e, #1a0a2e, #16213e); color: #eaf2ff; min-height: 100vh; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .side { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; background: rgba(10,16,30,.95); border-right: 2px solid rgba(255,215,0,.25); padding: 18px 14px; }
+    .side h2 { color: #ffed4e; font-size: 1.02em; margin-bottom: 10px; }
+    .side a { display: block; text-decoration: none; color: #d9e8ff; font-size: .86em; padding: 8px 9px; border-radius: 8px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); margin-bottom: 7px; }
+    .side a:hover { color: #ffed4e; border-color: rgba(255,215,0,.55); }
+    .content { padding: 24px; max-width: 1120px; }
+    .hero, .section { border-radius: 14px; padding: 16px; border: 1px solid rgba(255,255,255,.12); background: rgba(19, 28, 46, .84); margin-bottom: 14px; }
+    .hero { border: 2px solid rgba(255,215,0,.3); background: linear-gradient(135deg, rgba(255,215,0,.15), rgba(102,126,234,.15)); }
+    .hero h1, .section h2 { color: #ffed4e; margin-bottom: 8px; }
+    .section h3 { color: #96b7ff; margin: 10px 0 7px; font-size: 1.02em; }
+    .section p, .section li { color: #d6e4ff; line-height: 1.6; font-size: .95em; }
+    .section ul, .section ol { margin-left: 20px; margin-top: 8px; }
+    .track { border: 1px solid rgba(86,232,255,.35); border-radius: 10px; padding: 10px; margin-top: 10px; background: rgba(86,232,255,.06); }
+    .track h3 { color: #56e8ff; margin: 0 0 6px; }
+    .code { margin-top: 9px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(102,126,234,.35); background: #0b1220; }
+    .code-title { background: rgba(102,126,234,.12); color: #9ec0ff; font-size: .78em; font-weight: 700; padding: 8px 10px; border-bottom: 1px solid rgba(102,126,234,.25); }
+    pre { margin: 0; padding: 12px; overflow-x: auto; font-size: .84em; line-height: 1.45; }
+    code { font-family: Consolas, 'Courier New', monospace; color: #e7f1ff; }
+    .note { border-left: 3px solid #ffd700; background: rgba(255,215,0,.08); border-radius: 8px; padding: 10px 12px; margin-top: 8px; font-size: .9em; }
+    .check { display: grid; gap: 7px; margin-top: 9px; }
+    .check input { accent-color: #ffd700; }
+    .top-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+    .btn { text-decoration: none; border: 1px solid rgba(255,215,0,.45); border-radius: 10px; background: rgba(255,215,0,.12); color: #ffed4e; font-weight: 700; padding: 9px 12px; display: inline-block; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .side { position: static; height: auto; border-right: none; border-bottom: 2px solid rgba(255,215,0,.25); } .content { padding: 14px; } }
+  </style>
+  <style>
+    .easter-egg { background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 215, 0, 0.15)); border: 2px solid rgba(255, 107, 107, 0.4); border-radius: 12px; padding: 20px; margin: 25px 0; font-family: 'Courier New', monospace; font-size: 0.9em; line-height: 1.4; position: relative; overflow: hidden; animation: easter-glow 3s ease-in-out infinite; }
+    .easter-egg::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.2), transparent); animation: easter-shine 3s infinite; pointer-events: none; }
+    .easter-egg-content { position: relative; z-index: 1; }
+    .easter-egg-title { color: #ff6b6b; font-weight: 800; margin-bottom: 10px; font-size: 1.1em; }
+    .easter-egg-text { color: #ddd; white-space: pre-wrap; word-wrap: break-word; }
+    .easter-egg-quote { color: #ffd700; font-style: italic; font-weight: 600; margin: 8px 0; }
+    @keyframes easter-glow { 0%, 100% { box-shadow: 0 0 10px rgba(255, 107, 107, 0.3); } 50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); } }
+    @keyframes easter-shine { 0% { left: -100%; } 50% { left: 100%; } 100% { left: 100%; } }
+  </style>
+  <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="side">
+      <h2>День 4 · Оглавление</h2>
+      <a href="#goal">🎯 Цели дня</a>
+      <a href="#day-flow">🗺️ Как пройти День 4</a>
+      <a href="#bots-intro">🤖 Боты: SQLite зачем и как</a>
+      <a href="#bots-micro">🧪 Боты: мини-примеры SQL</a>
+      <a href="#bots-full">🤖 Боты: database.py + repository.py</a>
+      <a href="#bots-debug">🧯 Боты: частые ошибки БД</a>
+      <a href="#parsing-intro">🕷️ Парсинг: Google Sheets зачем</a>
+      <a href="#parsing-micro">🧪 Парсинг: мини-примеры Sheets API</a>
+      <a href="#parsing-full">🕷️ Парсинг: append_to_sheet()</a>
+      <a href="#parsing-debug">🧯 Парсинг: частые ошибки Sheets</a>
+      <a href="#practice">🏋️ Практика</a>
+      <a href="day-04-practice-lab.html">🧪 Отдельный практикум Модуля 4</a>
+      <a href="#exam">📝 Самопроверка</a>
+      <a href="index.html">← К модулям</a>
+      <a href="../30d-main-tasks.html">← К плану</a>
+    </aside>
+
+    <main class="content">
+      <div class="top-actions">
+        <a class="btn" href="day-03-fsm-filters.html">← День 3</a>
+        <a class="btn" href="day-04-practice-lab.html">🧪 Практикум Модуля 4</a>
+        <a class="btn" href="day-05-index.html">День 5 →</a>
+        <a class="btn" href="index.html">К модулям</a>
+      </div>
+
+      <div class="course-top-tools">
+        <button id="readToggleBtn" class="read-toggle-btn" type="button">📘 Отметить день как прочитанный</button>
+        <div class="track-switch">
+          <button class="track-btn active" data-track="all" type="button">Все блоки</button>
+          <button class="track-btn" data-track="bots" type="button">🤖 Только БОТЫ</button>
+          <button class="track-btn" data-track="parsing" type="button">🕷️ Только ПАРСИНГ</button>
+        </div>
+      </div>
+
+      <section class="hero" id="goal">
+        <h1>Модуль 4 · День 4: хранение данных и облачная выгрузка</h1>
+        <p>Сегодня ты переводишь проекты из «демо» в «полезный сервис»: бот сохраняет заявки в БД, парсер отдаёт результат в Google Sheets.</p>
+      </section>
+
+      <section class="section" id="day-flow">
+        <h2>🗺️ Как пройти День 4 (без перегруза)</h2>
+        <ol>
+          <li><strong>Сначала маленькие куски</strong> — SQL и Sheets по 3-8 строк.</li>
+          <li><strong>Потом полный модуль</strong> — видишь, как части работают вместе.</li>
+          <li><strong>Потом интеграция</strong> — подключаешь к своему боту и парсеру.</li>
+          <li><strong>Потом проверка</strong> — заявка реально в БД, строки реально в таблице.</li>
+        </ol>
+        <div class="note">Критерий «день закрыт»: не «я прочитал», а «я сохранил данные и могу их показать».</div>
+      </section>
+
+      <section class="section track-block" data-track="bots" id="bots-intro">
+        <h2>🤖 БОТЫ: зачем SQLite в боте</h2>
+        <p>Если не сохранять заявки — они исчезают после перезапуска. SQLite решает это без сложной настройки сервера.</p>
+        <p>Проще говоря: SQLite — это твоя «память» проекта. Без неё бот отвечает, но ничего не накапливает.</p>
+        <div class="track">
+          <h3>Результат дня по ботам</h3>
+          <ul>
+            <li>Таблица <code>leads</code> создаётся автоматически.</li>
+            <li>Форма из Дня 3 пишет данные в БД.</li>
+            <li>Можно получить последние заявки для админки.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section track-block" data-track="bots" id="bots-micro">
+        <h2>🧪 БОТЫ: мини-примеры SQL/SQLite</h2>
+        <div class="code">
+          <div class="code-title">Пример 1: CREATE TABLE</div>
+          <pre><code>CREATE TABLE IF NOT EXISTS leads (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    name TEXT,
+    phone TEXT,
+    comment TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);</code></pre>
+        </div>
+
+        <div class="code">
+          <div class="code-title">Пример 2: INSERT</div>
+          <pre><code>INSERT INTO leads (user_id, name, phone, comment)
+VALUES (?, ?, ?, ?);</code></pre>
+        </div>
+        <p>Важно: <code>?</code> — защита от SQL-инъекций и корректная подстановка значений.</p>
+
+        <h3>Мини-пример 3: получить последние записи</h3>
+        <div class="code">
+          <div class="code-title">SELECT + ORDER + LIMIT</div>
+          <pre><code>SELECT id, name, phone
+FROM leads
+ORDER BY id DESC
+LIMIT 5;</code></pre>
+        </div>
+        <p>Так обычно строят быстрый «админский просмотр» свежих заявок.</p>
+
+        <h3>Мини-пример 4: commit после записи</h3>
+        <div class="code">
+          <div class="code-title">Почему без commit данные не видны</div>
+          <pre><code>await db.execute(query, params)
+await db.commit()  # фиксируем изменения в файле БД</code></pre>
+        </div>
+        <p>Без <code>commit()</code> запись может не сохраниться физически, особенно заметно после перезапуска.</p>
+      </section>
+
+      <section class="section track-block" data-track="bots" id="bots-full">
+        <h2>🤖 БОТЫ: полный рабочий пример с комментариями</h2>
+
+        <div class="code">
+          <div class="code-title">db/database.py</div>
+          <pre><code>import aiosqlite
+
+DB_PATH = "bot.db"
+
+CREATE_LEADS_TABLE = """
+CREATE TABLE IF NOT EXISTS leads (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    name TEXT,
+    phone TEXT,
+    comment TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+"""
+
+async def init_db() -> None:
+    # Создаём файл БД и таблицу при старте приложения
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(CREATE_LEADS_TABLE)
+        await db.commit()</code></pre>
+        </div>
+
+        <div class="code">
+          <div class="code-title">db/repository.py</div>
+          <pre><code>import aiosqlite
+from db.database import DB_PATH
+
+async def save_lead(user_id: int, name: str, phone: str, comment: str) -> None:
+    query = """
+    INSERT INTO leads (user_id, name, phone, comment)
+    VALUES (?, ?, ?, ?)
+    """
+    async with aiosqlite.connect(DB_PATH) as db:
+        # Пишем новую заявку
+        await db.execute(query, (user_id, name, phone, comment))
+        await db.commit()
+
+async def get_last_leads(limit: int = 10) -> list[tuple]:
+    query = """
+    SELECT id, name, phone, comment, created_at
+    FROM leads
+    ORDER BY id DESC
+    LIMIT ?
+    """
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute(query, (limit,))
+        rows = await cursor.fetchall()
+        return rows</code></pre>
+        </div>
+
+        <div class="code">
+          <div class="code-title">Фрагмент из FSM завершения (интеграция)</div>
+          <pre><code>from db.repository import save_lead
+
+# ... внутри финального шага FSM
+await save_lead(
+    user_id=message.from_user.id,
+    name=data["name"],
+    phone=data["phone"],
+    comment=data["comment"]
+)
+# После этого заявка сохранена в SQLite</code></pre>
+        </div>
+
+        <h3>Пошаговая карта потока данных в боте</h3>
+        <ol>
+          <li>Пользователь завершает FSM-форму.</li>
+          <li>Ты берёшь данные из <code>state.get_data()</code>.</li>
+          <li>Вызываешь <code>save_lead(...)</code> и фиксируешь <code>commit</code>.</li>
+          <li>Пользователь получает подтверждение, админ может увидеть заявку позже.</li>
+        </ol>
+        <div class="note">Это уже полноценный сценарий «сбор и хранение лидов», который можно показывать в портфолио как бизнес-функцию.</div>
+      </section>
+
+      <section class="section track-block" data-track="bots" id="bots-debug">
+        <h2>🧯 БОТЫ: частые ошибки при работе с SQLite</h2>
+        <ul>
+          <li><strong>Таблица не найдена:</strong> <code>init_db()</code> не вызван при старте приложения.</li>
+          <li><strong>Записи не появляются:</strong> забыт <code>await db.commit()</code>.</li>
+          <li><strong>Пустые поля:</strong> на одном из шагов FSM не сохранены данные в state.</li>
+          <li><strong>Ошибки импорта:</strong> модуль <code>aiosqlite</code> не установлен в активном окружении.</li>
+        </ul>
+      </section>
+
+      <section class="section track-block" data-track="parsing" id="parsing-intro">
+        <h2>🕷️ ПАРСИНГ: зачем Google Sheets</h2>
+        <p>Google Sheets — это «панель для клиента»: он видит результат без запуска кода, можно делиться ссылкой и хранить историю.</p>
+        <p>То есть ты превращаешь локальный CSV в «живой отчёт», который открывается по ссылке с телефона или ноутбука.</p>
+        <div class="track">
+          <h3>Результат дня по парсингу</h3>
+          <ul>
+            <li>Подключён сервисный аккаунт Google.</li>
+            <li>Парсер дописывает строки в таблицу.</li>
+            <li>Отчёт доступен в облаке.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section track-block" data-track="parsing" id="parsing-micro">
+        <h2>🧪 ПАРСИНГ: мини-примеры Sheets API</h2>
+        <div class="code">
+          <div class="code-title">Пример 1: авторизация</div>
+          <pre><code>import gspread
+from google.oauth2.service_account import Credentials
+
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+creds = Credentials.from_service_account_file("service-account.json", scopes=SCOPES)
+client = gspread.authorize(creds)</code></pre>
+        </div>
+
+        <div class="code">
+          <div class="code-title">Пример 2: добавить одну строку</div>
+          <pre><code>sheet = client.open("Parser Results").sheet1
+sheet.append_row(["Название", "Цена", "Ссылка"])  # Одна строка</code></pre>
+        </div>
+        <p>Важно: сначала поделись таблицей с email сервисного аккаунта (из JSON-ключа), иначе будет ошибка доступа.</p>
+
+        <h3>Мини-пример 3: пакетная запись (быстрее)</h3>
+        <div class="code">
+          <div class="code-title">append_rows вместо append_row в цикле</div>
+          <pre><code>prepared = [
+    ["Товар A", "12990", "https://example.com/a"],
+    ["Товар B", "15990", "https://example.com/b"],
+]
+sheet.append_rows(prepared, value_input_option="USER_ENTERED")</code></pre>
+        </div>
+        <p>Когда строк много, пачечная запись заметно быстрее и стабильнее.</p>
+      </section>
+
+      <section class="section track-block" data-track="parsing" id="parsing-full">
+        <h2>🕷️ ПАРСИНГ: полный append_to_sheet()</h2>
+        <div class="code">
+          <div class="code-title">services/sheets_export.py — рабочий модуль с комментариями</div>
+          <pre><code>import gspread
+from google.oauth2.service_account import Credentials
+
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+
+
+def get_sheet(creds_path: str, spreadsheet_name: str):
+    # Загружаем права сервисного аккаунта
+    creds = Credentials.from_service_account_file(creds_path, scopes=SCOPES)
+    client = gspread.authorize(creds)
+
+    # Открываем таблицу и берём первый лист
+    sheet = client.open(spreadsheet_name).sheet1
+    return sheet
+
+
+def append_to_sheet(sheet, rows: list[dict]) -> None:
+    if not rows:
+        return
+
+    # Преобразуем список словарей в список списков
+    prepared = []
+    for row in rows:
+        prepared.append([
+            row.get("title", ""),
+            row.get("price", ""),
+            row.get("url", "")
+        ])
+
+    # Записываем пачкой (быстрее, чем по одной)
+    sheet.append_rows(prepared, value_input_option="USER_ENTERED")</code></pre>
+        </div>
+
+        <h3>Пошагово, что делает модуль</h3>
+        <ol>
+          <li><strong>get_sheet</strong> — авторизуется сервисным аккаунтом.</li>
+          <li>Открывает нужную таблицу и берёт лист.</li>
+          <li><strong>append_to_sheet</strong> — готовит данные в формат «список списков».</li>
+          <li>Пишет всё пачкой для скорости и удобства.</li>
+        </ol>
+        <div class="note">Это уже уровень «клиентский отчёт в облаке», а не просто файл на твоём компьютере.</div>
+      </section>
+
+      <section class="section track-block" data-track="parsing" id="parsing-debug">
+        <h2>🧯 ПАРСИНГ: частые ошибки Google Sheets</h2>
+        <ul>
+          <li><strong>403 / Permission denied:</strong> таблица не расшарена на email сервисного аккаунта.</li>
+          <li><strong>Spreadsheet not found:</strong> неверное имя таблицы в <code>client.open(...)</code>.</li>
+          <li><strong>Пустая выгрузка:</strong> в <code>rows</code> передаётся пустой список.</li>
+          <li><strong>Ломается формат:</strong> в словарях нет одинаковых ключей <code>title/price/url</code>.</li>
+        </ul>
+      </section>
+
+      <div class="easter-egg">
+        <div class="easter-egg-content">
+          <div class="easter-egg-title">💾 День 4 = Данные остаются с тобой навечно</div>
+          <div class="easter-egg-quote">День 1-3 ты писал код, который работает. День 4? День 4 ты пишешь код, который помнит всё. Каждая заявка остаётся в БД. Каждая парсированная запись отправляется в таблицу. Бот без памяти — это чат. Бот с БД — это бизнес-инструмент! 🚀</div>
+        </div>
+      </div>
+
+      <section class="section\" id=\"practice\">
+        <h2>🏋️ Практика дня</h2>
+        <h3>БОТЫ</h3>
+        <ol>
+          <li>Инициализируй таблицу при запуске бота.</li>
+          <li>После завершения FSM сохраняй заявку в БД.</li>
+          <li>Сделай команду для админа, которая выводит последние 5 заявок.</li>
+        </ol>
+
+        <h3>ПАРСИНГ</h3>
+        <ol>
+          <li>Создай Google Sheet для результатов.</li>
+          <li>Подключи сервисный аккаунт и проверь доступ.</li>
+          <li>Выгрузи минимум 20 строк парсинга в таблицу.</li>
+        </ol>
+
+        <h3>Порядок выполнения (рекомендую)</h3>
+        <ol>
+          <li>Сначала доведи SQLite-часть до стабильной работы.</li>
+          <li>Потом подключи Sheets и выгрузку.</li>
+          <li>В конце запиши 30-60 секунд демо: заявка в боте → запись в БД → строки в таблице.</li>
+        </ol>
+
+        <div class="check">
+          <label><input type="checkbox" data-check /> SQLite таблица создаётся и не падает</label>
+          <label><input type="checkbox" data-check /> Заявки из бота реально сохраняются</label>
+          <label><input type="checkbox" data-check /> Таблица Google Sheets пополняется данными</label>
+          <label><input type="checkbox" data-check /> Есть мини-демо «бот + облачная таблица»</label>
+        </div>
+        <div style="margin-top: 12px;">
+          <a href="day-04-practice-lab.html" class="btn" style="border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Открыть отдельный практикум</a>
+        </div>
+      </section>
+
+      <section class="section" id="exam">
+        <h2>📝 Самопроверка</h2>
+        <ol>
+          <li>Зачем в SQL-запросах использовать <code>?</code>, а не f-string?</li>
+          <li>Почему для клиента удобна выгрузка в Google Sheets?</li>
+          <li>Что нужно сделать, если сервисный аккаунт не видит таблицу?</li>
+          <li>Что должно происходить в боте после успешного сохранения заявки?</li>
+        </ol>
+      </section>
+
+      <div class="top-actions">
+        <a class="btn" href="day-03-fsm-filters.html">← День 3</a>
+        <a class="btn" href="day-04-practice-lab.html">🧪 Практикум Модуля 4</a>
+        <a class="btn" href="day-05-index.html">День 5 →</a>
+        <a class="btn" href="index.html">К модулям</a>
+      </div>
+    </main>
+  </div>
+
+  <script src="course-tools.js"></script>
+  <script>
+    const KEY = 'course_day4_checks';
+    function restoreChecks() {
+      const saved = JSON.parse(localStorage.getItem(KEY) || '[]');
+      document.querySelectorAll('input[data-check]').forEach((el, idx) => {
+        el.checked = Boolean(saved[idx]);
+        el.addEventListener('change', persistChecks);
+      });
+    }
+    function persistChecks() {
+      const values = Array.from(document.querySelectorAll('input[data-check]')).map(el => el.checked);
+      localStorage.setItem(KEY, JSON.stringify(values));
+    }
+    restoreChecks();
+    CourseTools.initModulePage(4);
+  </script>
+</body>
+</html>

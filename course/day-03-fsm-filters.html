@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Модуль 3 · День 3 — FSM и фильтры</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+    body { font-family: 'Montserrat', sans-serif; background: linear-gradient(135deg, #0f0f1e, #1a0a2e, #16213e); color: #eaf2ff; min-height: 100vh; }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .side { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; background: rgba(10,16,30,.95); border-right: 2px solid rgba(255,215,0,.25); padding: 18px 14px; }
+    .side h2 { color: #ffed4e; font-size: 1.02em; margin-bottom: 10px; }
+    .side a { display: block; text-decoration: none; color: #d9e8ff; font-size: .86em; padding: 8px 9px; border-radius: 8px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); margin-bottom: 7px; }
+    .side a:hover { color: #ffed4e; border-color: rgba(255,215,0,.55); }
+    .content { padding: 24px; max-width: 1120px; }
+    .hero, .section { border-radius: 14px; padding: 16px; border: 1px solid rgba(255,255,255,.12); background: rgba(19, 28, 46, .84); margin-bottom: 14px; }
+    .hero { border: 2px solid rgba(255,215,0,.3); background: linear-gradient(135deg, rgba(255,215,0,.15), rgba(102,126,234,.15)); }
+    .hero h1, .section h2 { color: #ffed4e; margin-bottom: 8px; }
+    .section h3 { color: #96b7ff; margin: 10px 0 7px; font-size: 1.02em; }
+    .section p, .section li { color: #d6e4ff; line-height: 1.6; font-size: .95em; }
+    .section ul, .section ol { margin-left: 20px; margin-top: 8px; }
+    .track { border: 1px solid rgba(86,232,255,.35); border-radius: 10px; padding: 10px; margin-top: 10px; background: rgba(86,232,255,.06); }
+    .track h3 { color: #56e8ff; margin: 0 0 6px; }
+    .code { margin-top: 9px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(102,126,234,.35); background: #0b1220; }
+    .code-title { background: rgba(102,126,234,.12); color: #9ec0ff; font-size: .78em; font-weight: 700; padding: 8px 10px; border-bottom: 1px solid rgba(102,126,234,.25); }
+    pre { margin: 0; padding: 12px; overflow-x: auto; font-size: .84em; line-height: 1.45; }
+    code { font-family: Consolas, 'Courier New', monospace; color: #e7f1ff; }
+    .note { border-left: 3px solid #ffd700; background: rgba(255,215,0,.08); border-radius: 8px; padding: 10px 12px; margin-top: 8px; font-size: .9em; }
+    .check { display: grid; gap: 7px; margin-top: 9px; }
+    .check input { accent-color: #ffd700; }
+    .top-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+    .btn { text-decoration: none; border: 1px solid rgba(255,215,0,.45); border-radius: 10px; background: rgba(255,215,0,.12); color: #ffed4e; font-weight: 700; padding: 9px 12px; display: inline-block; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .side { position: static; height: auto; border-right: none; border-bottom: 2px solid rgba(255,215,0,.25); } .content { padding: 14px; } }
+  </style>
+  <style>
+    /* ===== ПАСХАЛКИ ===== */
+    .easter-egg {
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 215, 0, 0.15));
+      border: 2px solid rgba(255, 107, 107, 0.4);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 25px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+      line-height: 1.4;
+      position: relative;
+      overflow: hidden;
+      animation: easter-glow 3s ease-in-out infinite;
+    }
+    .easter-egg::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.2), transparent);
+      animation: easter-shine 3s infinite;
+      pointer-events: none;
+    }
+    .easter-egg-content {
+      position: relative;
+      z-index: 1;
+    }
+    .easter-egg-title {
+      color: #ff6b6b;
+      font-weight: 800;
+      margin-bottom: 10px;
+      font-size: 1.1em;
+    }
+    .easter-egg-text {
+      color: #ddd;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .easter-egg-quote {
+      color: #ffd700;
+      font-style: italic;
+      font-weight: 600;
+      margin: 8px 0;
+    }
+    @keyframes easter-glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(255, 107, 107, 0.3); }
+      50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+    }
+    @keyframes easter-shine {
+      0% { left: -100%; }
+      50% { left: 100%; }
+      100% { left: 100%; }
+    }
+  </style>
+  <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="side">
+      <h2>День 3 · Оглавление</h2>
+      <a href="#goal">🎯 Цели дня</a>
+      <a href="#day-flow">🗺️ Как проходить День 3</a>
+      <a href="#bots-intro">🤖 Боты: что такое FSM</a>
+      <a href="#bots-micro">🧪 Боты: мини-примеры FSM</a>
+      <a href="#bots-full">🤖 Боты: полный сценарий имя→телефон→коммент</a>
+      <a href="#bots-debug">🧯 Боты: частые ошибки FSM</a>
+      <a href="#parsing-intro">🕷️ Парсинг: фильтры и TOP-10</a>
+      <a href="#parsing-micro">🧪 Парсинг: мини-примеры фильтрации</a>
+      <a href="#parsing-full">🕷️ Парсинг: полный модуль фильтров</a>
+      <a href="#parsing-debug">🧯 Парсинг: частые ошибки аналитики</a>
+      <a href="#practice">🏋️ Практика</a>
+      <a href="day-03-practice-lab.html">🧪 Отдельный практикум Модуля 3</a>
+      <a href="#exam">📝 Самопроверка</a>
+      <a href="index.html">← К модулям</a>
+      <a href="../30d-main-tasks.html">← К плану</a>
+    </aside>
+
+    <main class="content">
+      <div class="top-actions">
+        <a class="btn" href="day-02-interface-data.html">← День 2</a>
+        <a class="btn" href="day-03-practice-lab.html">🧪 Практикум Модуля 3</a>
+        <a class="btn" href="day-04-db-sheets.html">День 4 →</a>
+      </div>
+
+      <div class="course-top-tools">
+        <button id="readToggleBtn" class="read-toggle-btn" type="button">📘 Отметить день как прочитанный</button>
+        <div class="track-switch">
+          <button class="track-btn active" data-track="all" type="button">Все блоки</button>
+          <button class="track-btn" data-track="bots" type="button">🤖 Только БОТЫ</button>
+          <button class="track-btn" data-track="parsing" type="button">🕷️ Только ПАРСИНГ</button>
+        </div>
+      </div>
+
+      <section class="hero" id="goal">
+        <h1>Модуль 3 · День 3: FSM + фильтры/топы</h1>
+        <p>Сегодня ты учишься делать две ключевые вещи, которые реально продаются: <strong>диалоговые формы в боте</strong> и <strong>умная обработка данных в парсере</strong>.</p>
+        <p>Формат дня: сначала маленькие примеры с комментариями, потом большие рабочие блоки.</p>
+      </section>
+
+      <section class="section" id="day-flow">
+        <h2>🗺️ Как проходить День 3 (чтобы не утонуть в коде)</h2>
+        <ol>
+          <li><strong>Сначала мини-пример</strong> — понять механику на коротком фрагменте.</li>
+          <li><strong>Потом полный блок</strong> — увидеть, как всё соединяется в рабочий сценарий.</li>
+          <li><strong>Потом руками</strong> — воспроизвести в своём проекте и проверить.</li>
+          <li><strong>Потом объяснить</strong> — кратко сформулировать, что и зачем ты сделал.</li>
+        </ol>
+        <div class="note">FSM и аналитика кажутся сложными, пока не разбить их на шаги. Сегодня мы именно так и делаем.</div>
+      </section>
+
+      <section class="section track-block" data-track="bots" id="bots-intro">
+        <h2>🤖 БОТЫ: зачем нужен FSM</h2>
+        <p>FSM (Finite State Machine) — это «машина состояний». Она не даёт пользователю перескочить шаги формы и поддерживает порядок диалога.</p>
+        <h3>Очень простая аналогия</h3>
+        <p>Представь администратора, который вручную заполняет анкету: сначала спрашивает имя, потом телефон, потом комментарий. FSM делает такого администратора «автоматическим», и он никогда не путает этапы.</p>
+        <div class="track">
+          <h3>Что получаем в итоге</h3>
+          <ul>
+            <li>Пользователь идёт по шагам: имя → телефон → комментарий.</li>
+            <li>Можно отменить процесс командой <code>/cancel</code>.</li>
+            <li>Можно легко добавить валидацию на каждом шаге.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section track-block" data-track="bots" id="bots-micro">
+        <h2>🧪 БОТЫ: мини-примеры FSM (с комментариями)</h2>
+        <div class="code">
+          <div class="code-title">Пример 1: объявление состояний</div>
+          <pre><code>from aiogram.fsm.state import State, StatesGroup
+
+# Класс описывает шаги диалога
+class LeadForm(StatesGroup):
+    name = State()      # Шаг 1: ждём имя
+    phone = State()     # Шаг 2: ждём телефон
+    comment = State()   # Шаг 3: ждём комментарий</code></pre>
+        </div>
+
+        <div class="code">
+          <div class="code-title">Пример 2: перевод в следующее состояние</div>
+          <pre><code>@router.message(Command("lead"))
+async def start_form(message: Message, state: FSMContext):
+    # Переводим пользователя на первый шаг формы
+    await state.set_state(LeadForm.name)
+    await message.answer("Введите ваше имя")</code></pre>
+        </div>
+        <p>Смысл: бот «запоминает», на каком шаге сейчас пользователь, и не смешивает этапы.</p>
+
+        <h3>Мини-пример 3: сохранить промежуточные данные</h3>
+        <div class="code">
+          <div class="code-title">update_data + get_data</div>
+          <pre><code>await state.update_data(name="Назар")
+data = await state.get_data()
+print(data["name"])</code></pre>
+        </div>
+        <p>Это критично: каждый шаг формы сохраняет кусок данных, а в конце ты собираешь всё как единый объект заявки.</p>
+
+        <h3>Мини-пример 4: завершить сценарий</h3>
+        <div class="code">
+          <div class="code-title">Очистка состояния</div>
+          <pre><code>await state.clear()
+await message.answer("Форма завершена")</code></pre>
+        </div>
+        <p>Если не чистить состояние, пользователь может застрять в старом шаге и бот начнёт отвечать «странно».</p>
+      </section>
+
+      <div class="easter-egg">
+        <div class="easter-egg-content">
+          <div class="easter-egg-title">🔥 FSM = волшебство диалога</div>
+          <div class="easter-egg-quote">FSM — это не сложное слово. Это когда каждый шаг формы помнит, где ты находишься. Пользователь пишет название → бот запомнил → просит телефон → бот запомнил оба → проверяет. Без FSM бот был бы как блин комом, не запоминал бы контекст. С FSM → это приложение с памятью! 🧠</div>
+        </div>
+      </div>
+
+      <section class="section track-block" data-track="bots" id="bots-full\">
+        <h2>🤖 БОТЫ: полный сценарий формы</h2>
+        <div class="code">
+          <div class="code-title">handlers/lead_fsm.py — полный пример с комментариями</div>
+          <pre><code>from aiogram import Router
+from aiogram.filters import Command
+from aiogram.types import Message
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
+
+router = Router()
+
+class LeadForm(StatesGroup):
+    name = State()      # Шаг 1: имя
+    phone = State()     # Шаг 2: телефон
+    comment = State()   # Шаг 3: комментарий
+
+@router.message(Command("lead"))
+async def lead_start(message: Message, state: FSMContext):
+    # Старт формы — очищаем старые данные на всякий случай
+    await state.clear()
+    await state.set_state(LeadForm.name)
+    await message.answer("📝 Как вас зовут?")
+
+@router.message(Command("cancel"))
+async def lead_cancel(message: Message, state: FSMContext):
+    # Пользователь может отменить в любой момент
+    await state.clear()
+    await message.answer("❌ Форма отменена")
+
+@router.message(LeadForm.name)
+async def lead_name(message: Message, state: FSMContext):
+    # Сохраняем имя в state storage
+    await state.update_data(name=message.text.strip())
+    # Переходим на следующий шаг
+    await state.set_state(LeadForm.phone)
+    await message.answer("📞 Введите телефон")
+
+@router.message(LeadForm.phone)
+async def lead_phone(message: Message, state: FSMContext):
+    text = message.text.strip()
+
+    # Мини-валидация: проверяем, что есть хотя бы 7 цифр
+    digits = ''.join(ch for ch in text if ch.isdigit())
+    if len(digits) < 7:
+        await message.answer("⚠️ Телефон выглядит коротким. Введите корректный номер.")
+        return
+
+    await state.update_data(phone=text)
+    await state.set_state(LeadForm.comment)
+    await message.answer("💬 Добавьте комментарий к заявке")
+
+@router.message(LeadForm.comment)
+async def lead_comment(message: Message, state: FSMContext):
+    await state.update_data(comment=message.text.strip())
+
+    # Забираем все накопленные данные формы
+    data = await state.get_data()
+
+    # Здесь в День 4 подключим сохранение в БД
+    await message.answer(
+        "✅ Заявка принята!\n"
+        f"Имя: {data['name']}\n"
+        f"Телефон: {data['phone']}\n"
+        f"Комментарий: {data['comment']}"
+    )
+
+    # Завершаем FSM-сессию
+    await state.clear()</code></pre>
+        </div>
+        <h3>Пошаговая карта полного сценария</h3>
+        <ol>
+          <li><code>/lead</code> — старт, очистка старых данных.</li>
+          <li><code>LeadForm.name</code> — сохраняем имя и двигаемся дальше.</li>
+          <li><code>LeadForm.phone</code> — проверяем телефон, не пропускаем мусор.</li>
+          <li><code>LeadForm.comment</code> — получаем финальные данные и показываем итог.</li>
+          <li><code>state.clear()</code> — закрываем сценарий правильно.</li>
+        </ol>
+        <div class="note">Практическая польза: это уже почти готовая форма заявок для реального клиента.</div>
+      </section>
+
+      <section class="section track-block" data-track="bots" id="bots-debug">
+        <h2>🧯 БОТЫ: частые ошибки FSM и быстрый фикс</h2>
+        <ul>
+          <li><strong>Обработчик «молчит»:</strong> состояние не установлено или не совпадает фильтр.</li>
+          <li><strong>Форма не сбрасывается:</strong> забыли <code>await state.clear()</code> в конце.</li>
+          <li><strong>/cancel не работает:</strong> обработчик есть, но router не подключён в <code>main.py</code>.</li>
+          <li><strong>Данные теряются:</strong> пропущен <code>await state.update_data(...)</code> на одном из шагов.</li>
+        </ul>
+        <div class="note">Мини-практика: добавь временные print/log в каждый шаг FSM — сразу увидишь, где цепочка ломается.</div>
+      </section>
+
+      <section class="section track-block" data-track="parsing" id="parsing-intro">
+        <h2>🕷️ ПАРСИНГ: зачем фильтры и TOP-10</h2>
+        <p>Сырые данные редко нужны клиенту. Ему нужен «результат по критериям»: диапазон цены, релевантность, удобная сводка.</p>
+        <p>Проще: клиент хочет не «весь интернет», а короткий, понятный, применимый список.</p>
+        <div class="track">
+          <h3>Что будет после Дня 3</h3>
+          <ul>
+            <li>Фильтрация объектов по цене.</li>
+            <li>Вычисление TOP-10 (например, самых дешёвых).</li>
+            <li>Отдельный экспорт отфильтрованных данных.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section track-block" data-track="parsing" id="parsing-micro">
+        <h2>🧪 ПАРСИНГ: маленькие примеры фильтрации</h2>
+        <div class="code">
+          <div class="code-title">Пример 1: очистка цены из строки</div>
+          <pre><code>def parse_price(raw: str) -> int:
+    # Оставляем только цифры, убирая валюту/пробелы
+    digits = ''.join(ch for ch in raw if ch.isdigit())
+    return int(digits) if digits else 0</code></pre>
+        </div>
+
+        <div class="code">
+          <div class="code-title">Пример 2: фильтр по диапазону</div>
+          <pre><code>def filter_by_price(rows: list[dict], min_price: int, max_price: int) -> list[dict]:
+    result = []
+    for row in rows:
+        price = parse_price(row.get("price", "0"))
+        if min_price <= price <= max_price:
+            result.append(row)
+    return result</code></pre>
+        </div>
+
+        <h3>Мини-пример 3: сортировка по цене</h3>
+        <div class="code">
+          <div class="code-title">sorted + key</div>
+          <pre><code>rows = [
+    {"title": "A", "price_num": 400},
+    {"title": "B", "price_num": 150},
+]
+
+rows_sorted = sorted(rows, key=lambda r: r["price_num"])
+print(rows_sorted[0]["title"])  # B</code></pre>
+        </div>
+        <p>Это основа TOP-10: сначала сортировка, потом берём первые <code>N</code> элементов.</p>
+
+        <h3>Мини-пример 4: безопасный доступ к ключу</h3>
+        <div class="code">
+          <div class="code-title">dict.get вместо прямого доступа</div>
+          <pre><code>price_text = row.get("price", "0")
+# если ключа нет, код не упадёт</code></pre>
+        </div>
+        <p>Когда сайты меняют верстку, такие мелочи спасают от падений в проде.</p>
+      </section>
+
+      <div class="easter-egg">
+        <div class="easter-egg-content">
+          <div class="easter-egg-title">💡 TOP-10 = минимум для клиента, максимум для дохода</div>
+          <div class="easter-egg-text">Знаешь, за что платят деньги?
+
+НЕ за 1000 строк сырых данных.
+А за 10 лучших вариантов для быстрого решения.
+
+Клиент хочет:
+top_10 отсортировать = готово
+top_10 дешевых = продал
+top_10 дорогих = продал
+
+Один парсер, разные фильтры = разные проекты, разные деньги 💰</div>
+        </div>
+      </div>
+
+      <section class="section track-block\" data-track=\"parsing\" id=\"parsing-full\">
+        <h2>🕷️ ПАРСИНГ: полный модуль фильтра и TOP-10</h2>
+        <div class="code">
+          <div class="code-title">services/analytics.py — рабочий пример с комментариями</div>
+          <pre><code>import csv
+
+
+def parse_price(raw: str) -> int:
+    # Преобразуем "12 990 ₽" -> 12990
+    digits = ''.join(ch for ch in str(raw) if ch.isdigit())
+    return int(digits) if digits else 0
+
+
+def filter_by_price(rows: list[dict], min_price: int = 0, max_price: int = 10**9) -> list[dict]:
+    filtered = []
+    for row in rows:
+        # Считаем числовую цену из текстового поля
+        p = parse_price(row.get("price", "0"))
+        if min_price <= p <= max_price:
+            # Сохраняем цену в отдельное поле для сортировки
+            row["price_num"] = p
+            filtered.append(row)
+    return filtered
+
+
+def top_cheapest(rows: list[dict], limit: int = 10) -> list[dict]:
+    # Сортируем по числовой цене по возрастанию
+    sorted_rows = sorted(rows, key=lambda x: x.get("price_num", 10**9))
+    return sorted_rows[:limit]
+
+
+def export_csv(rows: list[dict], file_path: str):
+    if not rows:
+        return
+
+    # Берём заголовки по ключам первого объекта
+    fieldnames = list(rows[0].keys())
+    with open(file_path, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)</code></pre>
+        </div>
+        <h3>Пошаговый разбор логики модуля</h3>
+        <ol>
+          <li><strong>parse_price</strong> — превращает «грязную» цену в число.</li>
+          <li><strong>filter_by_price</strong> — отсекает всё вне диапазона.</li>
+          <li><strong>top_cheapest</strong> — сортирует и возвращает первые N.</li>
+          <li><strong>export_csv</strong> — сохраняет результат в читаемый отчёт.</li>
+        </ol>
+        <div class="note">Это уже мини-пайплайн аналитики, который можно продавать как «обработку и ранжирование данных».</div>
+      </section>
+
+      <section class="section track-block" data-track="parsing" id="parsing-debug">
+        <h2>🧯 ПАРСИНГ: частые ошибки аналитики</h2>
+        <ul>
+          <li><strong>TOP-10 пустой:</strong> до сортировки пришёл пустой список (проверь фильтр).</li>
+          <li><strong>Сортировка странная:</strong> сортируешь строковые цены, а не числовые.</li>
+          <li><strong>CSV не открывается корректно:</strong> пропущены <code>encoding="utf-8"</code> и <code>newline=""</code>.</li>
+          <li><strong>Поля «прыгают»:</strong> у объектов разные ключи, из-за этого ломается единый формат экспорта.</li>
+        </ul>
+      </section>
+
+      <div class="easter-egg">
+        <div class="easter-egg-content">
+          <div class="easter-egg-title">🎯 День 3 = Ты становишься интересным для клиентов</div>
+          <div class="easter-egg-quote">День 1 ты учился. День 2 ты писал полезный код. День 3? День 3 ты пишешь код с памятью и интеллектом. Бот, который помнит контекст. Парсер, который отдаёт ТОП-10, а не кашу из 500 строк. Это уже не джуниор, это мидл-уровень! 🚀</div>
+        </div>
+      </div>
+
+      <section class="section\" id=\"practice\">
+        <h2>🏋️ Практика дня</h2>
+        <h3>БОТЫ</h3>
+        <ol>
+          <li>Добавь в FSM обязательную валидацию имени (не менее 2 символов).</li>
+          <li>Сделай шаг подтверждения: «Отправить заявку? Да/Нет».</li>
+          <li>Проверь сценарии: нормальный путь, отмена, ошибка телефона.</li>
+        </ol>
+
+        <h3>ПАРСИНГ</h3>
+        <ol>
+          <li>Сделай фильтр по цене от 10 000 до 50 000.</li>
+          <li>Сделай TOP-10 самых дешёвых.</li>
+          <li>Экспортируй отдельно: <code>filtered.csv</code> и <code>top10.csv</code>.</li>
+        </ol>
+
+        <h3>Рекомендуемый порядок выполнения (чтобы не запутаться)</h3>
+        <ol>
+          <li>Сначала полностью закрой блок БОТЫ.</li>
+          <li>Потом отдельно блок ПАРСИНГ.</li>
+          <li>В конце сними мини-демо: форма в боте + два CSV-файла.</li>
+        </ol>
+
+        <div class="check">
+          <label><input type="checkbox" data-check /> FSM форма проходит путь имя→телефон→комментарий</label>
+          <label><input type="checkbox" data-check /> /cancel работает на любом шаге</label>
+          <label><input type="checkbox" data-check /> Фильтр по цене работает корректно</label>
+          <label><input type="checkbox" data-check /> TOP-10 формируется и экспортируется</label>
+        </div>
+        <div style="margin-top: 12px;">
+          <a href="day-03-practice-lab.html" class="btn" style="border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Открыть отдельный практикум</a>
+        </div>
+      </section>
+
+      <section class="section" id="exam">
+        <h2>📝 Самопроверка</h2>
+        <ol>
+          <li>Почему FSM лучше простых «if» в длинной форме?</li>
+          <li>Зачем отдельно хранить <code>price_num</code>?</li>
+          <li>Как обработать ситуацию, когда пользователь прислал неверный телефон?</li>
+          <li>Почему клиенту нужен TOP-10, а не весь массив?</li>
+        </ol>
+      </section>
+
+      <div class="top-actions">
+        <a class="btn" href="day-02-interface-data.html">← День 2</a>
+        <a class="btn" href="day-03-practice-lab.html">🧪 Практикум Модуля 3</a>
+        <a class="btn" href="day-04-db-sheets.html">День 4 →</a>
+      </div>
+    </main>
+  </div>
+
+  <script src="course-tools.js"></script>
+  <script>
+    const KEY = 'course_day3_checks';
+    function restoreChecks() {
+      const saved = JSON.parse(localStorage.getItem(KEY) || '[]');
+      document.querySelectorAll('input[data-check]').forEach((el, idx) => {
+        el.checked = Boolean(saved[idx]);
+        el.addEventListener('change', persistChecks);
+      });
+    }
+    function persistChecks() {
+      const values = Array.from(document.querySelectorAll('input[data-check]')).map(el => el.checked);
+      localStorage.setItem(KEY, JSON.stringify(values));
+    }
+    restoreChecks();
+    CourseTools.initModulePage(3);
+  </script>
+</body>
+</html>

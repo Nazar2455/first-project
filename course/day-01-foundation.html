@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Модуль 1 · День 1 — Фундамент</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(135deg, #0f0f1e, #1a0a2e, #16213e);
+      color: #eaf2ff;
+      min-height: 100vh;
+    }
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .side {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      height: 100vh;
+      overflow-y: auto;
+      background: rgba(10, 16, 30, 0.95);
+      border-right: 2px solid rgba(255,215,0,0.25);
+      padding: 18px 14px;
+    }
+    .side h2 { color: #ffed4e; font-size: 1.02em; margin-bottom: 10px; }
+    .side p { color: #b9cdea; font-size: 0.84em; line-height: 1.45; margin-bottom: 10px; }
+    .side a {
+      display: block;
+      text-decoration: none;
+      color: #d9e8ff;
+      font-size: 0.86em;
+      padding: 8px 9px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 7px;
+    }
+    .side a:hover { color: #ffed4e; border-color: rgba(255,215,0,0.55); }
+    .content { padding: 24px; max-width: 1100px; }
+    .hero {
+      background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(102,126,234,0.15));
+      border: 2px solid rgba(255,215,0,0.3);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 14px;
+    }
+    .hero h1 { color: #ffed4e; margin-bottom: 8px; }
+    .hero p { color: #d5e6ff; line-height: 1.6; margin-bottom: 7px; }
+    .section {
+      margin-bottom: 14px;
+      background: rgba(19, 28, 46, 0.84);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .section h2 { color: #ffed4e; font-size: 1.22em; margin-bottom: 8px; }
+    .section h3 { color: #96b7ff; font-size: 1.02em; margin: 11px 0 7px; }
+    .section p, .section li { color: #d6e4ff; line-height: 1.6; font-size: 0.95em; }
+    .section ul, .section ol { margin-left: 20px; margin-top: 8px; }
+    .note {
+      border-left: 3px solid #ffd700;
+      background: rgba(255,215,0,0.08);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-top: 8px;
+      font-size: 0.9em;
+    }
+    .code {
+      margin-top: 9px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(102,126,234,0.35);
+      background: #0b1220;
+    }
+    .code-title {
+      background: rgba(102,126,234,0.12);
+      color: #9ec0ff;
+      font-size: 0.78em;
+      font-weight: 700;
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(102,126,234,0.25);
+    }
+    pre { margin: 0; padding: 12px; overflow-x: auto; font-size: 0.84em; line-height: 1.45; }
+    code { font-family: Consolas, 'Courier New', monospace; color: #e7f1ff; }
+    .check { display: grid; gap: 7px; margin-top: 9px; }
+    .check label { display: flex; gap: 8px; align-items: center; font-size: 0.9em; }
+    .check input { accent-color: #ffd700; }
+    .top-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,215,0,0.45);
+      border-radius: 10px;
+      background: rgba(255,215,0,0.12);
+      color: #ffed4e;
+      font-weight: 700;
+      padding: 9px 12px;
+      display: inline-block;
+      cursor: pointer;
+    }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .side { position: static; height: auto; border-right: none; border-bottom: 2px solid rgba(255,215,0,0.25); }
+      .content { padding: 14px; }
+    }
+    /* ===== ПАСХАЛКИ ===== */
+    .easter-egg {
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 215, 0, 0.15));
+      border: 2px solid rgba(255, 107, 107, 0.4);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 25px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+      line-height: 1.4;
+      position: relative;
+      overflow: hidden;
+      animation: easter-glow 3s ease-in-out infinite;
+    }
+
+    .easter-egg::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.2), transparent);
+      animation: easter-shine 3s infinite;
+      pointer-events: none;
+    }
+
+    .easter-egg-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .easter-egg-title {
+      color: #ff6b6b;
+      font-weight: 800;
+      margin-bottom: 10px;
+      font-size: 1.1em;
+    }
+
+    .easter-egg-text {
+      color: #ddd;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .easter-egg-code {
+      color: #4dae64;
+      margin: 8px 0;
+    }
+
+    .easter-egg-quote {
+      color: #ffd700;
+      font-style: italic;
+      font-weight: 600;
+      margin: 8px 0;
+    }
+
+    @keyframes easter-glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(255, 107, 107, 0.3); }
+      50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+    }
+
+    @keyframes easter-shine {
+      0% { left: -100%; }
+      50% { left: 100%; }
+      100% { left: 100%; }
+    }
+  </style>
+  <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="side">
+      <h2>День 1 · Оглавление</h2>
+      <p>Этот урок максимально подробный. Проходи сверху вниз и выполняй практику сразу в проекте.</p>
+      <a href="#goal">🎯 Цели дня</a>
+      <a href="#mindset">🧠 Мышление разработчика</a>
+      <a href="#tools">🛠 Установка и инструменты</a>
+      <a href="#python-base">🐍 Python и окружение</a>
+      <a href="#code-reading">🔍 Как читать код новичку</a>
+      <a href="#micro-python">🧪 Маленькие примеры Python</a>
+      <a href="#bot-track">🤖 Трек бота: первый запуск</a>
+      <a href="#micro-bot">🧩 Маленькие примеры aiogram</a>
+      <a href="#parser-track">🕷️ Трек парсинга: первые 100</a>
+      <a href="#micro-parser">🧩 Маленькие примеры парсинга</a>
+      <a href="#debug">🧯 Диагностика ошибок</a>
+      <a href="#practice">🏋️ Практика и мини-задания</a>
+      <a href="day-01-practice-lab.html">🧪 Отдельный практикум Модуля 1</a>
+      <a href="#homework">📌 Домашка и критерии готовности</a>
+      <a href="#exam">📝 Самопроверка</a>
+      <a href="index.html">← К модулям</a>
+      <a href="../30d-main-tasks.html">← К плану</a>
+    </aside>
+
+    <main class="content">
+      <div class="top-actions">
+        <a class="btn" href="index.html">← Модули курса</a>
+        <a class="btn" href="day-01-practice-lab.html">🧪 Практикум Модуля 1</a>
+        <a class="btn" href="day-02-interface-data.html">День 2 →</a>
+      </div>
+
+      <div class="course-top-tools">
+        <button id="readToggleBtn" class="read-toggle-btn" type="button">📘 Отметить день как прочитанный</button>
+        <div class="track-switch">
+          <button class="track-btn active" data-track="all" type="button">Все блоки</button>
+          <button class="track-btn" data-track="bots" type="button">🤖 Только БОТЫ</button>
+          <button class="track-btn" data-track="parsing" type="button">🕷️ Только ПАРСИНГ</button>
+        </div>
+      </div>
+
+      <section class="hero" id="goal">
+        <h1>Модуль 1 · День 1: фундамент для заработка</h1>
+        <p><strong>Главная мысль:</strong> твоя цель сегодня — не «выучить всё в теории», а создать рабочий фундамент двух направлений: Telegram-бот и парсер. Это твоя первая производственная база.</p>
+        <p>Мы идём по принципу: <strong>понял → сделал → проверил → сохранил результат</strong>. Такой подход делает тебя не «читателем статей», а человеком, который реально выполняет заказы.</p>
+      </section>
+
+      <section class="section" id="mindset">
+        <h2>🧠 Как думать в первый день (и почему это важно)</h2>
+        <p>Новички часто пытаются «сначала разобраться вообще во всём». Из-за этого теряется темп и мотивация. Профессиональный подход другой:</p>
+        <ol>
+          <li>Сначала получить минимальный рабочий результат (MVP).</li>
+          <li>Потом улучшать структуру и качество.</li>
+          <li>Параллельно учиться, но через практику.</li>
+        </ol>
+        <div class="note">Сегодня ты строишь фундамент. Фундамент в доходных проектах — это: структура папок, управление зависимостями, запуск приложения и контроль ошибок.</div>
+      </section>
+
+      <section class="section" id="tools">
+        <h2>🛠 Инструменты и рабочее место</h2>
+        <h3>Что должно быть установлено</h3>
+        <ul>
+          <li>Python 3.11+</li>
+          <li>VS Code</li>
+          <li>Git (желательно)</li>
+          <li>Telegram аккаунт + BotFather</li>
+        </ul>
+
+        <h3>Что такое «рабочее окружение»</h3>
+        <p>Окружение — это отдельная мини-среда Python для конкретного проекта. Если не изолировать окружения, библиотеки начнут конфликтовать между проектами.</p>
+        <div class="note">Правило специалиста: 1 проект = 1 виртуальное окружение.</div>
+      </section>
+
+      <section class="section" id="python-base">
+        <div class="easter-egg">
+          <div class="easter-egg-content">
+            <div class="easter-egg-title">💡 Секрет фрилансеров</div>
+            <div class="easter-egg-text">┌─────────────────────────────────────┐
+│ 90% проблем = плохое окружение     │
+│                                     │
+│ → Конфликты библиотек              │
+│ → Чужой код ломает твой проект    │
+│ → 12 часов дебага вместо 5 минут  │
+│                                     │
+│ Один venv = спокойствие 🎯         │
+└─────────────────────────────────────┘</div>
+          </div>
+        </div>
+        <h2>🐍 Python, venv, requirements, .env — разжёвано</h2>
+
+        <h3>1) Зачем нужен <code>requirements.txt</code></h3>
+        <p>Это список зависимостей с версиями. Без фиксации версий проект может «вдруг сломаться» из-за обновлений библиотек.</p>
+
+        <h3>2) Зачем нужен <code>.env</code></h3>
+        <p>В <code>.env</code> хранятся секреты: токены, ключи, ID админов. Секреты нельзя оставлять в коде и нельзя пушить в GitHub.</p>
+
+        <div class="code">
+          <div class="code-title">Пример .env</div>
+          <pre><code>TELEGRAM_BOT_TOKEN=your_token_here
+ADMIN_IDS=123456789</code></pre>
+        </div>
+
+        <h3>3) Зачем нужен <code>.env.example</code></h3>
+        <p>Это шаблон без секретов, чтобы другой разработчик понимал, какие переменные нужны проекту.</p>
+
+        <div class="code">
+          <div class="code-title">.env.example</div>
+          <pre><code>TELEGRAM_BOT_TOKEN=
+ADMIN_IDS=</code></pre>
+        </div>
+      </section>
+
+      <section class="section" id="code-reading">
+        <h2>🔍 Как читать код, если ты не робот</h2>
+        <p>Ты дал супер-точное замечание: «код есть, но как его читать?». Вот универсальная схема чтения, которой пользуются джуны и мидлы.</p>
+        <ol>
+          <li><strong>Шаг 1 — найди вход:</strong> где начинается выполнение? Обычно это <code>main()</code> или блок <code>if __name__ == "__main__"</code>.</li>
+          <li><strong>Шаг 2 — найди данные:</strong> что приходит на вход и что выходит на выход.</li>
+          <li><strong>Шаг 3 — найди узкие места:</strong> где могут быть ошибки (сеть, файл, внешний API).</li>
+          <li><strong>Шаг 4 — проследи путь:</strong> по одной функции сверху вниз, не прыгая хаотично.</li>
+        </ol>
+        <div class="note">Правило чтения: сначала понимаем смысл блока на уровне «что делает», и только потом углубляемся в синтаксис.</div>
+      </section>
+
+      <section class="section" id="micro-python">
+        <h2>🧪 Маленькие примеры Python перед боевым кодом</h2>
+          <div class="easter-egg">
+            <div class="easter-egg-content">
+              <div class="easter-egg-title">🔥 Коммент разработчика</div>
+              <div class="easter-egg-quote">"Код, который я написал 6 месяцев назад? Я не признаю его как свой. Не правится — краснею. Но это нормально! Это рост." — каждый кодер когда-нибудь это чувствовал 😅</div>
+            </div>
+          </div>
+        <h3>Мини-пример 1: функция</h3>
+        <div class="code">
+          <div class="code-title">Простейшая функция</div>
+          <pre><code>def greet(name: str) -> str:
+    return f"Привет, {name}!"
+
+print(greet("Nazar"))</code></pre>
+        </div>
+        <p>Разбор: <code>def</code> — объявление функции, <code>name: str</code> — ожидаем строку, <code>-> str</code> — функция возвращает строку.</p>
+
+        <h3>Мини-пример 2: обработка ошибки</h3>
+        <div class="code">
+          <div class="code-title">try/except</div>
+          <pre><code>try:
+    x = int("123")
+except ValueError:
+    x = 0
+
+print(x)</code></pre>
+        </div>
+        <p>Разбор: если преобразование к числу не удалось — приложение не падает, а переходит в безопасный сценарий.</p>
+      </section>
+
+      <section class="section track-block" data-track="bots" id="bot-track">
+        <div class="easter-egg">
+          <div class="easter-egg-content">
+            <div class="easter-egg-title">🚀 Факт про боты</div>
+            <div class="easter-egg-text">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃  Telegram боты обрабатывают    ┃
+┃ МИЛЛИАРДЫ сообщений в день 🔥  ┃
+┃                                ┃
+┃  Твой бот на День 1?           ┃
+┃  Простой. Работает. Приносит $ ┃
+┃                                ┃
+┃  После 30 дней?                ┃
+┃  Масштабируемый. Профи уровня  ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</div>
+          </div>
+        </div>
+        <h2>🤖 Трек бота: первый боевой запуск</h2>
+
+        <h3>Структура на День 1</h3>
+        <div class="code">
+          <div class="code-title">Дерево проекта</div>
+          <pre><code>lead-bot-v1/
+├── .env
+├── .env.example
+├── requirements.txt
+├── main.py
+└── README.md</code></pre>
+        </div>
+
+        <h3>Минимальный рабочий код</h3>
+        <div class="code">
+          <div class="code-title">main.py</div>
+          <pre><code>import asyncio
+import os
+from aiogram import Bot, Dispatcher
+from aiogram.filters import Command
+from aiogram.types import Message
+from dotenv import load_dotenv
+
+load_dotenv()
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+
+if not TOKEN:
+    raise ValueError("Не найден TELEGRAM_BOT_TOKEN в .env")
+
+dp = Dispatcher()
+
+@dp.message(Command("start"))
+async def cmd_start(message: Message):
+    await message.answer("Привет! Я твой lead-бот. Напиши /help")
+
+@dp.message(Command("help"))
+async def cmd_help(message: Message):
+    await message.answer("Доступные команды: /start, /help")
+
+async def main() -> None:
+    bot = Bot(token=TOKEN)
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+        </div>
+
+        <h3>Построчный разбор</h3>
+        <ul>
+          <li><code>load_dotenv()</code> — загружает переменные из файла.</li>
+          <li><code>TOKEN = os.getenv(...)</code> — берём токен из окружения.</li>
+          <li>Проверка <code>if not TOKEN</code> — ранний контроль ошибки.</li>
+          <li><code>@dp.message(Command("start"))</code> — хендлер команды.</li>
+          <li><code>start_polling</code> — бесконечный цикл обработки сообщений.</li>
+        </ul>
+
+        <div class="note">Почему это продаваемо: ты уже умеешь поднять базовый бот-сервис, который можно расширить до формы заявок, FAQ, CRM-функций.</div>
+      </section>
+
+      <section class="section track-block" data-track="bots" id="micro-bot">
+        <h2>🧩 Маленькие примеры aiogram перед большим модулем</h2>
+        <h3>Мини-пример: обработчик одного текста</h3>
+        <div class="code">
+          <div class="code-title">Простой message handler</div>
+          <pre><code>@dp.message()
+async def any_message(message: Message):
+    await message.answer("Я получил сообщение")</code></pre>
+        </div>
+        <p>Что это даёт: ты понимаешь главную модель aiogram — приходит событие (сообщение), обработчик реагирует.</p>
+
+        <h3>Мини-пример: только конкретная команда</h3>
+        <div class="code">
+          <div class="code-title">Фильтр по команде</div>
+          <pre><code>@dp.message(Command("ping"))
+async def cmd_ping(message: Message):
+    await message.answer("pong")</code></pre>
+        </div>
+        <p>Смысл фильтра: обработчик не сработает на любой текст, только на целевую команду.</p>
+      </section>
+
+      <section class="section track-block" data-track="parsing" id="parser-track">
+        <div class="easter-egg">
+          <div class="easter-egg-content">
+            <div class="easter-egg-title">Деньги здесь</div>
+            <div class="easter-egg-quote">Парсер, написанный за день, может приносить доход 30 дней подряд. Автоматизация того, что занимает часы = это основа заработка фрилансера. Парсинг = деньги! 💸</div>
+          </div>
+        </div>
+        <h2>Трек парсинга: первые 100 объектов правильно</h2>
+
+        <h3>Структура на День 1</h3>
+        <div class="code">
+          <div class="code-title">Дерево parser-project-1</div>
+          <pre><code>parser-project-1/
+├── requirements.txt
+├── main.py
+├── result.csv
+└── README.md</code></pre>
+        </div>
+
+        <h3>Код стартового парсера</h3>
+        <div class="code">
+          <div class="code-title">main.py</div>
+          <pre><code>import csv
+import requests
+from bs4 import BeautifulSoup
+
+URL = "https://example.com/catalog"
+
+
+def fetch_html(url: str) -> str:
+    response = requests.get(url, timeout=20)
+    response.raise_for_status()
+    return response.text
+
+
+def parse_cards(html: str) -> list[dict]:
+    soup = BeautifulSoup(html, "html.parser")
+    cards = soup.select(".product-card")
+    rows = []
+
+    for card in cards[:100]:
+        title_el = card.select_one(".title")
+        price_el = card.select_one(".price")
+        if not title_el or not price_el:
+            continue
+
+        rows.append({
+            "title": title_el.get_text(strip=True),
+            "price": price_el.get_text(strip=True)
+        })
+    return rows
+
+
+def save_csv(rows: list[dict], file_path: str = "result.csv") -> None:
+    with open(file_path, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=["title", "price"])
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def main() -> None:
+    html = fetch_html(URL)
+    rows = parse_cards(html)
+    save_csv(rows)
+    print(f"✅ Сохранено строк: {len(rows)}")
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+        </div>
+
+        <h3>Что здесь профессионально</h3>
+        <ul>
+          <li>Код разбит на функции: загрузка, парсинг, сохранение.</li>
+          <li>Есть обработка HTTP-ошибок через <code>raise_for_status()</code>.</li>
+          <li>Логика легко тестируется и масштабируется.</li>
+        </ul>
+
+        <div class="note">Для фриланса важен не «хитрый» код, а надёжность и предсказуемость результата.</div>
+      </section>
+
+      <section class="section track-block" data-track="parsing" id="micro-parser">
+        <h2>🧩 Маленькие примеры парсинга перед большим кодом</h2>
+        <h3>Мини-пример: взять один заголовок</h3>
+        <div class="code">
+          <div class="code-title">BeautifulSoup select_one</div>
+          <pre><code>html = "&lt;h1 class='title'&gt;Ноутбук&lt;/h1&gt;"
+soup = BeautifulSoup(html, "html.parser")
+title = soup.select_one(".title").get_text(strip=True)
+print(title)</code></pre>
+        </div>
+        <p>Разбор: <code>select_one</code> возвращает первый найденный элемент по CSS-селектору.</p>
+
+        <h3>Мини-пример: безопасное извлечение</h3>
+        <div class="code">
+          <div class="code-title">Проверка на None</div>
+          <pre><code>price_el = card.select_one(".price")
+price = price_el.get_text(strip=True) if price_el else "нет цены"</code></pre>
+        </div>
+        <p>Смысл: сайт может поменяться, а код не должен падать из-за одного отсутствующего поля.</p>
+      </section>
+
+      <section class="section" id="debug">
+        <h2>🧯 Частые ошибки Дня 1 и быстрый ремонт</h2>
+
+        <h3>Бот не запускается</h3>
+        <ul>
+          <li>Проверь токен в <code>.env</code>.</li>
+          <li>Убедись, что в проекте активировано окружение.</li>
+          <li>Проверь, что установлены зависимости из <code>requirements.txt</code>.</li>
+        </ul>
+
+        <h3>Парсер вернул 0 объектов</h3>
+        <ul>
+          <li>Скорее всего, CSS-селектор не совпадает с реальной HTML-структурой.</li>
+          <li>Открой страницу в браузере и перепроверь классы.</li>
+          <li>Проверь, не грузится ли контент через JavaScript (в таком случае нужен другой подход).</li>
+        </ul>
+
+        <h3>CSV «кривой» или с кракозябрами</h3>
+        <ul>
+          <li>Используй <code>encoding="utf-8"</code>.</li>
+          <li>Не забывай <code>newline=""</code> при записи CSV в Windows.</li>
+        </ul>
+      </section>
+
+      <section class="section" id="practice">
+        <h2>🏋️ Практикум Дня 1 (сделай руками)</h2>
+
+      <div class="easter-egg">
+        <div class="easter-egg-content">
+          <div class="easter-egg-title">Очень важно!</div>
+          <div class="easter-egg-quote">Теория без практики = ты ничего не помнишь через неделю. Практика без теории = ты слепо копируешь код. Нужно оба! 🧠</div>
+        </div>
+      </div>
+
+        <h3>Практика A — бот</h3>
+        <ol>
+          <li>Сделай команду <code>/about</code> с описанием, что умеет бот.</li>
+          <li>Добавь лог в консоль при каждом входящем сообщении.</li>
+          <li>Проверь команды в Telegram.</li>
+        </ol>
+
+        <h3>Практика B — парсер</h3>
+        <ol>
+          <li>Добавь в CSV третье поле (например, ссылка).</li>
+          <li>Ограничь выборку первыми 50 строками.</li>
+          <li>Проверь, что файл открывается и читается корректно.</li>
+        </ol>
+
+        <div class="note">Именно на этой практике формируется «мышечная память разработчика».</div>
+        
+        <div style="margin-top: 15px; display: flex; gap: 10px;">
+          <button onclick="markPracticeCompleted()" style="background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.95em;">
+            ✅ Я выполнил практику
+          </button>
+          <a href="day-01-practice-lab.html" class="btn" style="border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Открыть отдельный практикум</a>
+          <span style="color: #999; font-size: 0.85em; align-self: center;">+1ч практики, +50 XP</span>
+        </div>
+      </section>
+
+      <section class="section" id="homework">
+        <h2>📌 Домашка и критерии «День 1 закрыт»</h2>
+        <div class="check">
+          <label><input type="checkbox" data-check /> Создан `lead-bot-v1` и запускается без ошибок</label>
+          <label><input type="checkbox" data-check /> В боте работают /start и /help</label>
+          <label><input type="checkbox" data-check /> Создан `parser-project-1` и формируется `result.csv`</label>
+          <label><input type="checkbox" data-check /> Получено минимум 100 строк данных (или максимально возможное с сайта)</label>
+          <label><input type="checkbox" data-check /> Есть README в обоих проектах</label>
+          <label><input type="checkbox" data-check /> Сделан 1 коммит в Git</label>
+        </div>
+      </section>
+
+      <section class="section" id="exam">
+        <h2>📝 Контрольные вопросы (сам себе преподаватель)</h2>
+        <ol>
+          <li>Почему нельзя хранить токен Telegram прямо в коде?</li>
+          <li>Для чего нужен `requirements.txt`?</li>
+          <li>Что делает `raise_for_status()` и зачем он нужен?</li>
+          <li>Какая разница между `select` и `select_one` в BeautifulSoup?</li>
+          <li>Почему важно делить код на функции даже в маленьком проекте?</li>
+        </ol>
+        <div class="note">Если можешь уверенно ответить на все 5 — День 1 усвоен на хорошем уровне.</div>
+      </section>
+
+      <div class="top-actions">
+        <a class="btn" href="index.html">← Модули курса</a>
+        <a class="btn" href="day-01-practice-lab.html">🧪 Практикум Модуля 1</a>
+        <a class="btn" href="day-02-interface-data.html">День 2 →</a>
+      </div>
+    </main>
+  </div>
+
+  <script src="course-tools.js"></script>
+  <script>
+    const KEY = 'course_day1_checks';
+    function restoreChecks() {
+      const saved = JSON.parse(localStorage.getItem(KEY) || '[]');
+      document.querySelectorAll('input[data-check]').forEach((el, idx) => {
+        el.checked = Boolean(saved[idx]);
+        el.addEventListener('change', persistChecks);
+      });
+    }
+    function persistChecks() {
+      const values = Array.from(document.querySelectorAll('input[data-check]')).map(el => el.checked);
+      localStorage.setItem(KEY, JSON.stringify(values));
+    }
+    restoreChecks();
+    CourseTools.initModulePage(1);
+  </script>
+</body>
+</html>

@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🎮 Code Dungeon</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Montserrat, Arial, sans-serif;
+            background: radial-gradient(circle at top, #1b2440, #0d1122);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+            gap: 10px;
+        }
+        .hud {
+            width: min(1100px, 96vw);
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+            background: rgba(16, 24, 45, 0.9);
+            border: 2px solid #ffd700;
+            border-radius: 12px;
+            padding: 10px 14px;
+        }
+        .stats { display: flex; gap: 12px; flex-wrap: wrap; }
+        .chip {
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid rgba(255, 215, 0, 0.45);
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-weight: 700;
+            font-size: 13px;
+            color: #ffe88f;
+        }
+        .btn {
+            border: 1px solid rgba(102, 126, 234, 0.7);
+            background: rgba(102, 126, 234, 0.15);
+            color: #d4defc;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        canvas {
+            width: min(1100px, 96vw);
+            height: auto;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            background: #11182c;
+            image-rendering: crisp-edges;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+        .controls {
+            width: min(1100px, 96vw);
+            background: rgba(17, 25, 46, 0.9);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 10px 12px;
+            color: #c7d6ff;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+        .lore-panel {
+            width: min(1100px, 96vw);
+            background: linear-gradient(135deg, rgba(34, 22, 58, 0.92), rgba(22, 34, 64, 0.92));
+            border: 1px solid rgba(240, 147, 251, 0.45);
+            border-radius: 10px;
+            padding: 10px 12px;
+            color: #e3dbff;
+        }
+        .lore-title {
+            color: #ffd9ff;
+            font-weight: 800;
+            margin-bottom: 5px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .lore-text {
+            font-size: 13px;
+            color: #d6dcff;
+            line-height: 1.5;
+        }
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.62);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 14px;
+        }
+        .card {
+            width: min(740px, 96vw);
+            background: linear-gradient(180deg, #1b2747, #121a30);
+            border: 2px solid #ffd700;
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .card h2 { margin: 0 0 8px; color: #ffea9d; }
+        .card p { color: #d8e2ff; }
+        .answers { display: grid; gap: 8px; margin-top: 12px; }
+        .answer {
+            text-align: left;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.04);
+            color: #f0f4ff;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .answer:hover { border-color: #ffd700; }
+        .small { font-size: 12px; color: #a8badf; margin-top: 8px; }
+    </style>
+</head>
+<body>
+    <div class="hud">
+        <div class="stats">
+            <div class="chip">❤️ HP: <span id="hp">100</span></div>
+            <div class="chip">🪙 XP: <span id="xp">0</span></div>
+            <div class="chip">⚡ Stamina: <span id="stamina">100</span></div>
+            <div class="chip">🏰 Комната: <span id="room">1</span>/4</div>
+            <div class="chip">🧰 Сундуки: <span id="term">0</span></div>
+            <div class="chip">⚔️ Враги: <span id="enemy">0</span></div>
+            <div class="chip">🎯 Цель: <span id="objective">—</span></div>
+        </div>
+        <div style="display:flex; gap:8px;">
+            <a class="btn" href="games-hub.html">🕹️ Хаб</a>
+            <a class="btn" href="30d-main-tasks.html">⬅️ В план</a>
+            <a class="btn" href="task-verification.html">✅ Проверка</a>
+        </div>
+    </div>
+
+    <canvas id="game" width="1100" height="620"></canvas>
+
+    <div class="controls">
+        <b>Управление:</b> WASD / стрелки / ЦФЫВ — движение, Space — атака, F — спец-удар, Shift — рывок, E (У) — сундук/дверь.<br>
+        Смысл игры: в каждой комнате у тебя <b>контракт фрилансера</b>. Зачищаешь врагов, проходишь учебные терминалы, получаешь XP для основного плана.
+    </div>
+
+    <div class="lore-panel">
+        <div class="lore-title">📜 Глава: <span id="chapterTitle">Пробуждение</span> <span class="chip" id="contractReward">Награда: +0 XP</span></div>
+        <div class="lore-text" id="chapterText">Гильдия ждёт. Первый контракт начинается...</div>
+    </div>
+
+    <div class="overlay" id="introOverlay" style="display:flex;">
+        <div class="card">
+            <h2>🎮 Code Dungeon: Контракты Гильдии</h2>
+            <p>
+                Ты проходишь боевые комнаты и одновременно тренируешь навыки под реальные задания плана.
+                <br><br>
+                <b>Как победить:</b> в каждой комнате закрой контракт: убей врагов + реши терминалы.<br>
+                <b>Награда:</b> XP уходит в твой основной прогресс (монеты/уровень).
+            </p>
+            <div class="small">Совет: если у тебя русская раскладка — движение работает на <b>ЦФЫВ</b>, действие на <b>У</b>.</div>
+            <div style="margin-top:12px; display:flex; gap:8px;">
+                <button class="answer" onclick="startDungeon()">🚀 Начать забег</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="quizOverlay">
+        <div class="card">
+            <h2>🧠 Код-терминал</h2>
+            <p id="quizQuestion"></p>
+            <div class="answers" id="quizAnswers"></div>
+            <div class="small" id="quizHint"></div>
+        </div>
+    </div>
+
+    <div class="overlay" id="resultOverlay">
+        <div class="card">
+            <h2 id="resultTitle"></h2>
+            <p id="resultText"></p>
+            <div style="margin-top:12px; display:flex; gap:8px;">
+                <button class="answer" onclick="restartRun()">🔁 Запустить снова</button>
+                <a class="answer" href="30d-main-tasks.html" style="text-decoration:none; display:inline-block;">⬅️ Вернуться в план</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="dungeon-content.js"></script>
+    <script src="api-client.js"></script>
+    <script src="game-session-tracker.js"></script>
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+
+        const API_BASE = localStorage.getItem('planApiBase') || 'http://127.0.0.1:8000/api';
+
+        async function apiRequest(path, options = {}) {
+            if (window.PlanApiClient?.request) {
+                return window.PlanApiClient.request(path, options, API_BASE);
+            }
+
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 3000);
+
+            try {
+                const response = await fetch(`${API_BASE}${path}`, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(options.headers || {})
+                    },
+                    signal: controller.signal
+                });
+
+                if (!response.ok) return null;
+                return await response.json();
+            } catch (_) {
+                return null;
+            } finally {
+                clearTimeout(timeout);
+            }
+        }
+
+        async function hydrateDungeonFromServer() {
+            const [mainState, dungeonState] = await Promise.all([
+                apiRequest('/state/main_tracker'),
+                apiRequest('/state/code_dungeon')
+            ]);
+
+            if (mainState?.value && typeof mainState.value === 'object') {
+                const incoming = mainState.value;
+                if (typeof incoming.points === 'number') localStorage.setItem('points', String(incoming.points));
+                if (typeof incoming.level === 'number') localStorage.setItem('level', String(incoming.level));
+            }
+
+            if (dungeonState?.value && typeof dungeonState.value === 'object') {
+                const incoming = dungeonState.value;
+                if (typeof incoming.xp === 'number') localStorage.setItem('dungeonXP', String(incoming.xp));
+                if (typeof incoming.bestRoom === 'number') localStorage.setItem('dungeonBestRoom', String(incoming.bestRoom));
+            }
+
+            state.xp = parseInt(localStorage.getItem('dungeonXP') || localStorage.getItem('points') || '0');
+        }
+
+        async function syncDungeonToServer() {
+            const bestRoom = parseInt(localStorage.getItem('dungeonBestRoom') || '0');
+
+            await apiRequest('/state/code_dungeon', {
+                method: 'PUT',
+                body: JSON.stringify({ value: { xp: state.xp, bestRoom } })
+            });
+        }
+
+        const state = {
+            hp: 100,
+            xp: parseInt(localStorage.getItem('points') || '0'),
+            roomIndex: 0,
+            running: false,
+            quizOpen: false,
+            currentTerminal: null,
+            questionQueue: buildDungeonQuestionQueue(16),
+            qIndex: 0,
+            contracts: [
+                { title: 'Lead Bot MVP', goal: 'Базовая логика /start + структура проекта', reward: 60 },
+                { title: 'Parser Export', goal: 'Сбор данных + подготовка экспортируемого результата', reward: 70 },
+                { title: 'Deploy Readiness', goal: 'Стабильность + обработка ошибок', reward: 80 },
+                { title: 'Boss: First Client', goal: 'Итоговый контракт: качество + скорость + понятный результат', reward: 120 }
+            ],
+            message: '',
+            messageT: 0,
+            loots: [],
+            particles: [],
+            decor: [],
+            projectiles: [],
+            currentBiome: { floorA: '#0f1833', floorB: '#15224a', accent: '#667eea', wall: '#263458', rune: '#ffd700' },
+            chapters: [
+                {
+                    title: 'Пробуждение Новичка',
+                    text: 'Ты входишь в Подземелье Контрактов. Здесь выживает тот, кто умеет доводить MVP до результата.'
+                },
+                {
+                    title: 'Шахты Данных',
+                    text: 'Пауки парсинга охраняют руду данных. Извлеки структуру и не потеряй стабильность.'
+                },
+                {
+                    title: 'Башня Деплоя',
+                    text: 'Без uptime нет доверия. Подними сервис и докажи, что твой код живёт 24/7.'
+                },
+                {
+                    title: 'Тронный зал Клиента',
+                    text: 'Финальная проверка: качество, сроки и ясность. Здесь рождается первый платящий клиент.'
+                }
+            ],
+            biomes: [
+                { floorA: '#0f1833', floorB: '#1b2a56', accent: '#6278d9', wall: '#263458', rune: '#ffd700' },
+                { floorA: '#13231f', floorB: '#1f3a33', accent: '#53d6a4', wall: '#2a4a42', rune: '#8effcf' },
+                { floorA: '#2a1d12', floorB: '#3a2918', accent: '#ff9f5a', wall: '#5a3d24', rune: '#ffc07d' },
+                { floorA: '#2a1120', floorB: '#421b32', accent: '#ff6f8c', wall: '#5d2d45', rune: '#ffd0dc' }
+            ],
+            assets: {
+                knight: null,
+                goblin: null,
+                witch: null,
+                dragon: null,
+                loaded: false
+            },
+            player: { x: 90, y: 310, r: 14, speed: 3.1, dashMult: 1.9, stamina: 100, attackCd: 0, hitCd: 0, facingX: 1, facingY: 0 },
+            walls: [],
+            enemies: [],
+            terminals: [],
+            door: { x: 1035, y: 260, w: 35, h: 110, open: false }
+        };
+
+        function createSeededRandom(seed) {
+            let t = seed >>> 0;
+            return function() {
+                t += 0x6D2B79F5;
+                let x = t;
+                x = Math.imul(x ^ x >>> 15, x | 1);
+                x ^= x + Math.imul(x ^ x >>> 7, x | 61);
+                return ((x ^ x >>> 14) >>> 0) / 4294967296;
+            };
+        }
+
+        function loadAssets() {
+            const toLoad = [
+                ['knight', 'art/sprite-knight.svg'],
+                ['goblin', 'art/sprite-goblin.svg'],
+                ['witch', 'art/sprite-witch.svg'],
+                ['dragon', 'art/sprite-dragon.svg']
+            ];
+            let loadedCount = 0;
+            toLoad.forEach(([key, src]) => {
+                const img = new Image();
+                img.onload = () => {
+                    loadedCount += 1;
+                    if (loadedCount === toLoad.length) state.assets.loaded = true;
+                };
+                img.onerror = () => {
+                    loadedCount += 1;
+                    if (loadedCount === toLoad.length) state.assets.loaded = true;
+                };
+                img.src = src;
+                state.assets[key] = img;
+            });
+        }
+
+        const pressed = { keys: new Set(), codes: new Set() };
+        function blockKeys(e) {
+            const code = e.code;
+            if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(code)) {
+                e.preventDefault();
+            }
+        }
+        window.addEventListener('keydown', e => {
+            blockKeys(e);
+            pressed.codes.add(e.code);
+            pressed.keys.add((e.key || '').toLowerCase());
+        });
+        window.addEventListener('keyup', e => {
+            pressed.codes.delete(e.code);
+            pressed.keys.delete((e.key || '').toLowerCase());
+        });
+
+        function isDown(action) {
+            if (action === 'up') return pressed.codes.has('KeyW') || pressed.codes.has('ArrowUp') || pressed.keys.has('w') || pressed.keys.has('ц');
+            if (action === 'down') return pressed.codes.has('KeyS') || pressed.codes.has('ArrowDown') || pressed.keys.has('s') || pressed.keys.has('ы');
+            if (action === 'left') return pressed.codes.has('KeyA') || pressed.codes.has('ArrowLeft') || pressed.keys.has('a') || pressed.keys.has('ф');
+            if (action === 'right') return pressed.codes.has('KeyD') || pressed.codes.has('ArrowRight') || pressed.keys.has('d') || pressed.keys.has('в');
+            if (action === 'interact') return pressed.codes.has('KeyE') || pressed.keys.has('e') || pressed.keys.has('у');
+            if (action === 'attack') return pressed.codes.has('Space');
+            if (action === 'dash') return pressed.codes.has('ShiftLeft') || pressed.codes.has('ShiftRight');
+            return false;
+        }
+
+        function rect(x, y, w, h) { return { x, y, w, h }; }
+
+        function showMessage(text, t = 140) {
+            state.message = text;
+            state.messageT = t;
+        }
+
+        function updateChapterUI() {
+            const ch = state.chapters[state.roomIndex] || state.chapters[0];
+            const c = state.contracts[state.roomIndex] || state.contracts[0];
+            document.getElementById('chapterTitle').textContent = ch.title;
+            document.getElementById('chapterText').textContent = ch.text;
+            document.getElementById('contractReward').textContent = `Награда: +${c.reward} XP`;
+        }
+
+        function spawnParticles(x, y, color, count = 8, speed = 2.1) {
+            for (let i = 0; i < count; i++) {
+                const a = Math.random() * Math.PI * 2;
+                const s = Math.random() * speed + 0.4;
+                state.particles.push({
+                    x, y,
+                    vx: Math.cos(a) * s,
+                    vy: Math.sin(a) * s,
+                    life: 24 + Math.random() * 18,
+                    color,
+                    size: 1.8 + Math.random() * 2.5
+                });
+            }
+        }
+
+        function buildRoom(index) {
+            state.roomIndex = index;
+            state.player.x = 90;
+            state.player.y = 310;
+            state.currentBiome = state.biomes[index] || state.biomes[0];
+            const rand = createSeededRandom(1337 + index * 97);
+            state.walls = [
+                rect(0, 0, 1100, 20), rect(0, 600, 1100, 20), rect(0, 0, 20, 620), rect(1080, 0, 20, 620),
+                rect(260, 80, 30, 180), rect(260, 360, 30, 180), rect(520, 140, 30, 340), rect(780, 80, 30, 180), rect(780, 360, 30, 180)
+            ];
+            state.loots = [];
+            state.particles = [];
+            state.projectiles = [];
+
+            state.decor = [];
+            for (let i = 0; i < 30; i++) {
+                state.decor.push({
+                    x: 40 + rand() * 1020,
+                    y: 40 + rand() * 540,
+                    type: rand() < 0.5 ? 'rock' : 'rune',
+                    s: 4 + rand() * 8
+                });
+            }
+
+            const enemyCount = index < 3 ? 2 + index : 1;
+            state.enemies = [];
+            for (let i = 0; i < enemyCount; i++) {
+                const isBoss = index === 3;
+                state.enemies.push({
+                    x: 700 + Math.random() * 280,
+                    y: 120 + Math.random() * 380,
+                    r: isBoss ? 30 : 16,
+                    hp: isBoss ? 140 : 40 + index * 15,
+                    speed: isBoss ? 1.25 : 1.4 + index * 0.2,
+                    damage: isBoss ? 18 : 8,
+                    wanderT: 0,
+                    vx: 0,
+                    vy: 0,
+                    boss: isBoss,
+                    kind: isBoss ? 'devil-boss' : (Math.random() < 0.5 ? 'devil-imp' : 'devil-witch')
+                });
+            }
+
+            const terminalsCount = index < 3 ? 2 : 1;
+            state.terminals = [];
+            for (let i = 0; i < terminalsCount; i++) {
+                state.terminals.push({
+                    x: 330 + i * 330,
+                    y: i % 2 === 0 ? 120 : 460,
+                    w: 44,
+                    h: 44,
+                    solved: false,
+                    chest: true,
+                    question: state.questionQueue[state.qIndex++ % state.questionQueue.length]
+                });
+            }
+
+            state.door.open = false;
+            const c = state.contracts[state.roomIndex];
+            showMessage(`Контракт: ${c.title} • ${c.goal}`);
+            updateChapterUI();
+        }
+
+        function collidesCircleRect(cx, cy, r, rw) {
+            const tx = Math.max(rw.x, Math.min(cx, rw.x + rw.w));
+            const ty = Math.max(rw.y, Math.min(cy, rw.y + rw.h));
+            const dx = cx - tx;
+            const dy = cy - ty;
+            return dx * dx + dy * dy < r * r;
+        }
+
+        function movePlayer() {
+            if (!state.running || state.quizOpen) return;
+            let dx = 0, dy = 0;
+            if (isDown('up')) dy -= 1;
+            if (isDown('down')) dy += 1;
+            if (isDown('left')) dx -= 1;
+            if (isDown('right')) dx += 1;
+
+            if (dx !== 0 || dy !== 0) {
+                const len = Math.hypot(dx, dy);
+                dx /= len; dy /= len;
+                state.player.facingX = dx;
+                state.player.facingY = dy;
+            }
+
+            const dash = isDown('dash') && state.player.stamina > 5;
+            const spd = dash ? state.player.speed * state.player.dashMult : state.player.speed;
+            const nx = state.player.x + dx * spd;
+            const ny = state.player.y + dy * spd;
+
+            if (dash && (dx !== 0 || dy !== 0)) {
+                state.player.stamina = Math.max(0, state.player.stamina - 0.9);
+            } else {
+                state.player.stamina = Math.min(100, state.player.stamina + 0.35);
+            }
+
+            let blocked = false;
+            for (const w of state.walls) {
+                if (collidesCircleRect(nx, ny, state.player.r, w)) { blocked = true; break; }
+            }
+
+            if (!blocked) {
+                state.player.x = nx;
+                state.player.y = ny;
+            }
+        }
+
+        function updateEnemies() {
+            const survivors = [];
+            for (const e of state.enemies) {
+                const dx = state.player.x - e.x;
+                const dy = state.player.y - e.y;
+                const d = Math.hypot(dx, dy);
+
+                if (d < 260) {
+                    e.vx = (dx / (d || 1)) * e.speed;
+                    e.vy = (dy / (d || 1)) * e.speed;
+                } else {
+                    e.wanderT -= 1;
+                    if (e.wanderT <= 0) {
+                        const ang = Math.random() * Math.PI * 2;
+                        e.vx = Math.cos(ang) * e.speed * 0.7;
+                        e.vy = Math.sin(ang) * e.speed * 0.7;
+                        e.wanderT = 40 + Math.random() * 70;
+                    }
+                }
+
+                const nx = e.x + e.vx;
+                const ny = e.y + e.vy;
+                let blocked = false;
+                for (const w of state.walls) {
+                    if (collidesCircleRect(nx, ny, e.r, w)) { blocked = true; break; }
+                }
+                if (!blocked) { e.x = nx; e.y = ny; }
+
+                const hitDist = state.player.r + e.r + 2;
+                if (Math.hypot(state.player.x - e.x, state.player.y - e.y) < hitDist && state.player.hitCd <= 0) {
+                    state.hp -= e.damage;
+                    state.player.hitCd = 30;
+                    spawnParticles(state.player.x, state.player.y, '#ff9e9e', 10, 2.6);
+                    if (state.hp <= 0) {
+                        state.hp = 0;
+                        gameOver(false);
+                    }
+                }
+                if (e.hp > 0) {
+                    survivors.push(e);
+                } else {
+                    // Дроп лута с шансом
+                    state.loots.push({
+                        x: e.x,
+                        y: e.y,
+                        r: 8,
+                        type: Math.random() < 0.25 ? 'heal' : 'xp',
+                        value: e.boss ? 50 : 20
+                    });
+                }
+            }
+
+            state.enemies = survivors;
+        }
+
+        function updateLoot() {
+            const nextLoot = [];
+            for (const l of state.loots) {
+                const d = Math.hypot(state.player.x - l.x, state.player.y - l.y);
+                if (d < state.player.r + l.r + 3) {
+                    if (l.type === 'heal') {
+                        state.hp = Math.min(100, state.hp + 12);
+                        showMessage('+12 HP');
+                    } else {
+                        state.xp += l.value;
+                        localStorage.setItem('dungeonXP', state.xp);
+                        void syncDungeonToServer();
+                        showMessage(`+${l.value} XP`);
+                    }
+                } else {
+                    nextLoot.push(l);
+                }
+            }
+            state.loots = nextLoot;
+        }
+
+        function doAttack() {
+            if (state.player.attackCd > 0 || !state.running || state.quizOpen) return;
+            state.player.attackCd = 20;
+            const ax = state.player.x + state.player.facingX * 34;
+            const ay = state.player.y + state.player.facingY * 34;
+            for (const e of state.enemies) {
+                const d = Math.hypot(ax - e.x, ay - e.y);
+                if (d < e.r + 36) {
+                    e.hp -= 30;
+                    spawnParticles(e.x, e.y, '#ffd36f', 7, 2.2);
+                }
+            }
+        }
+
+        function doSpecialAttack() {
+            if (!state.running || state.quizOpen) return;
+            if (state.player.stamina < 22) {
+                showMessage('Недостаточно stamina для спец-удара', 70);
+                return;
+            }
+            state.player.stamina -= 22;
+            const spd = 7.2;
+            state.projectiles.push({
+                x: state.player.x + state.player.facingX * 18,
+                y: state.player.y + state.player.facingY * 18,
+                vx: state.player.facingX * spd,
+                vy: state.player.facingY * spd,
+                life: 48,
+                r: 8,
+                dmg: 45
+            });
+            spawnParticles(state.player.x, state.player.y, '#8fd8ff', 16, 3);
+            showMessage('⚡ Руна-удар!', 60);
+        }
+
+        function updateProjectiles() {
+            const next = [];
+            for (const p of state.projectiles) {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 1;
+
+                let dead = false;
+                for (const w of state.walls) {
+                    if (collidesCircleRect(p.x, p.y, p.r, w)) {
+                        dead = true;
+                        break;
+                    }
+                }
+
+                if (!dead) {
+                    for (const e of state.enemies) {
+                        const d = Math.hypot(p.x - e.x, p.y - e.y);
+                        if (d < p.r + e.r) {
+                            e.hp -= p.dmg;
+                            spawnParticles(e.x, e.y, '#ffb87f', 12, 2.7);
+                            dead = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!dead && p.life > 0) next.push(p);
+            }
+            state.projectiles = next;
+        }
+
+        function updateParticles() {
+            const next = [];
+            for (const p of state.particles) {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vx *= 0.96;
+                p.vy *= 0.96;
+                p.life -= 1;
+                if (p.life > 0) next.push(p);
+            }
+            state.particles = next;
+        }
+
+        function drawRoomTexture() {
+            const b = state.currentBiome;
+            const grad = ctx.createLinearGradient(20, 20, 1080, 600);
+            grad.addColorStop(0, b.floorA);
+            grad.addColorStop(1, b.floorB);
+            ctx.fillStyle = grad;
+            ctx.fillRect(20, 20, 1060, 580);
+
+            // Плитка-текстура
+            ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+            for (let x = 20; x <= 1080; x += 40) {
+                ctx.beginPath(); ctx.moveTo(x, 20); ctx.lineTo(x, 600); ctx.stroke();
+            }
+            for (let y = 20; y <= 600; y += 40) {
+                ctx.beginPath(); ctx.moveTo(20, y); ctx.lineTo(1080, y); ctx.stroke();
+            }
+
+            // Декор без мерцания
+            for (const d of state.decor) {
+                if (d.type === 'rock') {
+                    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+                    ctx.fillRect(d.x, d.y, d.s, d.s);
+                } else {
+                    ctx.strokeStyle = b.accent + '44';
+                    ctx.beginPath();
+                    ctx.arc(d.x, d.y, d.s * 0.7, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            }
+
+            // Руны/декор
+            ctx.strokeStyle = b.accent + '66';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(36, 36, 1028, 548);
+            ctx.lineWidth = 1;
+        }
+
+        function drawTexturedWalls() {
+            const b = state.currentBiome;
+            state.walls.forEach(w => {
+                ctx.fillStyle = b.wall;
+                ctx.fillRect(w.x, w.y, w.w, w.h);
+                // Кирпичная текстура
+                ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+                for (let yy = w.y + 10; yy < w.y + w.h; yy += 12) {
+                    ctx.beginPath();
+                    ctx.moveTo(w.x, yy);
+                    ctx.lineTo(w.x + w.w, yy);
+                    ctx.stroke();
+                }
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.strokeRect(w.x + 0.5, w.y + 0.5, w.w - 1, w.h - 1);
+            });
+        }
+
+        function tryInteract() {
+            if (!state.running || state.quizOpen) return;
+
+            // Терминалы
+            for (const t of state.terminals) {
+                if (t.solved) continue;
+                const d = Math.hypot(state.player.x - (t.x + t.w / 2), state.player.y - (t.y + t.h / 2));
+                if (d < 70) {
+                    openQuiz(t);
+                    return;
+                }
+            }
+
+            // Дверь
+            const dDoor = Math.hypot(state.player.x - (state.door.x + 18), state.player.y - (state.door.y + 55));
+            if (state.door.open && dDoor < 70) {
+                if (state.roomIndex < 3) {
+                    buildRoom(state.roomIndex + 1);
+                } else {
+                    gameOver(true);
+                }
+            }
+        }
+
+        function openQuiz(terminal) {
+            state.quizOpen = true;
+            state.currentTerminal = terminal;
+            const overlay = document.getElementById('quizOverlay');
+            const q = terminal.question || state.questionQueue[0];
+            document.getElementById('quizQuestion').textContent = q.question;
+            document.getElementById('quizHint').textContent = 'Подсказка появится после ответа.';
+
+            const answers = document.getElementById('quizAnswers');
+            answers.innerHTML = '';
+            q.options.forEach((op, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer';
+                btn.textContent = op;
+                btn.onclick = () => answerQuiz(i);
+                answers.appendChild(btn);
+            });
+
+            overlay.style.display = 'flex';
+        }
+
+        function answerQuiz(index) {
+            const t = state.currentTerminal;
+            const q = t.question;
+            const hint = document.getElementById('quizHint');
+
+            if (index === q.answerIndex) {
+                t.solved = true;
+                const gain = 40;
+                state.xp += gain;
+                localStorage.setItem('dungeonXP', state.xp);
+                void syncDungeonToServer();
+                hint.textContent = '✅ Верно! ' + q.tip + ` (+${gain} XP)`;
+            } else {
+                state.hp = Math.max(0, state.hp - 12);
+                hint.textContent = '❌ Не совсем. ' + q.tip + ' (-12 HP)';
+                if (state.hp <= 0) {
+                    closeQuiz();
+                    gameOver(false);
+                    return;
+                }
+            }
+
+            setTimeout(() => {
+                closeQuiz();
+            }, 900);
+        }
+
+        function closeQuiz() {
+            document.getElementById('quizOverlay').style.display = 'none';
+            state.quizOpen = false;
+            state.currentTerminal = null;
+        }
+
+        function updateDoorState() {
+            const allSolved = state.terminals.every(t => t.solved);
+            const allEnemiesDead = state.enemies.length === 0;
+            state.door.open = allSolved && allEnemiesDead;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawRoomTexture();
+            drawTexturedWalls();
+
+            // Сундуки-терминалы
+            state.terminals.forEach(t => {
+                const chestX = t.x - 4;
+                const chestY = t.y - 2;
+                if (t.solved) {
+                    ctx.fillStyle = '#8a5a2d';
+                    ctx.fillRect(chestX, chestY + 10, 52, 28);
+                    ctx.fillStyle = '#d8b27a';
+                    ctx.fillRect(chestX, chestY, 52, 14);
+                    ctx.fillStyle = '#7ff0b1';
+                    ctx.fillRect(chestX + 22, chestY + 12, 8, 8);
+                } else {
+                    ctx.fillStyle = '#6b3e1f';
+                    ctx.fillRect(chestX, chestY + 10, 52, 28);
+                    ctx.fillStyle = '#b87a3c';
+                    ctx.fillRect(chestX, chestY, 52, 14);
+                    ctx.fillStyle = '#ffd980';
+                    ctx.fillRect(chestX + 21, chestY + 14, 10, 10);
+                    ctx.fillStyle = '#1f1f1f';
+                    ctx.font = '16px Montserrat';
+                    ctx.fillText('?', chestX + 24, chestY + 12);
+                }
+            });
+
+            // Дверь
+            ctx.fillStyle = state.door.open ? '#ffd700' : '#4a4a4a';
+            ctx.fillRect(state.door.x, state.door.y, state.door.w, state.door.h);
+
+            // Лут
+            for (const l of state.loots) {
+                ctx.beginPath();
+                ctx.fillStyle = l.type === 'heal' ? '#56e58a' : '#ffe28a';
+                ctx.arc(l.x, l.y, l.r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Снаряды спец-атаки
+            for (const p of state.projectiles) {
+                ctx.beginPath();
+                ctx.fillStyle = '#7fd5ff';
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+                ctx.stroke();
+            }
+
+            // Враги
+            for (const e of state.enemies) {
+                // Текстурка "черта" (спрайт + рога)
+                const img = e.boss ? state.assets.dragon : (e.kind === 'devil-witch' ? state.assets.witch : state.assets.goblin);
+                if (state.assets.loaded && img && img.complete && img.naturalWidth > 0) {
+                    const size = e.boss ? 80 : 44;
+                    ctx.drawImage(img, e.x - size / 2, e.y - size / 2, size, size);
+                    // красная аура черта
+                    ctx.beginPath();
+                    ctx.strokeStyle = e.boss ? 'rgba(255,80,120,0.8)' : 'rgba(255,120,90,0.7)';
+                    ctx.arc(e.x, e.y, e.r + 4, 0, Math.PI * 2);
+                    ctx.stroke();
+                } else {
+                    ctx.beginPath();
+                    ctx.fillStyle = e.boss ? '#ff5f6d' : '#f18b5e';
+                    ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // рога
+                ctx.fillStyle = '#5b1a1a';
+                ctx.beginPath();
+                ctx.moveTo(e.x - e.r * 0.6, e.y - e.r * 0.8);
+                ctx.lineTo(e.x - e.r * 0.2, e.y - e.r * 1.3);
+                ctx.lineTo(e.x, e.y - e.r * 0.7);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.moveTo(e.x + e.r * 0.6, e.y - e.r * 0.8);
+                ctx.lineTo(e.x + e.r * 0.2, e.y - e.r * 1.3);
+                ctx.lineTo(e.x, e.y - e.r * 0.7);
+                ctx.fill();
+
+                // HP бар
+                const bw = e.boss ? 70 : 34;
+                const max = e.boss ? 140 : (40 + state.roomIndex * 15);
+                const p = Math.max(0, e.hp / max);
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                ctx.fillRect(e.x - bw / 2, e.y - e.r - 12, bw, 6);
+                ctx.fillStyle = '#78f08a';
+                ctx.fillRect(e.x - bw / 2, e.y - e.r - 12, bw * p, 6);
+            }
+
+            // Игрок
+            if (state.assets.loaded && state.assets.knight && state.assets.knight.complete && state.assets.knight.naturalWidth > 0) {
+                const size = 52;
+                ctx.save();
+                ctx.translate(state.player.x, state.player.y);
+                const ang = Math.atan2(state.player.facingY, state.player.facingX);
+                ctx.rotate(ang + Math.PI / 2);
+                ctx.globalAlpha = state.player.hitCd > 0 ? 0.75 : 1;
+                ctx.drawImage(state.assets.knight, -size / 2, -size / 2, size, size);
+                ctx.restore();
+                ctx.globalAlpha = 1;
+            } else {
+                ctx.beginPath();
+                ctx.fillStyle = state.player.hitCd > 0 ? '#ffcccb' : '#8cd4ff';
+                ctx.arc(state.player.x, state.player.y, state.player.r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#d9f1ff';
+                ctx.stroke();
+            }
+
+            // Направление
+            ctx.strokeStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.moveTo(state.player.x, state.player.y);
+            ctx.lineTo(state.player.x + state.player.facingX * 20, state.player.y + state.player.facingY * 20);
+            ctx.stroke();
+
+            // Атака вспышка
+            if (state.player.attackCd > 13) {
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(255, 215, 0, 0.8)';
+                ctx.lineWidth = 4;
+                const ax = state.player.x + state.player.facingX * 34;
+                const ay = state.player.y + state.player.facingY * 34;
+                ctx.arc(ax, ay, 24, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.lineWidth = 1;
+            }
+
+            // Подсказки взаимодействия
+            for (const t of state.terminals) {
+                if (t.solved) continue;
+                const d = Math.hypot(state.player.x - (t.x + t.w / 2), state.player.y - (t.y + t.h / 2));
+                if (d < 72) {
+                    ctx.fillStyle = '#ffe28a';
+                    ctx.font = '14px Montserrat';
+                    ctx.fillText('E: Открыть сундук-квест', t.x - 48, t.y - 10);
+                }
+            }
+            if (state.door.open) {
+                const d = Math.hypot(state.player.x - (state.door.x + 18), state.player.y - (state.door.y + 55));
+                if (d < 72) {
+                    ctx.fillStyle = '#ffe28a';
+                    ctx.font = '14px Montserrat';
+                    ctx.fillText('E: В следующую комнату', state.door.x - 70, state.door.y - 10);
+                }
+            }
+
+            // Сообщение по центру
+            if (state.messageT > 0 && state.message) {
+                const text = state.message;
+                ctx.font = '18px Montserrat';
+                const tw = ctx.measureText(text).width;
+                const bx = (canvas.width - tw) / 2 - 14;
+                const by = 34;
+                ctx.fillStyle = 'rgba(0,0,0,0.45)';
+                ctx.fillRect(bx, by, tw + 28, 36);
+                ctx.strokeStyle = 'rgba(255,215,0,0.6)';
+                ctx.strokeRect(bx, by, tw + 28, 36);
+                ctx.fillStyle = '#ffefb0';
+                ctx.fillText(text, bx + 14, by + 24);
+            }
+
+            // Частицы
+            for (const p of state.particles) {
+                ctx.globalAlpha = Math.max(0, p.life / 40);
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        function updateHud() {
+            document.getElementById('hp').textContent = state.hp;
+            document.getElementById('xp').textContent = state.xp;
+            document.getElementById('stamina').textContent = Math.round(state.player.stamina);
+            document.getElementById('room').textContent = state.roomIndex + 1;
+            document.getElementById('term').textContent = `${state.terminals.filter(t => t.solved).length}/${state.terminals.length}`;
+            document.getElementById('enemy').textContent = state.enemies.length;
+            document.getElementById('objective').textContent = state.door.open ? 'Иди к двери' : 'Очистить и взломать';
+        }
+
+        function gameLoop() {
+            if (state.running) {
+                movePlayer();
+                updateEnemies();
+                updateLoot();
+                updateProjectiles();
+                updateParticles();
+                updateDoorState();
+                if (state.player.attackCd > 0) state.player.attackCd -= 1;
+                if (state.player.hitCd > 0) state.player.hitCd -= 1;
+                if (state.messageT > 0) state.messageT -= 1;
+            }
+            draw();
+            updateHud();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function gameOver(victory) {
+            state.running = false;
+            const overlay = document.getElementById('resultOverlay');
+            const title = document.getElementById('resultTitle');
+            const text = document.getElementById('resultText');
+
+            if (victory) {
+                const bonus = 220 + state.contracts[state.roomIndex].reward;
+                state.xp += bonus;
+                localStorage.setItem('dungeonXP', state.xp);
+                localStorage.setItem('dungeonBestRoom', '4');
+                void syncDungeonToServer();
+                title.textContent = '🏆 Победа в Code Dungeon!';
+                text.textContent = `Ты закрыл контракт Гильдии и получил +${bonus} XP. Теперь открой план и закрой 1 реальную задачу дня.`;
+            } else {
+                const best = Math.max(parseInt(localStorage.getItem('dungeonBestRoom') || '0'), state.roomIndex + 1);
+                localStorage.setItem('dungeonBestRoom', String(best));
+                void syncDungeonToServer();
+                title.textContent = '💀 Попробуй ещё раз';
+                const nextContract = state.contracts[Math.min(state.roomIndex, state.contracts.length - 1)];
+                text.textContent = `Ты дошёл до комнаты ${state.roomIndex + 1}. Лучший результат сохранён. Следующий фокус: ${nextContract.title}.`;
+            }
+
+            overlay.style.display = 'flex';
+        }
+
+        function restartRun() {
+            document.getElementById('resultOverlay').style.display = 'none';
+            state.hp = 100;
+            state.player.stamina = 100;
+            state.running = true;
+            state.questionQueue = buildDungeonQuestionQueue(16);
+            state.qIndex = 0;
+            buildRoom(0);
+        }
+
+        function startDungeon() {
+            document.getElementById('introOverlay').style.display = 'none';
+            state.running = true;
+            showMessage('Контракт принят. Удачи в забеге!');
+        }
+
+        window.restartRun = restartRun;
+        window.startDungeon = startDungeon;
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') doAttack();
+            if (e.code === 'KeyF' || (e.key || '').toLowerCase() === 'а') doSpecialAttack();
+            if (e.code === 'KeyE' || (e.key || '').toLowerCase() === 'e' || (e.key || '').toLowerCase() === 'у') tryInteract();
+            if (e.key === 'Escape' && state.quizOpen) closeQuiz();
+        });
+
+        async function initPage() {
+            await hydrateDungeonFromServer();
+            window.PlanGameTracker?.startGameSession('code-dungeon', 'Code Dungeon');
+            loadAssets();
+            buildRoom(0);
+            gameLoop();
+        }
+
+        initPage();
+    </script>
+</body>
+</html>

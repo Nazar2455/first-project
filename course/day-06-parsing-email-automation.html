@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>День 6 · ПАРСИНГ — Email и автоматизация</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+    body{font-family:'Montserrat',sans-serif;background:linear-gradient(135deg,#0f0f1e,#1a0a2e,#16213e);color:#eaf2ff;min-height:100vh;padding:20px}
+    .wrap{max-width:1100px;margin:0 auto}.card{background:rgba(19,28,46,.86);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px;margin-bottom:12px}
+    h1{color:#ffed4e;margin-bottom:8px}h2{color:#56e8ff;font-size:1.12em;margin-bottom:8px}p,li{line-height:1.6;color:#d6e4ff}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}.btn{display:inline-block;text-decoration:none;border:1px solid rgba(255,215,0,.45);border-radius:10px;background:rgba(255,215,0,.12);color:#ffed4e;font-weight:700;padding:9px 12px}
+    .btn.alt{border-color:rgba(86,232,255,.55);color:#56e8ff;background:rgba(86,232,255,.12)}
+    .code{margin-top:8px;border-radius:10px;overflow:hidden;border:1px solid rgba(102,126,234,.35);background:#0b1220}.code-title{background:rgba(102,126,234,.12);color:#9ec0ff;font-size:.78em;font-weight:700;padding:8px 10px;border-bottom:1px solid rgba(102,126,234,.25)}
+    pre{margin:0;padding:12px;overflow-x:auto;font-size:.84em;line-height:1.45}code{font-family:Consolas,'Courier New',monospace;color:#e7f1ff}
+  </style>
+  <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+<div class="wrap">
+  <section class="card">
+    <h1>День 6 · 🕷️ ПАРСИНГ</h1>
+    <p>Тема: отправка результатов парсинга на email и плановый запуск по расписанию.</p>
+    <div class="actions">
+      <a class="btn" href="day-06-index.html">← День 6 (выбор трека)</a>
+      <a class="btn alt" href="day-06-bots-export.html">Переключиться на БОТЫ</a>
+      <a class="btn" href="day-07-index.html">День 7 →</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>1) Email-отправка результатов</h2>
+    <div class="code"><div class="code-title">services/email_report.py</div><pre><code>import smtplib
+from email.mime.text import MIMEText
+
+
+def send_report_email(sender: str, password: str, receiver: str, subject: str, body: str):
+    # Формируем email
+    msg = MIMEText(body, "plain", "utf-8")
+    msg["Subject"] = subject
+    msg["From"] = sender
+    msg["To"] = receiver
+
+    # Подключаемся к SMTP (пример для Gmail)
+    with smtplib.SMTP("smtp.gmail.com", 587) as server:
+        server.starttls()               # Шифруем соединение
+        server.login(sender, password)  # Логинимся
+        server.sendmail(sender, [receiver], msg.as_string())</code></pre></div>
+  </section>
+
+  <section class="card">
+    <h2>2) Retry-логика для надёжности</h2>
+    <div class="code"><div class="code-title">utils/retry.py</div><pre><code>import time
+
+
+def with_retry(func, retries: int = 3, delay: float = 1.5):
+    last_error = None
+
+    for attempt in range(1, retries + 1):
+        try:
+            return func()
+        except Exception as e:
+            last_error = e
+            if attempt < retries:
+                time.sleep(delay * attempt)  # Увеличиваем паузу
+
+    # Если все попытки неудачны — пробрасываем последнюю ошибку
+    raise last_error</code></pre></div>
+  </section>
+
+  <section class="card">
+    <h2>3) Плановый запуск</h2>
+    <h3>Windows Task Scheduler (рекомендовано для твоей ОС)</h3>
+    <ul>
+      <li>Создай задачу, которая запускает твой parser <code>main.py</code> 2 раза в день.</li>
+      <li>Укажи рабочую папку проекта, чтобы пути к файлам были корректны.</li>
+      <li>Проверь лог-файл после автозапуска.</li>
+    </ul>
+
+    <h3>Linux cron (если позже перейдёшь на сервер)</h3>
+    <div class="code"><div class="code-title">Идея crontab</div><pre><code># Пример: запуск в 9:00 и 18:00
+0 9,18 * * * /usr/bin/python3 /path/to/parser/main.py</code></pre></div>
+  </section>
+
+  <section class="card">
+    <h2>4) Практика</h2>
+    <ol>
+      <li>Собери текстовый отчёт: сколько объектов найдено + TOP-5.</li>
+      <li>Отправь его себе на email из кода.</li>
+      <li>Настрой автозапуск 1 раз в день и проверь, что письмо приходит.</li>
+    </ol>
+  </section>
+</div>
+</body>
+</html>

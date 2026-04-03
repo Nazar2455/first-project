@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Аркадный Гильдии — Code Dungeon Hub</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Montserrat, Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0e27, #1b0f3d);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            gap: 20px;
+        }
+        .navbar {
+            width: min(1200px, 96vw);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(20, 30, 60, 0.95);
+            border: 2px solid #ffd700;
+            border-radius: 12px;
+            padding: 15px 20px;
+            backdrop-filter: blur(8px);
+        }
+        .title {
+            font-size: 1.8em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            border: 1px solid rgba(102, 126, 234, 0.7);
+            background: rgba(102, 126, 234, 0.15);
+            color: #d4defc;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background: rgba(102, 126, 234, 0.25);
+            transform: translateY(-2px);
+        }
+        .header {
+            text-align: center;
+            width: min(1200px, 96vw);
+        }
+        .header h1 {
+            font-size: 2.6em;
+            margin: 0 0 10px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e, #ffa500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header p {
+            font-size: 1.1em;
+            color: #b0c4de;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        .games-grid {
+            width: min(1200px, 96vw);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .game-card {
+            background: linear-gradient(135deg, rgba(40, 50, 100, 0.9), rgba(60, 40, 100, 0.9));
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .game-card:hover {
+            border-color: #ffd700;
+            transform: translateY(-6px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+        }
+        .game-icon {
+            font-size: 4em;
+            animation: float 2.5s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .game-title {
+            font-size: 1.3em;
+            font-weight: 800;
+            color: #ffed4e;
+            text-align: center;
+        }
+        .game-desc {
+            font-size: 0.9em;
+            color: #d8e2ff;
+            text-align: center;
+            line-height: 1.5;
+        }
+        .game-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin-top: auto;
+        }
+        .tag {
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 0.75em;
+            color: #ffe88f;
+            font-weight: 600;
+        }
+        .locked {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .lock-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.2em;
+            background: rgba(255, 0, 0, 0.8);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .footer {
+            width: min(1200px, 96vw);
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .game-card-wrapper {
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="title">🎮 Аркадная Гильдия</div>
+        <div class="nav-buttons">
+            <a class="btn" href="30d-main-tasks.html">📋 План</a>
+            <a class="btn" href="task-verification.html">✅ Проверка</a>
+            <a class="btn" href="character-profile.html">👤 Профиль</a>
+        </div>
+    </div>
+
+    <div class="header">
+        <h1>🕹️ Выбери игру для фарма XP</h1>
+        <p>Каждая игра учит реальным навыкам для фриланса: MVP, парсинг, оптимизацию, код-челленджи с практикой.</p>
+    </div>
+
+    <div class="games-grid">
+        <!-- Code Dungeon -->
+        <a href="code-dungeon.html" class="game-card">
+            <div class="game-icon">🏰</div>
+            <div class="game-title">Code Dungeon</div>
+            <div class="game-desc">Боевые контракты: убивай багов, решай квизы, вскрывай сундуки с вопросами.</div>
+            <div class="game-tags">
+                <span class="tag">RPG</span>
+                <span class="tag">Вопросы</span>
+                <span class="tag">4 уровня</span>
+            </div>
+        </a>
+
+        <!-- Bot Builder Platformer -->
+        <a href="bot-builder-platformer.html" class="game-card">
+            <div class="game-icon">🤖</div>
+            <div class="game-title">Bot Builder</div>
+            <div class="game-desc">Платформер: собирай кусочки кода, избегай ошибок, сборка MVP на каждом уровне.</div>
+            <div class="game-tags">
+                <span class="tag">Платформер</span>
+                <span class="tag">Код-челленджи</span>
+                <span class="tag">5 уровней</span>
+            </div>
+        </a>
+
+        <!-- Parser Defense -->
+        <a href="parser-defense.html" class="game-card">
+            <div class="game-icon">🛡️</div>
+            <div class="game-title">Parser Defense</div>
+            <div class="game-desc">Башни: защищай от волн "грязных" данных, оптимизируй парсинг, берш сделки с клиентами.</div>
+            <div class="game-tags">
+                <span class="tag">Tower Defense</span>
+                <span class="tag">Оптимизация</span>
+                <span class="tag">6 уровней</span>
+            </div>
+        </a>
+
+        <!-- Future Game 1 - Locked -->
+        <div class="game-card-wrapper">
+            <div class="game-card locked">
+                <div class="game-icon">💰</div>
+                <div class="game-title">Deal Maker</div>
+                <div class="game-desc">Скоро: переговоры с клиентами, ценообразование, конверсия продаж.</div>
+                <div class="game-tags">
+                    <span class="tag">РазвиБаза</span>
+                    <span class="tag">Стратегия</span>
+                </div>
+            </div>
+            <div class="lock-badge">🔒</div>
+        </div>
+
+        <!-- Future Game 2 - Locked -->
+        <div class="game-card-wrapper">
+            <div class="game-card locked">
+                <div class="game-icon">📊</div>
+                <div class="game-title">Stats Craft</div>
+                <div class="game-desc">Скоро: анализ данных, воронка продаж, метрики успеха проекта.</div>
+                <div class="game-tags">
+                    <span class="tag">Логика</span>
+                    <span class="tag">Аналитика</span>
+                </div>
+            </div>
+            <div class="lock-badge">🔒</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>💡 Совместный XP через все игры идёт в основной план. Начни с Code Dungeon, переходи на Bot Builder для практики кода.</p>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script src="game-session-tracker.js"></script>
+    <script>
+        const API_BASE = localStorage.getItem('planApiBase') || 'http://127.0.0.1:8000/api';
+
+        async function apiRequest(path, options = {}) {
+            if (window.PlanApiClient?.request) {
+                return window.PlanApiClient.request(path, options, API_BASE);
+            }
+
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 3000);
+
+            try {
+                const response = await fetch(`${API_BASE}${path}`, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(options.headers || {})
+                    },
+                    signal: controller.signal
+                });
+
+                if (!response.ok) return null;
+                return await response.json();
+            } catch (_) {
+                return null;
+            } finally {
+                clearTimeout(timeout);
+            }
+        }
+
+        async function hydrateGameStatsFromServer() {
+            const data = await apiRequest('/state/game_stats');
+            if (data?.value && typeof data.value === 'object') {
+                localStorage.setItem('gameStats', JSON.stringify(data.value));
+            }
+        }
+
+        async function syncGameStatsToServer() {
+            const gameStats = JSON.parse(localStorage.getItem('gameStats') || '{}');
+            await apiRequest('/state/game_stats', {
+                method: 'PUT',
+                body: JSON.stringify({ value: gameStats })
+            });
+        }
+
+        // Tracking game plays + session time
+        function trackGamePlay(gameName) {
+            window.PlanGameTracker?.startGameSession(gameName, gameName);
+        }
+
+        async function initPage() {
+            await hydrateGameStatsFromServer();
+
+            document.querySelectorAll('a.game-card').forEach(card => {
+                const gameName = card.href.split('/').pop().replace('.html', '');
+                card.addEventListener('click', () => trackGamePlay(gameName));
+            });
+        }
+
+        initPage();
+    </script>
+</body>
+</html>

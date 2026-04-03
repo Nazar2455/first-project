@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>День 16 · БОТЫ — Логи и ошибки</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+    body{font-family:'Montserrat',sans-serif;background:linear-gradient(135deg,#0f0f1e,#1a0a2e,#16213e);color:#eaf2ff;min-height:100vh;padding:20px}
+    .wrap{max-width:1100px;margin:0 auto}.card{background:rgba(19,28,46,.86);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px;margin-bottom:12px}
+    h1{color:#ffed4e;margin-bottom:8px}h2{color:#56e8ff;font-size:1.12em;margin-bottom:8px}h3{color:#96b7ff;margin:10px 0 6px}
+    p,li{line-height:1.6;color:#d6e4ff}.actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{display:inline-block;text-decoration:none;border:1px solid rgba(255,215,0,.45);border-radius:10px;background:rgba(255,215,0,.12);color:#ffed4e;font-weight:700;padding:9px 12px}
+    .btn.alt{border-color:rgba(86,232,255,.55);color:#56e8ff;background:rgba(86,232,255,.12)}
+    .code{margin-top:8px;border-radius:10px;overflow:hidden;border:1px solid rgba(102,126,234,.35);background:#0b1220}.code-title{background:rgba(102,126,234,.12);color:#9ec0ff;font-size:.78em;font-weight:700;padding:8px 10px;border-bottom:1px solid rgba(102,126,234,.25)}
+    pre{margin:0;padding:12px;overflow-x:auto;font-size:.84em;line-height:1.45}code{font-family:Consolas,'Courier New',monospace;color:#e7f1ff}
+    .note{border-left:3px solid #ffd700;background:rgba(255,215,0,.08);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.9em}
+  </style>
+  <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+<div class="wrap">
+  <section class="card">
+    <h1>День 16 · 🤖 БОТЫ</h1>
+    <p>Тема: логирование и глобальная обработка ошибок — чтобы находить проблемы за минуты, а не за часы.</p>
+    <div class="actions">
+      <a class="btn" href="day-16-index.html">← День 16 (выбор трека)</a>
+      <a class="btn alt" href="day-16-parsing-logging-errors.html">Переключиться на ПАРСИНГ</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>1) Базовый loguru setup</h2>
+    <div class="code"><div class="code-title">utils/logger.py</div><pre><code>from loguru import logger
+
+logger.add("logs/bot.log", rotation="10 MB", retention="7 days")
+
+
+def info(msg: str):
+    logger.info(msg)
+
+
+def error(msg: str):
+    logger.error(msg)</code></pre></div>
+  </section>
+
+  <section class="card">
+    <h2>2) Global error handler</h2>
+    <div class="code"><div class="code-title">пример идеи</div><pre><code>try:
+    # обработка сообщения
+    ...
+except Exception as e:
+    logger.exception("Unhandled error: {}", e)
+    await message.answer("⚠️ Временная ошибка, попробуйте ещё раз")</code></pre></div>
+    <div class="note">Пользователь не должен видеть traceback, но ты должен видеть его в логах.</div>
+  </section>
+
+  <section class="card">
+    <h2>3) Что логировать обязательно</h2>
+    <ul>
+      <li>Старт/остановка бота</li>
+      <li>Ключевые команды (/start, /admin, /export)</li>
+      <li>Ошибки БД/API</li>
+      <li>Попытки неавторизованного доступа</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>4) Практика</h2>
+    <ol>
+      <li>Подключи loguru.</li>
+      <li>Добавь global error handler.</li>
+      <li>Сымитируй 2 ошибки и убедись, что они попали в лог.</li>
+      <li>Добавь краткий раздел «Troubleshooting» в README.</li>
+    </ol>
+  </section>
+</div>
+</body>
+</html>

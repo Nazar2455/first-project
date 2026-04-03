@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Модуль 2 · Практикум (UI бота + данные парсинга)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(135deg, #0f0f1e, #1a0a2e, #16213e);
+      color: #eaf2ff;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; }
+    .card {
+      background: rgba(19, 28, 46, 0.86);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    h1 { color: #ffed4e; margin-bottom: 8px; }
+    h2 { color: #56e8ff; font-size: 1.14em; margin-bottom: 8px; }
+    h3 { color: #9ec0ff; font-size: 1em; margin: 10px 0 7px; }
+    p, li { color: #d7e6ff; line-height: 1.6; }
+    ul, ol { margin-left: 20px; margin-top: 8px; }
+
+    .hint {
+      border-left: 3px solid #ffd700;
+      background: rgba(255,215,0,0.08);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-top: 8px;
+      font-size: 0.92em;
+    }
+
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      border: 1px solid rgba(255,215,0,.45);
+      border-radius: 10px;
+      background: rgba(255,215,0,.12);
+      color: #ffed4e;
+      font-weight: 700;
+      padding: 9px 12px;
+      cursor: pointer;
+    }
+    .btn.alt {
+      border-color: rgba(86,232,255,.55);
+      color: #56e8ff;
+      background: rgba(86,232,255,.12);
+    }
+
+    details {
+      margin-top: 8px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.03);
+    }
+    summary {
+      cursor: pointer;
+      color: #ffd700;
+      font-weight: 700;
+    }
+
+    .codebox {
+      margin-top: 10px;
+      border: 1px solid rgba(102,126,234,0.35);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #0b1220;
+    }
+    .codebox-title {
+      background: rgba(102,126,234,0.12);
+      color: #9ec0ff;
+      font-size: 0.8em;
+      font-weight: 700;
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(102,126,234,0.25);
+    }
+    textarea {
+      width: 100%;
+      min-height: 190px;
+      border: none;
+      resize: vertical;
+      padding: 12px;
+      font-family: Consolas, 'Courier New', monospace;
+      font-size: 0.88em;
+      line-height: 1.45;
+      color: #e7f1ff;
+      background: #0b1220;
+      outline: none;
+    }
+
+    .checks {
+      margin-top: 10px;
+      display: grid;
+      gap: 6px;
+      font-size: 0.92em;
+    }
+    .ok { color: #6ff3a3; }
+    .bad { color: #ff8f8f; }
+    .warn { color: #ffd78a; }
+
+    .result {
+      margin-top: 10px;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.92em;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .status-pill {
+      display: inline-block;
+      margin-top: 8px;
+      border: 1px solid rgba(255,215,0,.45);
+      border-radius: 999px;
+      padding: 4px 10px;
+      color: #ffed4e;
+      font-size: 0.8em;
+      font-weight: 700;
+      background: rgba(255,215,0,.1);
+    }
+    /* ===== ПАСХАЛКИ ===== */
+    .easter-egg {
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 215, 0, 0.15));
+      border: 2px solid rgba(255, 107, 107, 0.4);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 15px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+      line-height: 1.4;
+      position: relative;
+      overflow: hidden;
+      animation: easter-glow 3s ease-in-out infinite;
+    }
+    .easter-egg::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.2), transparent);
+      animation: easter-shine 3s infinite;
+      pointer-events: none;
+    }
+    .easter-egg-content {
+      position: relative;
+      z-index: 1;
+    }
+    .easter-egg-title {
+      color: #ff6b6b;
+      font-weight: 800;
+      margin-bottom: 10px;
+      font-size: 1em;
+    }
+    .easter-egg-quote {
+      color: #ffd700;
+      font-style: italic;
+      font-weight: 600;
+    }
+    @keyframes easter-glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(255, 107, 107, 0.3); }
+      50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+    }
+    @keyframes easter-shine {
+      0% { left: -100%; }
+      50% { left: 100%; }
+      100% { left: 100%; }
+    }
+  </style>
+  <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+  <div class="wrap">
+    <section class="card">
+      <h1>🧪 Модуль 2 · Практикум</h1>
+      <p>Шаблон как в Модуле 1, но задачи уже «уровнем выше»: в боте — интерфейс и callback-логика, в парсинге — фильтры/сортировка/CSV для клиента.</p>
+      <div class="actions">
+        <a class="btn" href="day-02-interface-data.html">← Теория Модуля 2</a>
+        <a class="btn alt" href="index.html">Ко всем модулям</a>
+        <a class="btn" href="day-03-fsm-filters.html">День 3 →</a>
+      </div>
+      <div class="course-top-tools">
+        <button id="readToggleBtn" class="read-toggle-btn" type="button">📘 Отметить день как прочитанный</button>
+        <span class="status-pill">Практика дня 2</span>
+      </div>
+    </section>
+
+    <div class="easter-egg">
+      <div class="easter-egg-content">
+        <div class="easter-egg-title">💡 Практикум День 2 = Ты становишься профессионалом</div>
+        <div class="easter-egg-quote">День 1 ты учился писать. День 2 ты пишешь то, что решает проблемы. Заметь разницу: на День 1 ты проверяешь, «работает ли»? На День 2 ты проверяешь, «довольны ли клиенты?». Это психологический переход. Ты уже профи! 🚀</div>
+      </div>
+    </div>
+
+    <section class="card" id="bot-practice">
+      <h2>🤖 Практическое задание #1 (ИНТЕРФЕЙС БОТА)</h2>
+      <p><strong>Цель:</strong> сделать интерфейс бота, в котором пользователь не вводит команды вручную, а управляет сценарием кнопками.</p>
+      <p><strong>Связь с теорией дня 2:</strong> закрепляешь блоки про <strong>Reply/Inline клавиатуры</strong>, <strong>callback_data</strong> и UX-логику «нажал кнопку → получил следующий шаг».</p>
+      <div class="hint"><strong>Фокус на смысл:</strong> цель задания не просто «добавить кнопки», а сделать понятный и быстрый пользовательский путь без лишнего текста и ручного ввода команд.</div>
+      <h3>Что нужно сделать (конкретно)</h3>
+      <ol>
+        <li>Добавь Reply-клавиатуру (минимум 3 кнопки).</li>
+        <li>Добавь Inline-клавиатуру (минимум 2 callback-кнопки).</li>
+        <li>Сделай обработчики callback + обязательно <code>call.answer()</code>.</li>
+        <li>Покажи, что переход «Назад в меню» работает.</li>
+      </ol>
+      <h3>Критерии готовности (Definition of Done)</h3>
+      <ul>
+        <li>В боте есть и Reply-, и Inline-интерфейс.</li>
+        <li>Callback-кнопки не «висят» (после нажатия вызывается <code>call.answer()</code>).</li>
+        <li>Переход «Назад в меню» возвращает пользователя в рабочее состояние.</li>
+      </ul>
+      <h3>Что сдать на проверку</h3>
+      <ul>
+        <li>Фрагменты кода с клавиатурами и callback-хендлерами.</li>
+        <li>Короткий лог/описание 2–3 тестовых нажатий кнопок.</li>
+      </ul>
+
+      <details>
+        <summary>Подсказка</summary>
+        <p>Ищи в коде: <code>ReplyKeyboardMarkup</code>, <code>InlineKeyboardMarkup</code>, <code>@router.callback_query</code>, <code>F.data</code>, <code>call.answer()</code>.</p>
+      </details>
+
+      <div class="codebox">
+        <div class="codebox-title">Вставь код бота (модуль 2)</div>
+        <textarea id="botCode" placeholder="handlers + keyboards + main.py"></textarea>
+      </div>
+      <div class="codebox">
+        <div class="codebox-title">Вставь лог/вывод (по желанию, но лучше добавить)</div>
+        <textarea id="botOutput" placeholder="stdout / заметки теста в Telegram"></textarea>
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="button" id="checkBotBtn">Проверить задание БОТЫ</button>
+      </div>
+      <div class="result" id="botResult">Пока не проверяли.</div>
+      <div class="checks" id="botChecks"></div>
+    </section>
+
+    <section class="card" id="parsing-practice">
+      <h2>🕷️ Практическое задание #2 (ПАРСИНГ + ДАННЫЕ)</h2>
+      <p><strong>Цель:</strong> получить не сырой список карточек, а клиентский результат: отфильтрованные и отсортированные данные в CSV.</p>
+      <p><strong>Связь с теорией дня 2:</strong> закрепляешь блоки про <strong>нормализацию данных</strong>, <strong>фильтрацию</strong>, <strong>сортировку</strong> и «данные, которые можно сразу использовать».</p>
+      <div class="hint"><strong>Фокус на смысл:</strong> клиенту нужен не «весь шум», а уже обработанная выборка по критериям, с которой можно работать сразу после выгрузки.</div>
+      <h3>Что нужно сделать (конкретно)</h3>
+      <ol>
+        <li>Собери до 200 карточек (или максимум доступных).</li>
+        <li>Добавь <code>parse_price</code> и фильтр <code>min_price/max_price</code>.</li>
+        <li>Сделай сортировку по цене.</li>
+        <li>Экспортируй CSV с полями <code>title, price, url, parsed_at</code>.</li>
+      </ol>
+      <h3>Критерии готовности (Definition of Done)</h3>
+      <ul>
+        <li>На выходе CSV с нужными колонками и корректной кодировкой.</li>
+        <li>Сортировка идёт по числовой цене, а не по строкам.</li>
+        <li>В консоли видно, сколько строк реально сохранено.</li>
+      </ul>
+      <h3>Что сдать на проверку</h3>
+      <ul>
+        <li>Код функций <code>parse_price</code>, фильтра и сортировки.</li>
+        <li>Пример строки лога с количеством сохранённых строк.</li>
+      </ul>
+
+      <details>
+        <summary>Подсказка</summary>
+        <p>Проверь, что в CSV есть <code>utf-8</code>, <code>newline=""</code>, и выводится количество сохранённых строк.</p>
+      </details>
+
+      <div class="codebox">
+        <div class="codebox-title">Вставь код парсера (модуль 2)</div>
+        <textarea id="parserCode" placeholder="main.py / parser utils"></textarea>
+      </div>
+      <div class="codebox">
+        <div class="codebox-title">Вставь лог запуска (например: Сохранено строк: 200)</div>
+        <textarea id="parserOutput" placeholder="stdout"></textarea>
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="button" id="checkParserBtn">Проверить задание ПАРСИНГ</button>
+      </div>
+      <div class="result" id="parserResult">Пока не проверяли.</div>
+      <div class="checks" id="parserChecks"></div>
+    </section>
+  </div>
+
+  <script src="course-tools.js"></script>
+  <script>
+    const LAB_KEY = 'course_day2_practice_lab_v1';
+
+    function has(text, pattern) { return pattern.test(text); }
+    function normalizeCode(text) { return String(text || '').replace(/\r\n/g, '\n').toLowerCase(); }
+    function nonEmptyLines(text) {
+      return String(text || '').split('\n').map(x => x.trim()).filter(Boolean).length;
+    }
+
+    function renderChecks(containerId, items) {
+      const el = document.getElementById(containerId);
+      el.innerHTML = items.map(i => {
+        const cls = i.level === 'warn' ? 'warn' : (i.ok ? 'ok' : 'bad');
+        const icon = i.level === 'warn' ? '⚠️' : (i.ok ? '✅' : '❌');
+        return `<div class="${cls}">${icon} ${i.label}${i.note ? ` — ${i.note}` : ''}</div>`;
+      }).join('');
+    }
+
+    function summarize(resultId, checks) {
+      const mandatoryFails = checks.filter(c => c.required && !c.ok);
+      const points = checks.reduce((acc, c) => acc + (c.ok ? (c.weight || 1) : 0), 0);
+      const maxPoints = checks.reduce((acc, c) => acc + (c.weight || 1), 0);
+      const pct = maxPoints ? Math.round((points / maxPoints) * 100) : 0;
+      const pass = mandatoryFails.length === 0 && pct >= 75;
+      const failText = mandatoryFails.length
+        ? `<br><span class="bad">Обязательные недочёты: ${mandatoryFails.map(x => x.short || x.label).join(', ')}</span>`
+        : '';
+      document.getElementById(resultId).innerHTML = `<strong>${points}/${maxPoints}</strong> баллов (${pct}%). ${pass ? '✅ Зачёт.' : '❌ Пока не зачёт.'}${failText}`;
+    }
+
+    function checkBotTask() {
+      const code = normalizeCode(document.getElementById('botCode').value || '');
+      const out = normalizeCode(document.getElementById('botOutput').value || '');
+      const lines = nonEmptyLines(code);
+
+      const checks = [
+        { label: 'Достаточный объём кода', short: 'мало кода', ok: lines >= 20, required: true, weight: 2, note: `${lines} строк` },
+        { label: 'Есть ReplyKeyboardMarkup', short: 'нет reply-клавиатуры', ok: has(code, /replykeyboardmarkup\(/), required: true, weight: 3 },
+        { label: 'Есть InlineKeyboardMarkup + callback_data', short: 'нет inline/callback_data', ok: has(code, /inlinekeyboardmarkup\(/) && has(code, /callback_data\s*=/), required: true, weight: 3 },
+        { label: 'Есть callback handlers (@router.callback_query)', short: 'нет callback handlers', ok: has(code, /@\w*router\.callback_query/) || has(code, /@router\.callback_query/), required: true, weight: 2 },
+        { label: 'Есть call.answer()', short: 'нет call.answer', ok: has(code, /call\.answer\(/), required: true, weight: 2 },
+        { label: 'Есть переход в меню/назад (menu/back)', short: 'нет кнопки назад', ok: has(code, /menu|назад|back/), required: true, weight: 2 },
+        { label: 'Лог теста в Telegram добавлен (желательно)', ok: /callback|нажал|кнопк|menu|back/.test(out), required: false, level: 'warn', weight: 1, note: out.trim() ? 'лог добавлен' : 'лог не добавлен' }
+      ];
+
+      renderChecks('botChecks', checks);
+      summarize('botResult', checks);
+      persistLab();
+    }
+
+    function checkParserTask() {
+      const code = normalizeCode(document.getElementById('parserCode').value || '');
+      const out = normalizeCode(document.getElementById('parserOutput').value || '');
+      const lines = nonEmptyLines(code);
+
+      const checks = [
+        { label: 'Достаточный объём кода', short: 'мало кода', ok: lines >= 24, required: true, weight: 2, note: `${lines} строк` },
+        { label: 'Есть сбор до 200 (срез/limit)', short: 'нет лимита 200', ok: has(code, /\[:\s*200\]/) || has(code, /limit\s*=\s*200/) || has(code, /min\(\s*200\s*,/), required: true, weight: 2 },
+        { label: 'Есть parse_price и очистка цифр', short: 'нет parse_price', ok: has(code, /def\s+parse_price\s*\(/) && (has(code, /isdigit\(/) || has(code, /\d/)), required: true, weight: 3 },
+        { label: 'Есть filter_by_price / min_price / max_price', short: 'нет фильтра цены', ok: has(code, /def\s+filter_by_price\s*\(/) || (has(code, /min_price/) && has(code, /max_price/)), required: true, weight: 3 },
+        { label: 'Есть сортировка по цене', short: 'нет сортировки', ok: has(code, /sorted\(/) || has(code, /sort\(/), required: true, weight: 2 },
+        { label: 'CSV: title, price, url, parsed_at + utf-8/newline', short: 'нет полного csv-экспорта', ok: has(code, /title/) && has(code, /price/) && has(code, /url/) && has(code, /parsed_at/) && has(code, /encoding\s*=\s*["']utf-8["']/) && has(code, /newline\s*=\s*["']["']/), required: true, weight: 4 },
+        { label: 'Есть вывод количества строк', short: 'нет print rows', ok: has(code, /print\s*\(.*(строк|rows|saved)/) || has(code, /print\s*\(.*len\s*\(/), required: true, weight: 2 },
+        { label: 'Лог запуска добавлен (желательно)', ok: /200|строк|rows|saved|сохранено/.test(out), required: false, level: 'warn', weight: 1, note: out.trim() ? 'лог добавлен' : 'лог не добавлен' }
+      ];
+
+      renderChecks('parserChecks', checks);
+      summarize('parserResult', checks);
+      persistLab();
+    }
+
+    function persistLab() {
+      const state = {
+        botCode: document.getElementById('botCode').value,
+        botOutput: document.getElementById('botOutput').value,
+        parserCode: document.getElementById('parserCode').value,
+        parserOutput: document.getElementById('parserOutput').value
+      };
+      localStorage.setItem(LAB_KEY, JSON.stringify(state));
+    }
+
+    function restoreLab() {
+      try {
+        const state = JSON.parse(localStorage.getItem(LAB_KEY) || '{}');
+        if (state.botCode) document.getElementById('botCode').value = state.botCode;
+        if (state.botOutput) document.getElementById('botOutput').value = state.botOutput;
+        if (state.parserCode) document.getElementById('parserCode').value = state.parserCode;
+        if (state.parserOutput) document.getElementById('parserOutput').value = state.parserOutput;
+      } catch {}
+    }
+
+    document.getElementById('checkBotBtn').addEventListener('click', checkBotTask);
+    document.getElementById('checkParserBtn').addEventListener('click', checkParserTask);
+
+    ['botCode', 'botOutput', 'parserCode', 'parserOutput'].forEach((id) => {
+      document.getElementById(id).addEventListener('input', persistLab);
+    });
+
+    restoreLab();
+    CourseTools.initModulePage(2);
+  </script>
+</body>
+</html>

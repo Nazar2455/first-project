@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 Курс-модули: Боты + Парсинг</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0f0f1e, #1a0a2e, #16213e);
+            color: #eaf2ff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .wrap { max-width: 1100px; margin: 0 auto; }
+        .hero {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.14), rgba(102, 126, 234, 0.14));
+            border: 2px solid rgba(255, 215, 0, 0.35);
+            border-radius: 16px;
+            padding: 22px;
+            margin-bottom: 18px;
+        }
+        .hero h1 { color: #ffed4e; margin-bottom: 8px; }
+        .hero p { color: #d7e6ff; line-height: 1.55; }
+        .actions { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn {
+            border: 1px solid rgba(255, 215, 0, 0.45);
+            border-radius: 10px;
+            background: rgba(255, 215, 0, 0.12);
+            color: #ffed4e;
+            font-weight: 700;
+            padding: 10px 14px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+        }
+        .card {
+            background: rgba(19, 28, 46, 0.85);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 14px;
+            padding: 14px;
+        }
+        .card h2 { color: #ffed4e; font-size: 1.12em; margin-bottom: 8px; }
+        .card p { color: #d5e4ff; font-size: 0.92em; line-height: 1.5; margin-bottom: 10px; }
+        .list { margin-left: 18px; }
+        .list li { margin-bottom: 6px; color: #cfe0ff; font-size: 0.9em; }
+        .badge {
+            display: inline-block;
+            border: 1px solid rgba(86,232,255,0.5);
+            color: #56e8ff;
+            border-radius: 999px;
+            padding: 3px 10px;
+            font-size: 0.75em;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+    </style>
+    <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+    <div class="wrap">
+        <section class="hero">
+            <h1>🎓 Подробный курс по модулям</h1>
+            <p>Теперь это основной формат обучения: <strong>по дням, отдельными страницами</strong>. Каждый модуль построен как урок: теория простыми словами → маленькие примеры → большие рабочие блоки → практика → проверка.</p>
+            <div class="actions">
+                <a class="btn" href="../30d-main-tasks.html">← К основному плану</a>
+            </div>
+            <div class="course-progress-pill" id="courseProgressText">Прочитано дней: 0/30</div>
+        </section>
+
+        <section class="grid">
+            <article class="card" data-day-card="1">
+                <div class="badge">МОДУЛЬ 1 · ДЕНЬ 1</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Фундамент: окружение, структура, первый бот и первый парсер</h2>
+                <p>Очень подробный старт: от установки и структуры до запуска первого рабочего результата в двух треках.</p>
+                <ul class="list">
+                    <li>Python, venv, pip, .env, зависимости</li>
+                    <li>aiogram: базовый бот /start и /help</li>
+                    <li>requests + BeautifulSoup: первые 100 объектов</li>
+                    <li>типичные ошибки новичка и как их чинить</li>
+                </ul>
+                <a class="btn" href="day-01-foundation.html">Открыть модуль 1</a>
+                <a class="btn" href="day-01-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 1</a>
+            </article>
+
+            <article class="card" data-day-card="2">
+                <div class="badge">МОДУЛЬ 2 · ДЕНЬ 2</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Интерфейсы и данные: кнопки в боте, CSV, фильтры и демо</h2>
+                <p>Прокачка первого дня: учимся делать полезный UX бота и оформлять результаты парсинга так, как нужно клиенту.</p>
+                <ul class="list">
+                    <li>Reply/Inline кнопки и callback-обработчики</li>
+                    <li>CSV-экспорт и базовые фильтры по данным</li>
+                    <li>как записать демо, которое продаёт</li>
+                    <li>чеклист качества перед публикацией</li>
+                </ul>
+                <a class="btn" href="day-02-interface-data.html">Открыть модуль 2</a>
+                <a class="btn" href="day-02-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 2</a>
+            </article>
+
+            <article class="card" data-day-card="3">
+                <div class="badge">МОДУЛЬ 3 · ДЕНЬ 3</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>FSM в боте + фильтры и TOP-10 в парсинге</h2>
+                <p>Переход к более «коммерческой» логике: строгий сценарий формы и полезная аналитика по данным.</p>
+                <ul class="list">
+                    <li>FSM: имя → телефон → комментарий + /cancel</li>
+                    <li>Фильтры цены и построение TOP-10</li>
+                    <li>Подробные комментарии в коде</li>
+                </ul>
+                <a class="btn" href="day-03-fsm-filters.html">Открыть модуль 3</a>
+                <a class="btn" href="day-03-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 3</a>
+            </article>
+
+            <article class="card" data-day-card="4">
+                <div class="badge">МОДУЛЬ 4 · ДЕНЬ 4</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>SQLite для бота + Google Sheets для парсинга</h2>
+                <p>Делаем хранение данных и облачную выдачу, чтобы проекты выглядели как настоящие рабочие сервисы.</p>
+                <ul class="list">
+                    <li>Создание таблицы leads и repository-слой</li>
+                    <li>Интеграция сохранения из FSM в БД</li>
+                    <li>append_to_sheet() и выгрузка в Google Sheets</li>
+                </ul>
+                <a class="btn" href="day-04-db-sheets.html">Открыть модуль 4</a>
+                <a class="btn" href="day-04-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 4</a>
+            </article>
+
+            <article class="card" data-day-card="5">
+                <div class="badge">МОДУЛЬ 5 · ДЕНЬ 5</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Разделение треков: админка бота и мониторинг парсинга</h2>
+                <p>Первый модуль в формате отдельного дневного хаба: внутри дня можно переключаться между БОТЫ и ПАРСИНГ.</p>
+                <ul class="list">
+                    <li>БОТЫ: <code>/admin</code>, безопасность по ADMIN_IDS</li>
+                    <li>ПАРСИНГ: min/max фильтры, JSON/CSV, новые объекты</li>
+                    <li>Переключение треков в 1 клик</li>
+                </ul>
+                <a class="btn" href="day-05-index.html">Открыть модуль 5</a>
+                <a class="btn" href="day-05-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 5</a>
+            </article>
+
+            <article class="card" data-day-card="6">
+                <div class="badge">МОДУЛЬ 6 · ДЕНЬ 6</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Экспорт и автоматизация: CSV в боте, email+cron в парсинге</h2>
+                <p>Второй модуль в формате отдельного дневного хаба, с полным разделением на треки и комментированным кодом.</p>
+                <ul class="list">
+                    <li>БОТЫ: команда <code>/export</code> и отправка CSV</li>
+                    <li>ПАРСИНГ: email-отчёты и плановый запуск</li>
+                    <li>Переключение треков в 1 клик</li>
+                </ul>
+                <a class="btn" href="day-06-index.html">Открыть модуль 6</a>
+                <a class="btn" href="day-06-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 6</a>
+            </article>
+
+            <article class="card" data-day-card="7">
+                <div class="badge">МОДУЛЬ 7 · ДЕНЬ 7</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Упаковка и продажи: README, демо, релизы, кейсы</h2>
+                <p>День про «видимость ценности»: превращаем проекты в понятные и продаваемые кейсы для клиентов.</p>
+                <ul class="list">
+                    <li>БОТЫ: продающий README, демо 60–90 сек, release v1.0.0</li>
+                    <li>ПАРСИНГ: кейс с результатами, скриншотами и отчётом</li>
+                    <li>Шаблоны откликов для фриланс-бирж</li>
+                </ul>
+                <a class="btn" href="day-07-index.html">Открыть модуль 7</a>
+                <a class="btn" href="day-07-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 7</a>
+            </article>
+
+            <article class="card" data-day-card="8">
+                <div class="badge">МОДУЛЬ 8 · ДЕНЬ 8</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Масштабирование: второй бот и второй парсер</h2>
+                <p>Развиваем скорость: переносим рабочие паттерны в новые проекты без копипаст-хаоса.</p>
+                <ul class="list">
+                    <li>БОТЫ: FAQ-бот на inline-кнопках + связь с менеджером</li>
+                    <li>ПАРСИНГ: адаптация под второй сайт и новые селекторы</li>
+                    <li>Второй набор кейсов для портфолио</li>
+                </ul>
+                <a class="btn" href="day-08-index.html">Открыть модуль 8</a>
+                <a class="btn" href="day-08-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 8</a>
+            </article>
+
+            <article class="card" data-day-card="9">
+                <div class="badge">МОДУЛЬ 9 · ДЕНЬ 9</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Деплой и стабильность: проекты в режиме 24/7</h2>
+                <p>Выводим оба направления в прод: облачный запуск, логи, расписание и контроль стабильности.</p>
+                <ul class="list">
+                    <li>БОТЫ: деплой на Render/Railway, проверка /start и логов</li>
+                    <li>ПАРСИНГ: автозапуск по расписанию и мониторинг результата</li>
+                    <li>Чеклист «готово к клиенту» для прод-среды</li>
+                </ul>
+                <a class="btn" href="day-09-index.html">Открыть модуль 9</a>
+                <a class="btn" href="day-09-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 9</a>
+            </article>
+
+            <article class="card" data-day-card="10">
+                <div class="badge">МОДУЛЬ 10 · ДЕНЬ 10</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Продажи и отклики: первые диалоги и заказы</h2>
+                <p>Фокус дня — монетизация: офферы, отклики, уточняющие вопросы и измеримый KPI по коммуникациям.</p>
+                <ul class="list">
+                    <li>БОТЫ: 3 пакета услуги и отклики с кейсами</li>
+                    <li>ПАРСИНГ: коммерческие предложения и структура подписки</li>
+                    <li>План по 20 откликов + трекинг конверсии</li>
+                </ul>
+                <a class="btn" href="day-10-index.html">Открыть модуль 10</a>
+                <a class="btn" href="day-10-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 10</a>
+            </article>
+
+            <article class="card" data-day-card="11">
+                <div class="badge">МОДУЛЬ 11 · ДЕНЬ 11</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Google Sheets интеграции: прозрачность для клиента</h2>
+                <p>День интеграций: заявки и результаты автоматически уходят в таблицы и становятся удобны для контроля.</p>
+                <ul class="list">
+                    <li>БОТЫ: запись лидов в Google Sheets параллельно с БД</li>
+                    <li>ПАРСИНГ: отчёты в Sheets и стратегия без дублей</li>
+                    <li>Подготовка интеграционных кейсов в портфолио</li>
+                </ul>
+                <a class="btn" href="day-11-index.html">Открыть модуль 11</a>
+                <a class="btn" href="day-11-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 11</a>
+            </article>
+
+            <article class="card" data-day-card="12">
+                <div class="badge">МОДУЛЬ 12 · ДЕНЬ 12</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Масштабирование портфеля: quiz-бот и третий парсер</h2>
+                <p>Усиливаем витрину навыков: ещё один бот и ещё один парсер для роста доверия и конверсии в заказы.</p>
+                <ul class="list">
+                    <li>БОТЫ: quiz-bot-v1 с системой баллов</li>
+                    <li>ПАРСИНГ: третий проект под новый сайт</li>
+                    <li>Чёткие критерии качества для портфолио</li>
+                </ul>
+                <a class="btn" href="day-12-index.html">Открыть модуль 12</a>
+                <a class="btn" href="day-12-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 12</a>
+            </article>
+
+            <article class="card" data-day-card="13">
+                <div class="badge">МОДУЛЬ 13 · ДЕНЬ 13</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Рефакторинг под шаблоны: скорость производства</h2>
+                <p>Стандартизируем проекты под reusable-архитектуру, чтобы запускать новые задачи без хаоса и копипасты.</p>
+                <ul class="list">
+                    <li>БОТЫ: bot-template с разделением на слои</li>
+                    <li>ПАРСИНГ: parser-template + конфиг селекторов</li>
+                    <li>Снижение времени старта нового проекта</li>
+                </ul>
+                <a class="btn" href="day-13-index.html">Открыть модуль 13</a>
+                <a class="btn" href="day-13-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 13</a>
+            </article>
+
+            <article class="card" data-day-card="14">
+                <div class="badge">МОДУЛЬ 14 · ДЕНЬ 14</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Упаковка недели: кейсы, публикация, отклики</h2>
+                <p>Закрепляем вторую неделю: упаковываем работы в продаваемые кейсы и усиливаем канал привлечения заказов.</p>
+                <ul class="list">
+                    <li>БОТЫ: упаковка 2 кейсов + публикация</li>
+                    <li>ПАРСИНГ: метрики и выгода в кейсах</li>
+                    <li>Первые быстрые улучшения по фидбеку рынка</li>
+                </ul>
+                <a class="btn" href="day-14-index.html">Открыть модуль 14</a>
+                <a class="btn" href="day-14-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 14</a>
+            </article>
+
+            <article class="card" data-day-card="15">
+                <div class="badge">МОДУЛЬ 15 · ДЕНЬ 15</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Шаблоны и ускорение: старт новых проектов в разы быстрее</h2>
+                <p>Переходим в режим системного производства: универсальные шаблоны для ботов и парсеров с минимальным временем запуска.</p>
+                <ul class="list">
+                    <li>БОТЫ: telegram-bot-template для новых заказов</li>
+                    <li>ПАРСИНГ: parser-template v2 с конфигом и retry</li>
+                    <li>Фокус на reusable-код и скорость старта</li>
+                </ul>
+                <a class="btn" href="day-15-index.html">Открыть модуль 15</a>
+                <a class="btn" href="day-15-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 15</a>
+            </article>
+
+            <article class="card" data-day-card="16">
+                <div class="badge">МОДУЛЬ 16 · ДЕНЬ 16</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Логирование и обработка ошибок: надёжность в проде</h2>
+                <p>День стабильности: внедряем логи, retry и обработку исключений, чтобы сервисы уверенно работали у клиентов.</p>
+                <ul class="list">
+                    <li>БОТЫ: global error handler и системные логи</li>
+                    <li>ПАРСИНГ: retry, critical-логи, базовые alerts</li>
+                    <li>Практика диагностики и troubleshooting</li>
+                </ul>
+                <a class="btn" href="day-16-index.html">Открыть модуль 16</a>
+                <a class="btn" href="day-16-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 16</a>
+            </article>
+
+            <article class="card" data-day-card="17">
+                <div class="badge">МОДУЛЬ 17 · ДЕНЬ 17</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Автоуведомления и платежный сценарий</h2>
+                <p>Делаем проекты более «сервисными»: события, статусы и стабильная доставка уведомлений клиенту.</p>
+                <ul class="list">
+                    <li>БОТЫ: mock payment flow и статусы created/pending/paid/failed</li>
+                    <li>ПАРСИНГ: уведомления о старте/итоге/ошибке + retry</li>
+                    <li>Переход от скриптов к управляемым сервисам</li>
+                </ul>
+                <a class="btn" href="day-17-index.html">Открыть модуль 17</a>
+                <a class="btn" href="day-17-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 17</a>
+            </article>
+
+            <article class="card" data-day-card="18">
+                <div class="badge">МОДУЛЬ 18 · ДЕНЬ 18</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Мини-CRM и админ-дашборд</h2>
+                <p>Добавляем контроль: статусы лидов, фильтрация задач и управляемая панель состояния парсеров.</p>
+                <ul class="list">
+                    <li>БОТЫ: lead status workflow (new/in_work/done)</li>
+                    <li>ПАРСИНГ: dashboard KPI и ручной restart</li>
+                    <li>Чёткий операционный контур для ежедневной работы</li>
+                </ul>
+                <a class="btn" href="day-18-index.html">Открыть модуль 18</a>
+                <a class="btn" href="day-18-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 18</a>
+            </article>
+
+            <article class="card" data-day-card="19">
+                <div class="badge">МОДУЛЬ 19 · ДЕНЬ 19</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Sales playbook: вопросы, ТЗ и возражения</h2>
+                <p>Собираем повторяемую систему продаж: структурные вопросы, шаблоны ТЗ и ответы на типовые сомнения клиента.</p>
+                <ul class="list">
+                    <li>БОТЫ: шаблон ТЗ и discovery-вопросы</li>
+                    <li>ПАРСИНГ: brief по источникам, полям, SLA</li>
+                    <li>Матрица возражений для стабильной коммуникации</li>
+                </ul>
+                <a class="btn" href="day-19-index.html">Открыть модуль 19</a>
+                <a class="btn" href="day-19-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 19</a>
+            </article>
+
+            <article class="card" data-day-card="20">
+                <div class="badge">МОДУЛЬ 20 · ДЕНЬ 20</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Отклики на потоке: системный набор заказов</h2>
+                <p>Выстраиваем pipeline откликов: персонализация, релевантные кейсы, follow-up и измерение конверсии.</p>
+                <ul class="list">
+                    <li>БОТЫ: шаблоны откликов + трекинг воронки</li>
+                    <li>ПАРСИНГ: офферы с KPI и conversion report</li>
+                    <li>План ежедневного outbound-потока</li>
+                </ul>
+                <a class="btn" href="day-20-index.html">Открыть модуль 20</a>
+                <a class="btn" href="day-20-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 20</a>
+            </article>
+
+            <article class="card" data-day-card="21">
+                <div class="badge">МОДУЛЬ 21 · ДЕНЬ 21</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Очереди и воркеры: надёжный delivery-pipeline</h2>
+                <p>Переходим к продовому подходу: тяжёлые операции уходят в очередь, а воркеры обрабатывают их стабильно и контролируемо.</p>
+                <ul class="list">
+                    <li>БОТЫ: task queue, worker, статусы задач</li>
+                    <li>ПАРСИНГ: batch-runner и dead-letter сценарий</li>
+                    <li>Повторяемость и управляемость под нагрузкой</li>
+                </ul>
+                <a class="btn" href="day-21-index.html">Открыть модуль 21</a>
+                <a class="btn" href="day-21-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 21</a>
+            </article>
+
+            <article class="card" data-day-card="22">
+                <div class="badge">МОДУЛЬ 22 · ДЕНЬ 22</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Контракты данных и строгая валидация</h2>
+                <p>Укрепляем качество: DTO/схемы, validation boundary и quarantine для невалидных данных.</p>
+                <ul class="list">
+                    <li>БОТЫ: DTO-модели и единый формат validation errors</li>
+                    <li>ПАРСИНГ: schema-check перед экспортом</li>
+                    <li>Снижение багов от «грязного» ввода</li>
+                </ul>
+                <a class="btn" href="day-22-index.html">Открыть модуль 22</a>
+                <a class="btn" href="day-22-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 22</a>
+            </article>
+
+            <article class="card" data-day-card="23">
+                <div class="badge">МОДУЛЬ 23 · ДЕНЬ 23</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Операционный мониторинг: метрики, алерты, triage</h2>
+                <p>Строим шаблон наблюдаемости: ключевые KPI, пороговые алерты и runbook для быстрого реагирования.</p>
+                <ul class="list">
+                    <li>БОТЫ: ops-метрики по командам и ошибкам</li>
+                    <li>ПАРСИНГ: baseline-мониторинг и health summary</li>
+                    <li>Контроль инцидентов и снижение MTTR</li>
+                </ul>
+                <a class="btn" href="day-23-index.html">Открыть модуль 23</a>
+                <a class="btn" href="day-23-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 23</a>
+            </article>
+
+            <article class="card" data-day-card="24">
+                <div class="badge">МОДУЛЬ 24 · ДЕНЬ 24</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Template-release: упаковка платформы в продукт</h2>
+                <p>Финализируем reusable-набор: bot-template + parser-template + ops-kit как готовый коммерческий пакет.</p>
+                <ul class="list">
+                    <li>БОТЫ: release candidate + onboarding/handover docs</li>
+                    <li>ПАРСИНГ: коммерческий пакет с SLA и KPI</li>
+                    <li>Оффер и портфолио-кейс «ускоренное внедрение»</li>
+                </ul>
+                <a class="btn" href="day-24-index.html">Открыть модуль 24</a>
+                <a class="btn" href="day-24-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 24</a>
+            </article>
+
+            <article class="card" data-day-card="25">
+                <div class="badge">МОДУЛЬ 25 · ДЕНЬ 25</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Упаковка кейсов с метриками</h2>
+                <p>Усиливаем доверие клиентов: перерабатываем кейсы в формат «до/после + цифры + доказательства».</p>
+                <ul class="list">
+                    <li>БОТЫ: метрики времени и потерь лидов</li>
+                    <li>ПАРСИНГ: quality/throughput KPI</li>
+                    <li>Короткие и длинные версии кейсов</li>
+                </ul>
+                <a class="btn" href="day-25-index.html">Открыть модуль 25</a>
+                <a class="btn" href="day-25-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 25</a>
+            </article>
+
+            <article class="card" data-day-card="26">
+                <div class="badge">МОДУЛЬ 26 · ДЕНЬ 26</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Подписка и сопровождение (SLA)</h2>
+                <p>Формируем регулярный доход через пакеты поддержки и понятные SLA-условия.</p>
+                <ul class="list">
+                    <li>БОТЫ: пакеты Lite/Standard/Pro</li>
+                    <li>ПАРСИНГ: ретейнер с мониторингом и отчётами</li>
+                    <li>Шаблоны коммерческих предложений</li>
+                </ul>
+                <a class="btn" href="day-26-index.html">Открыть модуль 26</a>
+                <a class="btn" href="day-26-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 26</a>
+            </article>
+
+            <article class="card" data-day-card="27">
+                <div class="badge">МОДУЛЬ 27 · ДЕНЬ 27</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Позиционирование под высокий чек</h2>
+                <p>Меняем коммуникацию и фильтры, чтобы получать более качественные и дорогие проекты.</p>
+                <ul class="list">
+                    <li>БОТЫ: квалификация лидов и premium-оффер</li>
+                    <li>ПАРСИНГ: enterprise-подача с KPI и SLA</li>
+                    <li>Фокус на value-based pricing</li>
+                </ul>
+                <a class="btn" href="day-27-index.html">Открыть модуль 27</a>
+                <a class="btn" href="day-27-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 27</a>
+            </article>
+
+            <article class="card" data-day-card="28">
+                <div class="badge">МОДУЛЬ 28 · ДЕНЬ 28</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Заказ среднего чека с шаблонами</h2>
+                <p>Закрываем реальный заказ быстрее за счёт переиспользования шаблонов и quality gate.</p>
+                <ul class="list">
+                    <li>БОТЫ: plan/fact по времени и марже</li>
+                    <li>ПАРСИНГ: delivery gate перед сдачей</li>
+                    <li>Post-delivery ретро и улучшение template</li>
+                </ul>
+                <a class="btn" href="day-28-index.html">Открыть модуль 28</a>
+                <a class="btn" href="day-28-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 28</a>
+            </article>
+
+            <article class="card" data-day-card="29">
+                <div class="badge">МОДУЛЬ 29 · ДЕНЬ 29</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Месячная аналитика и стратегия</h2>
+                <p>Сводим результаты месяца в метрики и строим план улучшений на следующий цикл.</p>
+                <ul class="list">
+                    <li>БОТЫ: воронка, средний чек, on-time rate</li>
+                    <li>ПАРСИНГ: failure rate, quality trend, retainer ratio</li>
+                    <li>Определение bottleneck и KPI-плана</li>
+                </ul>
+                <a class="btn" href="day-29-index.html">Открыть модуль 29</a>
+                <a class="btn" href="day-29-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 29</a>
+            </article>
+
+            <article class="card" data-day-card="30">
+                <div class="badge">МОДУЛЬ 30 · ДЕНЬ 30</div>
+                <div class="course-progress-pill" data-day-read-badge>📖 Не отмечено</div>
+                <h2>Roadmap на месяц 2</h2>
+                <p>Финализируем 30-дневный цикл и строим системный план роста дохода и навыков.</p>
+                <ul class="list">
+                    <li>БОТЫ: ООП/API/webhook-план</li>
+                    <li>ПАРСИНГ: устойчивость, dashboard и продуктовый оффер</li>
+                    <li>KPI, weekly-ритм и self-review</li>
+                </ul>
+                <a class="btn" href="day-30-index.html">Открыть модуль 30</a>
+                <a class="btn" href="day-30-practice-lab.html" style="margin-top: 8px; border-color: rgba(86,232,255,0.55); color: #56e8ff; background: rgba(86,232,255,0.12);">🧪 Практика модуля 30</a>
+            </article>
+        </section>
+    </div>
+    <script src="course-tools.js"></script>
+    <script>
+        CourseTools.updateIndexProgress(30);
+    </script>
+</body>
+</html>

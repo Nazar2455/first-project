@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>День 9 · БОТЫ — Деплой 24/7</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+    body{font-family:'Montserrat',sans-serif;background:linear-gradient(135deg,#0f0f1e,#1a0a2e,#16213e);color:#eaf2ff;min-height:100vh;padding:20px}
+    .wrap{max-width:1100px;margin:0 auto}.card{background:rgba(19,28,46,.86);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px;margin-bottom:12px}
+    h1{color:#ffed4e;margin-bottom:8px}h2{color:#56e8ff;font-size:1.12em;margin-bottom:8px}h3{color:#96b7ff;margin:10px 0 6px}
+    p,li{line-height:1.6;color:#d6e4ff}.actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{display:inline-block;text-decoration:none;border:1px solid rgba(255,215,0,.45);border-radius:10px;background:rgba(255,215,0,.12);color:#ffed4e;font-weight:700;padding:9px 12px}
+    .btn.alt{border-color:rgba(86,232,255,.55);color:#56e8ff;background:rgba(86,232,255,.12)}
+    .code{margin-top:8px;border-radius:10px;overflow:hidden;border:1px solid rgba(102,126,234,.35);background:#0b1220}.code-title{background:rgba(102,126,234,.12);color:#9ec0ff;font-size:.78em;font-weight:700;padding:8px 10px;border-bottom:1px solid rgba(102,126,234,.25)}
+    pre{margin:0;padding:12px;overflow-x:auto;font-size:.84em;line-height:1.45}code{font-family:Consolas,'Courier New',monospace;color:#e7f1ff}
+    .note{border-left:3px solid #ffd700;background:rgba(255,215,0,.08);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.9em}
+  </style>
+  <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+<div class="wrap">
+  <section class="card">
+    <h1>День 9 · 🤖 БОТЫ</h1>
+    <p>Тема: деплой бота в облако и контроль, что он работает 24/7, а не только на твоём ноутбуке.</p>
+    <div class="actions">
+      <a class="btn" href="day-09-index.html">← День 9 (выбор трека)</a>
+      <a class="btn alt" href="day-09-parsing-deploy.html">Переключиться на ПАРСИНГ</a>
+      <a class="btn" href="day-10-index.html">День 10 →</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>1) Минимум для облачного запуска</h2>
+    <ul>
+      <li><code>requirements.txt</code> с фиксированными версиями.</li>
+      <li>Точка входа: <code>python main.py</code>.</li>
+      <li>Токен и admin IDs в переменных окружения.</li>
+      <li>Логирование старта и критических ошибок.</li>
+    </ul>
+    <div class="note">Если бот не запускается в облаке, в 80% случаев проблема в env-переменных или зависимостях.</div>
+  </section>
+
+  <section class="card">
+    <h2>2) Пример startup-логов</h2>
+    <div class="code"><div class="code-title">main.py (идея)</div><pre><code>import asyncio
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+async def main():
+    logging.info("Bot is starting...")
+    # здесь запуск dp.start_polling(bot)
+
+
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        logging.exception("Fatal error during startup: %s", e)
+        raise</code></pre></div>
+  </section>
+
+  <section class="card">
+    <h2>3) Чеклист «бот в проде»</h2>
+    <ol>
+      <li>После деплоя команда <code>/start</code> отвечает.</li>
+      <li>FSM форма проходит полный цикл без ошибок.</li>
+      <li><code>/admin</code> доступен только админам.</li>
+      <li>В логах нет постоянных ошибок/restart loop.</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>4) Практика</h2>
+    <ol>
+      <li>Задеплой текущий бот в Render или Railway.</li>
+      <li>Сделай скриншот successful deploy + logs.</li>
+      <li>Добавь ссылку на деплой в README.</li>
+      <li>Отправь себе в заметки: «что сломалось и как починил».</li>
+    </ol>
+  </section>
+</div>
+</body>
+</html>

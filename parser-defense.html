@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛡️ Parser Defense | Оптимизация Парсера</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Montserrat, Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0e27, #1b0f3d);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .topbar {
+            background: rgba(20, 30, 60, 0.95);
+            border-bottom: 2px solid #ff6b35;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        .topbar-left {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .title {
+            font-weight: 800;
+            font-size: 1.3em;
+            background: linear-gradient(135deg, #ff6b35, #ffa62b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-badge {
+            background: rgba(255, 107, 53, 0.2);
+            border: 1px solid #ff6b35;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-weight: 700;
+            font-size: 0.85em;
+            color: #ffa62b;
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        .topbar-right {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-small {
+            border: 1px solid #ff6b35;
+            background: rgba(255, 107, 53, 0.15);
+            color: #ffa62b;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-weight: 700;
+            font-size: 0.75em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-small:hover {
+            background: rgba(255, 107, 53, 0.25);
+            transform: scale(1.05);
+        }
+        
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .game-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: linear-gradient(135deg, rgba(10, 14, 39, 0.8), rgba(40, 20, 10, 0.8));
+            border-right: 1px solid rgba(255, 107, 53, 0.2);
+        }
+        
+        canvas {
+            border: 2px solid #ff6b35;
+            background: linear-gradient(135deg, #1a1f3f, #3a2214);
+            display: block;
+        }
+        
+        .sidebar {
+            width: 320px;
+            background: rgba(20, 30, 60, 0.95);
+            border-left: 2px solid #ff6b35;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            gap: 12px;
+        }
+        
+        .panel {
+            background: rgba(255, 107, 53, 0.05);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .panel-title {
+            font-weight: 800;
+            color: #ffa62b;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .tower-shop {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        
+        .tower-btn {
+            background: rgba(255, 107, 53, 0.15);
+            border: 2px solid rgba(255, 107, 53, 0.4);
+            border-radius: 6px;
+            padding: 8px;
+            font-weight: 700;
+            font-size: 0.75em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #ffa62b;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        .tower-btn:hover:not(:disabled) {
+            background: rgba(255, 107, 53, 0.25);
+            border-color: #ffa62b;
+            transform: scale(1.05);
+        }
+        
+        .tower-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .tower-btn.active {
+            background: rgba(255, 107, 53, 0.4);
+            border-color: #ffa62b;
+        }
+        
+        .tower-cost {
+            font-size: 0.65em;
+            color: #ffaa44;
+        }
+        
+        .wave-concept {
+            background: rgba(255, 107, 53, 0.1);
+            border-left: 3px solid #ff6b35;
+            padding: 8px;
+            font-size: 0.8em;
+            line-height: 1.4;
+            color: #d8d8d8;
+        }
+        
+        .code-snippet {
+            background: rgba(255, 107, 53, 0.05);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 0.65em;
+            font-family: 'Courier New', monospace;
+            color: #ffaa44;
+            max-height: 70px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: rgba(20, 30, 60, 0.98);
+            border: 2px solid #ffa62b;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 0 50px rgba(255, 107, 53, 0.3);
+        }
+        
+        .modal-title {
+            font-size: 1.5em;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: #ffa62b;
+        }
+        
+        .modal-description {
+            font-size: 0.9em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #d8d8d8;
+        }
+        
+        .modal-code {
+            background: rgba(10, 20, 40, 0.9);
+            border: 1px solid rgba(255, 107, 53, 0.5);
+            border-radius: 6px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75em;
+            color: #ffaa44;
+            margin-bottom: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .modal-textarea {
+            width: 100%;
+            height: 100px;
+            background: rgba(10, 20, 40, 0.9);
+            border: 1px solid rgba(255, 107, 53, 0.5);
+            border-radius: 6px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75em;
+            color: #ffaa44;
+            resize: none;
+            margin-bottom: 10px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            border: 1px solid #ffa62b;
+            background: rgba(255, 107, 53, 0.2);
+            color: #ffa62b;
+            border-radius: 6px;
+            padding: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-btn:hover {
+            background: rgba(255, 107, 53, 0.4);
+            transform: scale(1.02);
+        }
+        
+        .modal-btn.submit {
+            background: linear-gradient(135deg, #ff6b35, #ffa62b);
+            color: #000;
+            border: none;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8em;
+            margin-bottom: 4px;
+        }
+        
+        .info-row-label {
+            color: #ff6b35;
+            font-weight: 700;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 107, 53, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 107, 53, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 107, 53, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="title">🛡️ Parser Defense: Оптимизация</div>
+            <div class="stat-badge">💰 <span id="goldCount">200</span></div>
+            <div class="stat-badge">❤️ <span id="healthCount">20</span></div>
+            <div class="stat-badge">🌊 Wave <span id="waveCount">1</span>/6</div>
+        </div>
+        <div class="topbar-right">
+            <button class="btn-small" onclick="goToHub()">← Хаб</button>
+            <button class="btn-small" id="startBtn" onclick="startWave()">▶️ НАЧАТЬ</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="game-area">
+            <canvas id="gameCanvas" width="900" height="500"></canvas>
+        </div>
+        
+        <div class="sidebar">
+            <div class="panel">
+                <div class="panel-title">📚 Концепция волны</div>
+                <div class="wave-concept" id="waveConcept">Нажми НАЧАТЬ → решай код-челленж перед волной.</div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-title">💻 Решение башней</div>
+                <div class="code-snippet" id="codeExample">// Примеры кода для каждой башни</div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-title">🏗️ Башни (Фильтры)</div>
+                <div class="tower-shop">
+                    <button class="tower-btn" id="tower-filter" onclick="selectTower('filter')">
+                        <div>🔍 Filter</div>
+                        <div class="tower-cost">25 💰</div>
+                    </button>
+                    <button class="tower-btn" id="tower-validate" onclick="selectTower('validate')">
+                        <div>✓ Validate</div>
+                        <div class="tower-cost">40 💰</div>
+                    </button>
+                    <button class="tower-btn" id="tower-cache" onclick="selectTower('cache')">
+                        <div>💾 Cache</div>
+                        <div class="tower-cost">60 💰</div>
+                    </button>
+                    <button class="tower-btn" id="tower-optimize" onclick="selectTower('optimize')">
+                        <div>⚡ Optimize</div>
+                        <div class="tower-cost">80 💰</div>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-title">📊 Прогресс</div>
+                <div class="info-row">
+                    <span class="info-row-label">Волн пройдено:</span>
+                    <span id="wavesPassed">0</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-row-label">Врагов убито:</span>
+                    <span id="enemiesKilled">0</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-row-label">XP заработано:</span>
+                    <span id="xpEarned">0</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-row-label">Код-челленджей:</span>
+                    <span id="codesCompleted">0/6</span>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-title">💡 Совет</div>
+                <div style="font-size: 0.8em; line-height: 1.5; color: #d8d8d8;" id="tipPanel">Перед волной решай код-челленж для бонуса XP!</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="codeModal">
+        <div class="modal">
+            <div class="modal-title" id="modalTitle">🔧 Подготовка к волне</div>
+            <div class="modal-description" id="modalDescription">Напиши решение для этой волны</div>
+            <div class="modal-code" id="modalCode">// Код-пример</div>
+            <div style="font-size: 0.8em; color: #ffaa44; margin-bottom: 10px;" id="modalHint">Подсказка</div>
+            <textarea class="modal-textarea" id="modalInput" placeholder="// Напиши решение..."></textarea>
+            <div style="font-size: 0.75em; color: #ff6b35; margin-bottom: 10px;" id="modalFeedback"></div>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="skipChallenge()">Пропустить</button>
+                <button class="modal-btn submit" onclick="submitChallenge()">ПРОВЕРИТЬ</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script src="game-session-tracker.js"></script>
+    <script>
+        const GAME_WIDTH = 900;
+        const GAME_HEIGHT = 500;
+        const GRID_SIZE = 50;
+
+        const TOWERS = {
+            filter: { name: 'Filter', cost: 25, damage: 10, range: 80, fireRate: 0.8, color: '#00ff88' },
+            validate: { name: 'Validate', cost: 40, damage: 15, range: 60, fireRate: 1.2, color: '#00ccff' },
+            cache: { name: 'Cache', cost: 60, damage: 8, range: 120, fireRate: 0.5, color: '#ffaa00' },
+            optimize: { name: 'Optimize', cost: 80, damage: 20, range: 70, fireRate: 0.6, color: '#ff6b35' }
+        };
+
+        const WAVES = [
+            {
+                num: 1,
+                concept: 'Грязные данные: пробелы, null, пустые строки. Нужно отфильтровать.',
+                challenge: 'function cleanData(arr) {\n  // TODO: .filter() для очистки\n}',
+                expectedPattern: /\.filter|filter\(/,
+                hint: 'Используй .filter() для очистки массива',
+                example: '.filter(x => x != null && x.trim())',
+                enemies: [{ type: 'dirty', count: 5, speed: 1.5, hp: 10 }],
+                xpReward: 50
+            },
+            {
+                num: 2,
+                concept: 'Дубликаты: повторяющиеся данные. Дедупликация через Set или filter.',
+                challenge: 'function removeDuplicates(arr) {\n  // TODO: Set или filter.indexOf\n}',
+                expectedPattern: /Set|filter.*indexOf/,
+                hint: 'Set или .filter((v, i) => arr.indexOf(v) === i)',
+                example: '[...new Set(arr)]',
+                enemies: [{ type: 'duplicate', count: 5, speed: 1.3, hp: 12 }],
+                xpReward: 75
+            },
+            {
+                num: 3,
+                concept: 'Быстрый поток: батчировка. Обработка большого потока частями.',
+                challenge: 'function batchProcess(arr, size) {\n  // TODO: Разредели на chunks\n}',
+                expectedPattern: /for.*chunk|batch|slice/,
+                hint: 'Разини на куски: for(let i=0; i<arr.length; i+=size)',
+                example: 'let batch = arr.slice(i, i+size);',
+                enemies: [{ type: 'fast', count: 6, speed: 2.0, hp: 8 }],
+                xpReward: 100
+            },
+            {
+                num: 4,
+                concept: 'Ошибки парсинга JSON. Безопасная обработка с try-catch.',
+                challenge: 'function safeJsonParse(str) {\n  // TODO: try-catch + JSON.parse\n}',
+                expectedPattern: /try|catch|JSON\.parse/,
+                hint: 'try { JSON.parse(str) } catch(e) { return {} }',
+                example: 'JSON.parse(str)',
+                enemies: [{ type: 'large', count: 2, speed: 0.8, hp: 50 }],
+                xpReward: 125
+            },
+            {
+                num: 5,
+                concept: 'Комбо: фильтр + дедуп + быстрый поток. Используй всё!',
+                challenge: 'async function processClean(url) {\n  // TODO: fetch + filter + Set + батч\n}',
+                expectedPattern: /async|await|fetch|\.filter|new Set/,
+                hint: 'Комбинируй: async/await + fetch + .filter + Set',
+                example: 'const data = await fetch(url);',
+                enemies: [{ type: 'fast', count: 8, speed: 2.0, hp: 8 }, { type: 'duplicate', count: 6, speed: 1.3, hp: 12 }],
+                xpReward: 150
+            },
+            {
+                num: 6,
+                concept: 'БОСС: все типы ошибок одновременно. Финальный экзамен!',
+                challenge: 'async function productionParser(urls) {\n  // TODO: Promise.all + обработка всего\n}',
+                expectedPattern: /Promise\.|async|await|catch|try/,
+                hint: 'Promise.all() + обработка ошибок',
+                example: 'Promise.all(urls.map(...))',
+                enemies: [{ type: 'boss', count: 1, speed: 1.0, hp: 100 }, { type: 'fast', count: 10, speed: 2.0, hp: 8 }],
+                xpReward: 250
+            }
+        ];
+
+        let currentWave = 1, gold = 200, health = 20, towers = [], enemies = [], projectiles = [];
+        let waveActive = false, waveEnemiesLeft = 0, enemiesKilled = 0, xpEarned = 0, codesCompleted = 0;
+        let showingChallenge = false, selectedTower = null;
+
+        function drawTowerTexture(ctx, x, y, type) {
+            ctx.save();
+            ctx.translate(x, y);
+            
+            if (type === 'filter') {
+                ctx.fillStyle = '#00ff88';
+                ctx.beginPath();
+                ctx.moveTo(-5, -8);
+                ctx.lineTo(5, -8);
+                ctx.lineTo(3, 0);
+                ctx.lineTo(-3, 0);
+                ctx.closePath();
+                ctx.fill();
+                ctx.fillRect(-2, 0, 4, 8);
+            } else if (type === 'validate') {
+                ctx.strokeStyle = '#00ccff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(-6, 0);
+                ctx.lineTo(-2, 4);
+                ctx.lineTo(6, -4);
+                ctx.stroke();
+                ctx.strokeRect(-8, -8, 16, 16);
+            } else if (type === 'cache') {
+                ctx.fillStyle = '#ffaa00';
+                ctx.fillRect(-5, -6, 10, 4);
+                ctx.fillStyle = '#ff9500';
+                ctx.fillRect(-5, -1, 10, 4);
+                ctx.fillStyle = '#ff8400';
+                ctx.fillRect(-5, 4, 10, 4);
+            } else if (type === 'optimize') {
+                ctx.fillStyle = '#ff6b35';
+                ctx.beginPath();
+                ctx.moveTo(0, -8);
+                ctx.lineTo(-4, -2);
+                ctx.lineTo(-1, -1);
+                ctx.lineTo(3, 8);
+                ctx.lineTo(1, 2);
+                ctx.lineTo(-2, 1);
+                ctx.closePath();
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        function selectTower(type) {
+            const tower = TOWERS[type];
+            if (gold < tower.cost && selectedTower !== type) return;
+            selectedTower = type;
+            document.querySelectorAll('.tower-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tower-' + type).classList.add('active');
+            document.getElementById('codeExample').textContent = 'tower-' + type.toUpperCase();
+            document.getElementById('gameCanvas').style.cursor = 'crosshair';
+        }
+
+        function placeCanvasTower(x, y) {
+            if (!selectedTower) return;
+            const tower = TOWERS[selectedTower];
+            if (gold < tower.cost) return alert('Не хватает золота!');
+            gold -= tower.cost;
+            towers.push({ x: Math.round(x / GRID_SIZE) * GRID_SIZE, y: Math.round(y / GRID_SIZE) * GRID_SIZE, type: selectedTower, cooldown: 0 });
+            updateUI();
+        }
+
+        function showCodeChallenge() {
+            const wave = WAVES[currentWave - 1];
+            document.getElementById('modalTitle').textContent = '🔧 Волна ' + currentWave;
+            document.getElementById('modalDescription').textContent = wave.concept;
+            document.getElementById('modalCode').textContent = wave.challenge;
+            document.getElementById('modalHint').textContent = wave.hint;
+            document.getElementById('modalInput').value = '';
+            document.getElementById('modalFeedback').textContent = '';
+            document.getElementById('codeModal').classList.add('active');
+            showingChallenge = true;
+        }
+
+        function submitChallenge() {
+            const wave = WAVES[currentWave - 1];
+            const solution = document.getElementById('modalInput').value;
+            const feedback = document.getElementById('modalFeedback');
+            
+            if (!solution.trim()) {
+                feedback.textContent = '⚠️ Напиши код!';
+                return;
+            }
+            
+            if (wave.expectedPattern.test(solution)) {
+                feedback.textContent = '✅ Верно! +50 XP';
+                feedback.style.color = '#00ff88';
+                xpEarned += 50;
+                codesCompleted++;
+                gold += 50;
+                syncParserDefenseToServer().catch(() => {});
+                setTimeout(() => {
+                    document.getElementById('codeModal').classList.remove('active');
+                    showingChallenge = false;
+                    startWaveActual();
+                }, 1500);
+            } else {
+                feedback.textContent = '❌ ' + wave.hint;
+                feedback.style.color = '#ff6666';
+            }
+        }
+
+        function skipChallenge() {
+            document.getElementById('codeModal').classList.remove('active');
+            showingChallenge = false;
+            startWaveActual();
+        }
+
+        function startWave() {
+            if (currentWave > 6) return alert('🏆 Победа!');
+            showCodeChallenge();
+        }
+
+        function startWaveActual() {
+            if (waveActive) return;
+            waveActive = true;
+            const wave = WAVES[currentWave - 1];
+            waveEnemiesLeft = wave.enemies.reduce((s, e) => s + e.count, 0);
+            let spawned = 0;
+            
+            const spawnInterval = setInterval(() => {
+                if (spawned >= waveEnemiesLeft) { clearInterval(spawnInterval); return; }
+                const enemyType = WAVES[currentWave - 1].enemies[Math.floor(Math.random() * WAVES[currentWave - 1].enemies.length)];
+                for (let i = 0; i < 2; i++) {
+                    enemies.push({
+                        x: -30, y: GAME_HEIGHT / 2 + (Math.random() - 0.5) * 100,
+                        type: enemyType.type, speed: enemyType.speed, hp: enemyType.hp, maxHp: enemyType.hp, width: 25, height: 25
+                    });
+                    spawned++;
+                }
+            }, 800);
+            document.getElementById('startBtn').disabled = true;
+        }
+
+        function update() {
+            if (showingChallenge || !waveActive) return;
+
+            towers.forEach(tower => {
+                const towerData = TOWERS[tower.type];
+                tower.cooldown--;
+                let closest = null, closestDist = towerData.range;
+                enemies.forEach(enemy => {
+                    const dist = Math.hypot(enemy.x - tower.x, enemy.y - tower.y);
+                    if (dist < closestDist) { closestDist = dist; closest = enemy; }
+                });
+                if (closest && tower.cooldown <= 0) {
+                    projectiles.push({
+                        x: tower.x, y: tower.y, targetX: closest.x, targetY: closest.y, target: closest,
+                        damage: towerData.damage, color: towerData.color, speed: 8
+                    });
+                    tower.cooldown = 30 / towerData.fireRate;
+                }
+            });
+
+            projectiles = projectiles.filter(proj => {
+                const dist = Math.hypot(proj.targetX - proj.x, proj.targetY - proj.y);
+                if (dist < 20) {
+                    if (proj.target) {
+                        proj.target.hp -= proj.damage;
+                        if (proj.target.hp <= 0) {
+                            enemies = enemies.filter(e => e !== proj.target);
+                            waveEnemiesLeft--;
+                            enemiesKilled++;
+                            xpEarned += 5;
+                            gold += 10;
+                            syncParserDefenseToServer().catch(() => {});
+                        }
+                    }
+                    return false;
+                }
+                const angle = Math.atan2(proj.targetY - proj.y, proj.targetX - proj.x);
+                proj.x += Math.cos(angle) * proj.speed;
+                proj.y += Math.sin(angle) * proj.speed;
+                return true;
+            });
+
+            enemies.forEach(enemy => {
+                enemy.x += enemy.speed;
+                if (enemy.x > GAME_WIDTH) {
+                    health--;
+                    enemies = enemies.filter(e => e !== enemy);
+                    waveEnemiesLeft--;
+                }
+            });
+
+            if (health <= 0) {
+                alert('💀 Game Over!');
+                location.reload();
+            }
+
+            if (waveActive && waveEnemiesLeft === 0 && enemies.length === 0) {
+                waveActive = false;
+                const reward = WAVES[currentWave - 1].xpReward;
+                xpEarned += reward;
+                gold += reward * 2;
+                currentWave++;
+                document.getElementById('startBtn').disabled = false;
+                syncParserDefenseToServer().catch(() => {});
+            }
+
+            updateUI();
+        }
+
+        function draw() {
+            const ctx = document.getElementById('gameCanvas').getContext('2d');
+            ctx.fillStyle = '#1a2533';
+            ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+            ctx.strokeStyle = 'rgba(255, 107, 53, 0.1)';
+            for (let x = 0; x < GAME_WIDTH; x += GRID_SIZE) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, GAME_HEIGHT);
+                ctx.stroke();
+            }
+            for (let y = 0; y < GAME_HEIGHT; y += GRID_SIZE) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(GAME_WIDTH, y);
+                ctx.stroke();
+            }
+
+            towers.forEach(tower => {
+                const data = TOWERS[tower.type];
+                ctx.fillStyle = 'rgba(255, 107, 53, 0.1)';
+                ctx.fillRect(tower.x - 20, tower.y - 20, 40, 40);
+                ctx.strokeStyle = data.color;
+                ctx.lineWidth = 2;
+                ctx.strokeRect(tower.x - 20, tower.y - 20, 40, 40);
+                drawTowerTexture(ctx, tower.x, tower.y, tower.type);
+                ctx.strokeStyle = 'rgba(255, 107, 53, 0.15)';
+                ctx.beginPath();
+                ctx.arc(tower.x, tower.y, data.range, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+
+            enemies.forEach(enemy => {
+                const colors = { dirty: '#ff6666', duplicate: '#ffaa00', fast: '#ff00ff', large: '#ff0088', boss: '#ff0000' };
+                ctx.fillStyle = colors[enemy.type] || '#ffff00';
+                ctx.fillRect(enemy.x - 12, enemy.y - 12, 24, 24);
+                ctx.fillStyle = '#00ff00';
+                ctx.fillRect(enemy.x - 12, enemy.y - 20, (enemy.hp / enemy.maxHp) * 24, 4);
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(enemy.x - 12, enemy.y - 20, 24, 4);
+            });
+
+            projectiles.forEach(proj => {
+                ctx.fillStyle = proj.color;
+                ctx.beginPath();
+                ctx.arc(proj.x, proj.y, 6, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ctx.fillStyle = '#ff6b35';
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText('Wave ' + currentWave + '/6 | Враги: ' + enemies.length, 20, 30);
+        }
+
+        function updateUI() {
+            document.getElementById('goldCount').textContent = gold;
+            document.getElementById('healthCount').textContent = health;
+            document.getElementById('waveCount').textContent = currentWave;
+            document.getElementById('enemiesKilled').textContent = enemiesKilled;
+            document.getElementById('xpEarned').textContent = xpEarned;
+            document.getElementById('codesCompleted').textContent = codesCompleted + '/6';
+            localStorage.setItem('parserDefenseXP', xpEarned);
+        }
+
+        function goToHub() { window.location.href = 'games-hub.html'; }
+
+        document.getElementById('gameCanvas').addEventListener('click', (e) => {
+            const rect = document.getElementById('gameCanvas').getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            placeCanvasTower(x, y);
+        });
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        const API_BASE = localStorage.getItem('planApiBase') || 'http://127.0.0.1:8000/api';
+
+        async function apiRequest(path, options = {}) {
+            if (window.PlanApiClient?.request) {
+                return window.PlanApiClient.request(path, options, API_BASE);
+            }
+
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 3000);
+
+            try {
+                const response = await fetch(`${API_BASE}${path}`, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(options.headers || {})
+                    },
+                    signal: controller.signal
+                });
+
+                if (!response.ok) return null;
+                return await response.json();
+            } catch (_) {
+                return null;
+            } finally {
+                clearTimeout(timeout);
+            }
+        }
+
+        async function hydrateParserDefenseFromServer() {
+            const [mainState, defenseState] = await Promise.all([
+                apiRequest('/state/main_tracker'),
+                apiRequest('/state/parser_defense')
+            ]);
+
+            if (mainState?.value && typeof mainState.value === 'object') {
+                const incoming = mainState.value;
+                if (typeof incoming.points === 'number') localStorage.setItem('points', String(incoming.points));
+                if (typeof incoming.level === 'number') localStorage.setItem('level', String(incoming.level));
+            }
+
+            if (defenseState?.value && typeof defenseState.value === 'object') {
+                const incoming = defenseState.value;
+                if (typeof incoming.xpEarned === 'number') xpEarned = incoming.xpEarned;
+            }
+        }
+
+        async function syncParserDefenseToServer() {
+            await apiRequest('/state/parser_defense', {
+                method: 'PUT',
+                body: JSON.stringify({ value: { xpEarned } })
+            });
+        }
+
+        async function initPage() {
+            await hydrateParserDefenseFromServer();
+            window.PlanGameTracker?.startGameSession('parser-defense', 'Parser Defense');
+            updateUI();
+            gameLoop();
+        }
+
+        initPage();
+    </script>
+</body>
+</html>

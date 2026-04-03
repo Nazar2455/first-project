@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👤 Профиль обучения | Статистика и ачивки</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0f0f1e, #1a0a2e, #16213e);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(20, 30, 50, 0.95);
+            border-bottom: 2px solid #ffd700;
+            padding: 15px 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+
+        .topbar-left {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .topbar-title {
+            font-size: 1.6em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-badge {
+            background: rgba(255, 215, 0, 0.15);
+            border: 2px solid #ffd700;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .btn-back {
+            border: 2px solid #ffd700;
+            background: rgba(255, 215, 0, 0.15);
+            color: #ffd700;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 215, 0, 0.25);
+            transform: scale(1.05);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: #b0c4de;
+            font-weight: 700;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            position: relative;
+            bottom: -2px;
+        }
+
+        .tab-btn.active {
+            color: #ffed4e;
+            border-bottom-color: #ffd700;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .profile-section {
+            background: linear-gradient(135deg, rgba(20, 30, 50, 0.9), rgba(30, 40, 70, 0.8));
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .stat-card-label {
+            font-size: 0.85em;
+            color: #b0c4de;
+            margin-bottom: 5px;
+        }
+
+        .stat-card-value {
+            font-size: 1.8em;
+            font-weight: 800;
+            color: #ffed4e;
+        }
+
+        /* ===== XP PROGRESS BAR ===== */
+        .profile-hero {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.25), rgba(255, 107, 107, 0.15));
+            border: 2px solid rgba(102, 126, 234, 0.4);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .level-display {
+            font-size: 3.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        .xp-bar-container {
+            margin-bottom: 10px;
+        }
+
+        .xp-bar {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .xp-bar-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+            height: 100%;
+            border-radius: 13px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8em;
+            color: #fff;
+            min-width: 30px;
+        }
+
+        .xp-text {
+            font-size: 0.9em;
+            color: #b0c4de;
+            margin-top: 8px;
+        }
+
+        /* ===== ГРАФИК СТАТИСТИКИ ===== */
+        .chart-container {
+            background: rgba(20, 30, 50, 0.6);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .chart-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            gap: 15px;
+            height: 250px;
+            margin-bottom: 20px;
+        }
+
+        .chart-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .bar {
+            width: 100%;
+            max-width: 60px;
+            background: linear-gradient(180deg, #667eea, #764ba2);
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            min-height: 10px;
+        }
+
+        .bar:hover {
+            filter: brightness(1.2);
+            transform: scaleY(1.05);
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 700;
+            font-size: 0.9em;
+            color: #ffd700;
+            white-space: nowrap;
+        }
+
+        .bar-label {
+            margin-top: 15px;
+            font-size: 0.85em;
+            color: #b0c4de;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* ===== ИНТЕРАКТИВНЫЙ TIMELINE ===== */
+        .timeline-container {
+            background: rgba(20, 30, 50, 0.6);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(35px, 1fr));
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .timeline-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8em;
+            border: 2px solid transparent;
+        }
+
+        .timeline-day:hover {
+            transform: scale(1.15);
+        }
+
+        .timeline-day.completed {
+            background: linear-gradient(135deg, #4dae64, #3a8a50);
+            border-color: #4dae64;
+            color: #fff;
+        }
+
+        .timeline-day.missed {
+            background: rgba(200, 50, 50, 0.3);
+            border-color: rgba(200, 50, 50, 0.6);
+            color: #ff6b6b;
+        }
+
+        .timeline-day.streak {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-color: #ffd700;
+            color: #000;
+        }
+
+        .timeline-day.frozen {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-color: #667eea;
+            color: #fff;
+        }
+
+        .timeline-tooltip {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: #ffd700;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.7em;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 10;
+        }
+
+        .timeline-day:hover .timeline-tooltip {
+            opacity: 1;
+        }
+
+        /* ===== АЧИВКИ ===== */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .achievement {
+            background: linear-gradient(135deg, rgba(20, 30, 50, 0.9), rgba(30, 40, 70, 0.8));
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .achievement.unlocked {
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .achievement.locked {
+            opacity: 0.5;
+            filter: grayscale(80%);
+        }
+
+        .achievement-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .achievement-ring {
+            --progress: 0;
+            width: 74px;
+            height: 74px;
+            margin: 0 auto 10px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: conic-gradient(#ffd700 calc(var(--progress) * 1%), rgba(255, 255, 255, 0.08) 0);
+            box-shadow: 0 0 14px rgba(255, 215, 0, 0.2);
+        }
+
+        .achievement-ring-inner {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(20, 30, 50, 0.95), rgba(30, 40, 70, 0.9));
+            display: grid;
+            place-items: center;
+            font-size: 2em;
+        }
+
+        .achievement-percent {
+            font-size: 0.68em;
+            color: #ffd700;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+        .stats-mode-switch {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .stats-mode-btn {
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            background: rgba(255, 255, 255, 0.04);
+            color: #b0c4de;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .stats-mode-btn.active {
+            color: #1a1a2e;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-color: #ffd700;
+        }
+
+        .achievement-name {
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            color: #ffed4e;
+        }
+
+        .achievement-desc {
+            font-size: 0.75em;
+            color: #b0c4de;
+            line-height: 1.3;
+        }
+
+        .achievement-progress {
+            font-size: 0.7em;
+            color: #667eea;
+            margin-top: 8px;
+        }
+
+        /* ===== АНИМАЦИИ ===== */
+        .confetti {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+
+        .confetti-regular {
+            animation: confetti-fall 2.5s ease-in forwards;
+        }
+
+        .confetti-gold {
+            animation: confetti-fall 3s ease-in forwards;
+            filter: drop-shadow(0 0 2px #ffd700);
+        }
+
+        @keyframes firework {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0);
+            }
+        }
+
+        .firework-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            animation: firework 1.5s ease-out forwards;
+        }
+
+        .cake-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4em;
+            animation: cake-pop 1s ease-out;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        @keyframes cake-pop {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.3);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* ===== ШОП КАТЕГОРИИ ===== */
+        .shop-category {
+            margin-bottom: 40px;
+        }
+
+        .category-title {
+            font-size: 1.3em;
+            font-weight: 800;
+            color: #ffed4e;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .currency-display {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+
+        .shop-controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+
+        .btn-unequip-all {
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 120, 120, 0.7);
+            background: linear-gradient(135deg, rgba(160, 44, 44, 0.6), rgba(90, 20, 20, 0.5));
+            color: #ffdada;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-unequip-all:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.1);
+        }
+
+        .btn-buy.unequip {
+            background: linear-gradient(135deg, rgba(192, 73, 73, 0.45), rgba(192, 73, 73, 0.2));
+            border-color: #ff8a8a;
+            color: #ffd7d7;
+        }
+
+        .weekly-stats-container {
+            padding: 20px;
+        }
+
+        .weekly-stats-table {
+            width: 100%;
+            background: rgba(75, 60, 95, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .weekly-stats-table thead {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .weekly-stats-table th,
+        .weekly-stats-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .weekly-stats-table th {
+            color: #ffd700;
+            font-weight: 800;
+            font-size: 0.95em;
+        }
+
+        .weekly-stats-table td {
+            color: #ddd;
+            font-size: 0.9em;
+        }
+
+        .weekly-stats-table tr:hover {
+            background: rgba(102, 126, 234, 0.15);
+        }
+
+        .weekly-week-col {
+            color: #ffd700;
+            font-weight: 700;
+        }
+
+        .weekly-stats-empty {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-size: 1.1em;
+        }
+
+        .daily-stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .daily-stats-chip {
+            background: rgba(102, 126, 234, 0.13);
+            border: 1px solid rgba(102, 126, 234, 0.35);
+            border-radius: 10px;
+            padding: 10px 12px;
+            color: #dbe7ff;
+            font-size: 0.9em;
+        }
+
+        .daily-stats-chip strong {
+            color: #ffed4e;
+            font-size: 1.05em;
+        }
+
+        .goblin-mini-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .goblin-mini-icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="topbar-title">👤 Профиль обучения</div>
+            <div class="stat-badge">⚡ <span id="currencyDisplay">0</span> ХП</div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-back goblin-mini-btn" onclick="goToGoblin()" title="Открыть профиль гоблина">
+                <svg class="goblin-mini-icon" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <ellipse cx="58" cy="142" rx="26" ry="52" fill="#4dae64"/>
+                    <ellipse cx="242" cy="142" rx="26" ry="52" fill="#4dae64"/>
+                    <circle cx="150" cy="150" r="94" fill="#67cf7a" stroke="#2d7a45" stroke-width="9"/>
+                    <ellipse cx="112" cy="138" rx="22" ry="20" fill="#fff"/>
+                    <ellipse cx="188" cy="138" rx="22" ry="20" fill="#fff"/>
+                    <circle cx="112" cy="140" r="10" fill="#141414"/>
+                    <circle cx="188" cy="140" r="10" fill="#141414"/>
+                    <path d="M102 193 Q150 234 198 193" stroke="#1b5e36" stroke-width="8" fill="none" stroke-linecap="round"/>
+                </svg>
+                К гоблину
+            </button>
+            <button class="btn-back" onclick="goBack()">← Назад на главную</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('profile', this)">� Статистика</button>            <button class="tab-btn" onclick="switchTab('weekly-stats', this)">📈 Неделя</button>            <button class="tab-btn" onclick="switchTab('achievements', this)">🏆 Ачивки</button>
+        </div>
+
+        <!-- ===== СТАТИСТИКА ТАБА ===== -->
+        <div id="profile" class="tab-content active">
+            <!-- Hero Section -->
+            <div class="profile-hero">
+                <div class="level-display" id="profLevelHero">LVL 1</div>
+                <div class="xp-bar-container">
+                    <div class="xp-bar">
+                        <div class="xp-bar-fill" id="xpFill" style="width: 0%">
+                            <span id="xpText"></span>
+                        </div>
+                    </div>
+                    <div class="xp-text" id="xpDetails">0 / 500 XP до следующего уровня</div>
+                </div>
+            </div>
+
+            <!-- Интерактивный График Активности -->
+            <div class="chart-container">
+                <div class="chart-title">📊 Распределение времени</div>
+                <div class="chart-bars" id="timeChart">
+                    <div class="chart-bar">
+                        <div class="bar" style="height: 0%;" data-type="theory">
+                            <span class="bar-value" id="val-theory">0ч</span>
+                        </div>
+                        <div class="bar-label">📖 Теория</div>
+                    </div>
+                    <div class="chart-bar">
+                        <div class="bar" style="height: 0%;" data-type="practice">
+                            <span class="bar-value" id="val-practice">0ч</span>
+                        </div>
+                        <div class="bar-label">🧪 Практика</div>
+                    </div>
+                    <div class="chart-bar">
+                        <div class="bar" style="height: 0%;" data-type="reading">
+                            <span class="bar-value" id="val-reading">0д</span>
+                        </div>
+                        <div class="bar-label">📘 Дней</div>
+                    </div>
+                    <div class="chart-bar">
+                        <div class="bar" style="height: 0%;" data-type="streak">
+                            <span class="bar-value" id="val-streak">0🔥</span>
+                        </div>
+                        <div class="bar-label">🔥 Серия</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Основные Карточки -->
+            <div class="profile-stats">
+                <div class="stat-card">
+                    <div class="stat-card-label">🔥 Серия дней</div>
+                    <div class="stat-card-value" id="streakDays">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">📘 Дней прочитано</div>
+                    <div class="stat-card-value" id="readDays">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">⏱ Теория (часы)</div>
+                    <div class="stat-card-value" id="theoryHours">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">🧪 Практика (часы)</div>
+                    <div class="stat-card-value" id="practiceHours">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">⏳ Всего времени</div>
+                    <div class="stat-card-value" id="totalTime">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">🏆 Ачивок</div>
+                    <div class="stat-card-value" id="achvCount">0</div>
+                </div>
+            </div>
+
+            <!-- Timeline Дней -->
+            <div class="timeline-container">
+                <h3 style="color: #ffd700; margin-bottom: 10px;">📅 Прогресс по дням (30-дневный марафон)</h3>
+                <div class="timeline" id="dayTimeline"></div>
+            </div>
+        </div>
+
+        <!-- ===== НЕДЕЛЬНАЯ СТАТИСТИКА ТАБА ===== -->
+        <div id="weekly-stats" class="tab-content">
+            <div class="weekly-stats-container">
+                <h2 style="color: #ffed4e; margin-bottom: 20px;">📅 Статистика по неделям</h2>
+                <div class="stats-mode-switch">
+                    <button class="stats-mode-btn active" id="statsModeWeek" onclick="setStatsMode('week')">По неделям</button>
+                    <button class="stats-mode-btn" id="statsModeDay" onclick="setStatsMode('day')">По дням</button>
+                </div>
+                <div id="weekly-stats-content"></div>
+            </div>
+        </div>
+
+        <!-- ===== АЧИВКИ ТАБА ===== -->
+        <div id="achievements" class="tab-content">
+            <div class="achievements-grid" id="achievements-grid"></div>
+        </div>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script>
+        // ===== СОСТОЯНИЕ ===== 
+        const READ_DAYS_KEY = 'course_days_read_v1';
+        const THEORY_MS_KEY = 'course_theory_time_ms';
+        const PRACTICE_MS_KEY = 'course_practice_time_ms';
+        const DAILY_STATS_KEY = 'course_daily_learning_stats_v1';
+
+        let STATS_MODE = 'week';
+        let DAILY_SELECTED_DAY = null;
+
+        let profileState = {
+            level: 1,
+            xp: 0,
+            achievements: [],
+            earnedAchievementXp: 0
+        };
+
+        let API_BASE = localStorage.getItem('planApiBase') || '';
+        const API_BASE_FALLBACKS = ['http://127.0.0.1:8001/api', 'http://127.0.0.1:8000/api'];
+
+        async function apiRequest(path, options = {}) {
+            if (window.PlanApiClient?.request) {
+                return window.PlanApiClient.request(path, options, API_BASE);
+            }
+
+            const bases = [API_BASE, ...API_BASE_FALLBACKS].filter(Boolean);
+            const uniqueBases = Array.from(new Set(bases));
+
+            for (const base of uniqueBases) {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 3000);
+                try {
+                    const response = await fetch(`${base}${path}`, {
+                        ...options,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...(options.headers || {})
+                        },
+                        signal: controller.signal
+                    });
+
+                    if (!response.ok) continue;
+                    API_BASE = base;
+                    localStorage.setItem('planApiBase', base);
+                    return await response.json();
+                } catch (_) {
+                    // try next base
+                } finally {
+                    clearTimeout(timeout);
+                }
+            }
+
+            return null;
+        }
+
+        async function hydrateProfileFromServer() {
+            loadProfileState();
+
+            const [mainState, profileStateRemote, characterState] = await Promise.all([
+                apiRequest('/state/main_tracker'),
+                apiRequest('/state/profile_cosmetics'),
+                apiRequest('/state/character_profile')
+            ]);
+
+            if (mainState?.value && typeof mainState.value === 'object') {
+                const incoming = mainState.value;
+                if (typeof incoming.points === 'number') localStorage.setItem('points', String(incoming.points));
+                if (typeof incoming.level === 'number') localStorage.setItem('level', String(incoming.level));
+                if (incoming.completed && typeof incoming.completed === 'object') localStorage.setItem('completed', JSON.stringify(incoming.completed));
+                if (incoming.cosmetics && typeof incoming.cosmetics === 'object') localStorage.setItem('cosmetics', JSON.stringify(incoming.cosmetics));
+                if (incoming.equippedCosmetics && typeof incoming.equippedCosmetics === 'object') localStorage.setItem('equippedCosmetics', JSON.stringify(incoming.equippedCosmetics));
+            }
+
+            if (profileStateRemote?.value && typeof profileStateRemote.value === 'object') {
+                const incoming = profileStateRemote.value;
+                if (Array.isArray(incoming.achievements)) profileState.achievements = incoming.achievements;
+                if (typeof incoming.earnedAchievementXp === 'number') profileState.earnedAchievementXp = incoming.earnedAchievementXp;
+            }
+
+            if (characterState?.value && typeof characterState.value === 'object') {
+                const incoming = characterState.value;
+                if (incoming.dailyLearningStats && typeof incoming.dailyLearningStats === 'object') {
+                    localStorage.setItem(DAILY_STATS_KEY, JSON.stringify(incoming.dailyLearningStats));
+                }
+            }
+
+        }
+
+        async function syncProfileToServer() {
+            await Promise.all([
+                apiRequest('/state/main_tracker', {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        value: {
+                            points: Number(localStorage.getItem('points') || profileState.xp || 0),
+                            level: Number(localStorage.getItem('level') || profileState.level || 1),
+                            completed: JSON.parse(localStorage.getItem('completed') || '{}'),
+                            cosmetics: JSON.parse(localStorage.getItem('cosmetics') || '{}'),
+                            equippedCosmetics: JSON.parse(localStorage.getItem('equippedCosmetics') || '{}')
+                        }
+                    })
+                }),
+                apiRequest('/state/profile_cosmetics', {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        value: profileState
+                    })
+                })
+            ]);
+        }
+
+        // Ачивки
+        const ACHIEVEMENTS_CATALOG = [
+            // 🎯 Однократные достижения
+            { id: 'first-day', name: 'Первый шаг', desc: 'Прочитать 1 день курса', icon: '👣', rewardXp: 40, condition: () => getLearningStats().readDays >= 1 },
+            { id: 'streak-3', name: 'Огонёк старта', desc: '3 дня подряд закрыть полностью (8/8 задач)', icon: '🔥', rewardXp: 70, condition: () => getCompletedDayStats().streakDays >= 3 },
+            { id: 'streak-7', name: 'Герой недели', desc: 'Серия 7 завершённых дней подряд', icon: '🏅', rewardXp: 130, condition: () => getCompletedDayStats().streakDays >= 7 },
+            { id: 'week-warrior', name: 'Воин недели', desc: 'Прочитать 7 дней курса', icon: '⚔️', rewardXp: 120, condition: () => getLearningStats().readDays >= 7 },
+            { id: 'halfway', name: 'Половина пути', desc: 'Прочитать 15 дней курса', icon: '🎯', rewardXp: 220, condition: () => getLearningStats().readDays >= 15 },
+            { id: 'final-boss', name: 'Финальный босс', desc: 'Прочитать все 30 дней', icon: '🏆', rewardXp: 650, condition: () => getLearningStats().readDays >= 30 },
+            
+            // 📚 Прокачиваемые: Теория (часы)
+            { id: 'bookworm-1h', name: 'Читатель I', desc: '1 час теории', icon: '📚', rewardXp: 50, level: 1, maxLevel: 4, condition: () => getLearningStats().theoryHours >= 1, currentLevel: () => Math.min(4, Math.floor(getLearningStats().theoryHours / 1)) },
+            { id: 'bookworm-5h', name: 'Читатель II', desc: '5 часов теории', icon: '📚', rewardXp: 150, level: 2, maxLevel: 4, condition: () => getLearningStats().theoryHours >= 5, currentLevel: () => Math.min(4, Math.floor(getLearningStats().theoryHours / 5)) },
+            { id: 'bookworm-10h', name: 'Книжный червь I', desc: '10 часов теории', icon: '📖', rewardXp: 250, level: 3, maxLevel: 4, condition: () => getLearningStats().theoryHours >= 10, currentLevel: () => Math.min(4, Math.floor(getLearningStats().theoryHours / 10)) },
+            { id: 'theory-master', name: 'Мастер теории', desc: '50 часов теории', icon: '🧠', rewardXp: 520, level: 4, maxLevel: 4, condition: () => getLearningStats().theoryHours >= 50, currentLevel: () => Math.min(4, Math.floor(getLearningStats().theoryHours / 50)) },
+            
+            // 🧪 Прокачиваемые: Практика (часы)
+            { id: 'practice-starter', name: 'Практик I', desc: '1 час практики', icon: '🧪', rewardXp: 90, level: 1, maxLevel: 4, condition: () => getLearningStats().practiceHours >= 1, currentLevel: () => Math.min(4, Math.floor(getLearningStats().practiceHours / 1)) },
+            { id: 'practice-pro-5', name: 'Практик II', desc: '5 часов практики', icon: '🛠️', rewardXp: 200, level: 2, maxLevel: 4, condition: () => getLearningStats().practiceHours >= 5, currentLevel: () => Math.min(4, Math.floor(getLearningStats().practiceHours / 5)) },
+            { id: 'practice-pro-10', name: 'Практик III', desc: '10 часов практики', icon: '🔧', rewardXp: 350, level: 3, maxLevel: 4, condition: () => getLearningStats().practiceHours >= 10, currentLevel: () => Math.min(4, Math.floor(getLearningStats().practiceHours / 10)) },
+            { id: 'practice-master', name: 'Гений практики', desc: '50 часов практики', icon: '⚡', rewardXp: 700, level: 4, maxLevel: 4, condition: () => getLearningStats().practiceHours >= 50, currentLevel: () => Math.min(4, Math.floor(getLearningStats().practiceHours / 50)) },
+            
+            // ✅ Прокачиваемые: Задания (выполненные)
+            { id: 'tasks-10', name: 'Помощник', desc: '10 выполненных заданий', icon: '✅', rewardXp: 100, level: 1, maxLevel: 4, condition: () => getMainProgress().completedTasks >= 10, currentLevel: () => Math.min(4, Math.floor(getMainProgress().completedTasks / 10)) },
+            { id: 'tasks-30', name: 'Исполнитель', desc: '30 выполненных заданий', icon: '✅', rewardXp: 250, level: 2, maxLevel: 4, condition: () => getMainProgress().completedTasks >= 30, currentLevel: () => Math.min(4, Math.floor(getMainProgress().completedTasks / 30)) },
+            { id: 'tasks-60', name: 'Мастер заданий', desc: '60 выполненных заданий', icon: '✅', rewardXp: 450, level: 3, maxLevel: 4, condition: () => getMainProgress().completedTasks >= 60, currentLevel: () => Math.min(4, Math.floor(getMainProgress().completedTasks / 60)) },
+            { id: 'tasks-120', name: 'Легенда заданий', desc: '120 выполненных заданий (все!)', icon: '🌟', rewardXp: 800, level: 4, maxLevel: 4, condition: () => getMainProgress().completedTasks >= 120, currentLevel: () => Math.min(4, Math.floor(getMainProgress().completedTasks / 120)) },
+            
+            // 🌟 Пасхалки
+            { id: 'super-egg-7', name: 'Охотник за тайнами I', desc: 'Найти супер-пасхалку Дня 7', icon: '🌟', rewardXp: 0, condition: () => hasSuperEgg(7) },
+            { id: 'super-egg-14', name: 'Охотник за тайнами II', desc: 'Найти супер-пасхалку Дня 14', icon: '✨', rewardXp: 0, condition: () => hasSuperEgg(14) },
+            { id: 'super-egg-21', name: 'Охотник за тайнами III', desc: 'Найти супер-пасхалку Дня 21', icon: '💫', rewardXp: 0, condition: () => hasSuperEgg(21) },
+            { id: 'super-egg-28', name: 'Мастер пасхалок', desc: 'Найти супер-пасхалку Дня 28', icon: '👑', rewardXp: 0, condition: () => hasSuperEgg(28) },
+            { id: 'ultra-secret-week', name: 'Лунный архив', desc: 'Открыть ультра-тайну недели', icon: '🌙', rewardXp: 0, condition: () => hasUltraWeekSecret() }
+        ];
+
+        function readNumber(key) {
+            const value = Number(localStorage.getItem(key) || 0);
+            return Number.isFinite(value) && value > 0 ? value : 0;
+        }
+
+        function getReadMap() {
+            try {
+                return JSON.parse(localStorage.getItem(READ_DAYS_KEY) || '{}');
+            } catch {
+                return {};
+            }
+        }
+
+        function getSuperEggsFoundMap() {
+            try {
+                return JSON.parse(localStorage.getItem('course_super_eggs_found_v1') || '{}');
+            } catch {
+                return {};
+            }
+        }
+
+        function hasSuperEgg(day) {
+            const map = getSuperEggsFoundMap();
+            return Boolean(map[String(day)]);
+        }
+
+        function hasUltraWeekSecret() {
+            try {
+                const data = JSON.parse(localStorage.getItem('course_ultra_week_secret_v1') || '{"claimed":false}');
+                return Boolean(data.claimed);
+            } catch {
+                return false;
+            }
+        }
+
+        function getLearningStats() {
+            const readMap = getReadMap();
+            const theoryMs = readNumber(THEORY_MS_KEY);
+            const practiceMs = readNumber(PRACTICE_MS_KEY);
+            const dailyStats = loadDailyLearningStats();
+            const gamingMs = Object.values(dailyStats).reduce((sum, row) => {
+                const value = row && typeof row === 'object' ? Number(row.gamingMs || 0) : 0;
+                return sum + (Number.isFinite(value) ? value : 0);
+            }, 0);
+            const totalMs = theoryMs + practiceMs + gamingMs;
+            const theoryHours = Number((theoryMs / 3600000).toFixed(1));
+            const practiceHours = Number((practiceMs / 3600000).toFixed(1));
+            const totalHours = Number((totalMs / 3600000).toFixed(1));
+
+            return {
+                readDays: Object.keys(readMap).length,
+                theoryHours,
+                practiceHours,
+                totalHours,
+                totalMs
+            };
+        }
+
+        function getCompletedDayStats() {
+            const completed = JSON.parse(localStorage.getItem('completed') || '{}');
+            const dayCounters = {};
+
+            Object.keys(completed).forEach((key) => {
+                const m = key.match(/^day-(\d+)-/);
+                if (!m) return;
+                const day = Number(m[1]);
+                dayCounters[day] = (dayCounters[day] || 0) + 1;
+            });
+
+            const fullDays = Object.keys(dayCounters)
+                .map(Number)
+                .filter((day) => dayCounters[day] >= 8)
+                .sort((a, b) => a - b);
+
+            let streakDays = 0;
+            for (let day = 1; day <= 30; day++) {
+                if (fullDays.includes(day)) {
+                    streakDays += 1;
+                } else {
+                    break;
+                }
+            }
+
+            return {
+                fullDays,
+                streakDays
+            };
+        }
+
+        function getMainProgress() {
+            const completed = JSON.parse(localStorage.getItem('completed') || '{}');
+            const completedTasks = Object.keys(completed).filter(k => completed[k] === true).length;
+            return {
+                completedTasks: completedTasks
+            };
+        }
+
+        function getISOWeekNumber(date = new Date()) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            const weekNum = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return { year: d.getUTCFullYear(), week: weekNum };
+        }
+
+        function formatWeekNumber(year, week) {
+            return `${year}-W${String(week).padStart(2, '0')}`;
+        }
+
+        function getWeeklyStats(weekNumber) {
+            try {
+                const data = localStorage.getItem(`weekly_stats_${weekNumber}`);
+                if (!data) {
+                    return { theoryMs: 0, practiceMs: 0, gamingMs: 0 };
+                }
+                return JSON.parse(data);
+            } catch {
+                return { theoryMs: 0, practiceMs: 0, gamingMs: 0 };
+            }
+        }
+
+        function msToHours(ms) {
+            const hours = Math.floor(ms / 3600000);
+            const minutes = Math.floor((ms % 3600000) / 60000);
+            return { hours, minutes };
+        }
+
+        function formatTime(hours, minutes) {
+            return `${hours}ч ${minutes}м`;
+        }
+
+        function getStreakDays() {
+            return Number(localStorage.getItem('streak_days') || 0);
+        }
+
+        function setStreakDays(days) {
+            localStorage.setItem('streak_days', String(days));
+        }
+
+        function getStreakFrozen() {
+            try {
+                const data = JSON.parse(localStorage.getItem('streak_frozen_this_week') || '{"week":"","frozen":false}');
+                return data;
+            } catch {
+                return { week: '', frozen: false };
+            }
+        }
+
+        function canFreezeThisWeek() {
+            const frozen = getStreakFrozen();
+            const current = getISOWeekNumber();
+            const currentWeek = formatWeekNumber(current.year, current.week);
+            
+            // If frozen week differs from current week, it can be frozen again
+            return currentWeek !== frozen.week || !frozen.frozen;
+        }
+
+        function freezeStreakThisWeek() {
+            const current = getISOWeekNumber();
+            const currentWeek = formatWeekNumber(current.year, current.week);
+            localStorage.setItem('streak_frozen_this_week', JSON.stringify({
+                week: currentWeek,
+                frozen: true
+            }));
+        }
+
+        function getStreakTimeline() {
+            // Build 30-day timeline showing which days were completed
+            const completed = JSON.parse(localStorage.getItem('completed') || '{}');
+            const timeline = [];
+            
+            for (let day = 1; day <= 30; day++) {
+                const tasksForDay = Object.keys(completed).filter(k => {
+                    const match = k.match(/^day-(\d+)-/);
+                    return match && Number(match[1]) === day;
+                });
+                
+                const tasksCompleted = tasksForDay.filter(k => completed[k] === true).length;
+                timeline.push({
+                    day,
+                    completed: tasksCompleted >= 8,
+                    tasksCompleted,
+                    icon: tasksCompleted >= 8 ? '✅' : tasksCompleted > 0 ? '⚠️' : '❌'
+                });
+            }
+            
+            return timeline;
+        }
+
+        function renderStreakTimeline() {
+            const container = document.getElementById('profile-stats') || document.querySelector('.profile-stats');
+            if (!container) return;
+            
+            const timeline = getStreakTimeline();
+            let html = '<div style="margin-top: 20px; padding: 15px; background: rgba(102, 126, 234, 0.1); border-radius: 10px; border: 1px solid rgba(102, 126, 234, 0.3);">' +
+                '<h3 style="color: #ffd700; margin-bottom: 10px;">🔥 Прогресс по дням</h3>' +
+                '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(30px, 1fr)); gap: 5px; margin-bottom: 10px;">';
+            
+            timeline.forEach((day, idx) => {
+                const color = day.completed ? '#4dae64' : day.tasksCompleted > 0 ? '#ffd700' : '#666';
+                const tooltip = `День ${day.day}: ${day.tasksCompleted}/8 задач`;
+                html += `<div style="width: 30px; height: 30px; background: ${color}; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 0.8em; cursor: help; title: '${tooltip}';">${day.icon}</div>`;
+            });
+            
+            html += '</div>';
+            
+            // Freeze button
+            const frozen = getStreakFrozen();
+            const canFreeze = canFreezeThisWeek();
+            const freezeBtn = '<button style="background: ' + (canFreeze ? '#667eea' : '#666') + '; color: #fff; border: none; padding: 8px 12px; border-radius: 5px; cursor: ' + (canFreeze ? 'pointer' : 'default') + '; margin-top: 5px;" ' + (canFreeze ? 'onclick="window.freezeStreakNow()"' : 'disabled') + '>' + (frozen.frozen ? '🧊 Заморозка активна на этой неделе' : '❄️ Заморозить серию (раз в неделю)') + '</button>';
+            html += freezeBtn + '</div>';
+            
+            // Insert or update
+            const existingTimeline = container.querySelector('[data-streak-timeline]');
+            if (existingTimeline) {
+                existingTimeline.innerHTML = html;
+            } else {
+                const timelineDiv = document.createElement('div');
+                timelineDiv.setAttribute('data-streak-timeline', 'true');
+                timelineDiv.innerHTML = html;
+                container.appendChild(timelineDiv);
+            }
+        }
+
+        function renderWeeklyStats() {
+            if (STATS_MODE === 'day') {
+                renderDailyStats();
+                return;
+            }
+
+            const container = document.getElementById('weekly-stats-content');
+            
+            // Get plan weeks 1-4
+            const weeks = [];
+            for (let w = 1; w <= 4; w++) {
+                weeks.push({ week: w, formatted: `plan-week-${w}` });
+            }
+            
+            // Collect stats for all weeks
+            const weeksData = weeks.map(w => {
+                const stats = getWeeklyStats(w.formatted);
+                const theory = msToHours(stats.theoryMs);
+                const practice = msToHours(stats.practiceMs);
+                const gaming = msToHours(stats.gamingMs);
+                const total = theory.hours + practice.hours + gaming.hours;
+                
+                return {
+                    week: w.week,
+                    formatted: w.formatted,
+                    theory: theory.hours + theory.minutes / 60,
+                    practice: practice.hours + practice.minutes / 60,
+                    gaming: gaming.hours + gaming.minutes / 60,
+                    total,
+                    allHours: [theory.hours, practice.hours, gaming.hours]
+                };
+            });
+
+            const maxHours = Math.max(...weeksData.map(w => w.total), 10);
+
+            // Build interactive chart
+            let html = '<div style="margin-bottom: 30px;">';
+            
+            // Add info header
+            html += `<div style="color: #667eea; font-size: 0.9em; margin-bottom: 10px; padding: 10px; background: rgba(102, 126, 234, 0.1); border-radius: 5px;">📚 Статистика за 4 недели обучения</div>`;
+            
+            html += '<div class="chart-bars" style="height: 300px; align-items: flex-end; margin-bottom: 30px;">';
+
+            weeksData.forEach((w, idx) => {
+                const theoryPercent = (w.theory / maxHours) * 100;
+                const practicePercent = (w.practice / maxHours) * 100;
+                const gamingPercent = (w.gaming / maxHours) * 100;
+                const totalPercent = (w.total / maxHours) * 100;
+
+                html += `<div class="chart-bar">
+                    <div style="position: relative; display: flex; flex-direction: column-reverse; height: calc((${totalPercent}px + 200px));">
+                        <div style="background: linear-gradient(180deg, #4dae64, #3a8a50); height: ${theoryPercent}%; border-radius: 4px 4px 0 0; position: relative;" data-week="${w.week}">
+                            <span style="position: absolute; bottom: 3px; font-size: 0.7em; color: #fff; font-weight: 700;">${w.theory.toFixed(1)}ч</span>
+                        </div>
+                        <div style="background: linear-gradient(180deg, #ffd700, #ffb700); height: ${practicePercent}%; position: relative;">
+                            <span style="position: absolute; bottom: 3px; font-size: 0.7em; color: #000; font-weight: 700;">${w.practice.toFixed(1)}ч</span>
+                        </div>
+                        <div style="background: linear-gradient(180deg, #667eea, #764ba2); height: ${gamingPercent}%; position: relative;">
+                            <span style="position: absolute; bottom: 3px; font-size: 0.7em; color: #fff; font-weight: 700;">${w.gaming.toFixed(1)}ч</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; text-align: center; font-weight: 700; color: #ffd700;">Неделя ${w.week}</div>
+                </div>`;
+            });
+
+            html += '</div>';
+
+            // Legend
+            html += `<div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 20px; height: 20px; background: linear-gradient(180deg, #4dae64, #3a8a50); border-radius: 3px;"></div>
+                    <span style="color: #b0c4de;">📖 Теория</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 20px; height: 20px; background: linear-gradient(180deg, #ffd700, #ffb700); border-radius: 3px;"></div>
+                    <span style="color: #b0c4de;">🧪 Практика</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 20px; height: 20px; background: linear-gradient(180deg, #667eea, #764ba2); border-radius: 3px;"></div>
+                    <span style="color: #b0c4de;">🎮 Игры</span>
+                </div>
+            </div>`;
+
+            // Summary table
+            html += '<table class="weekly-stats-table"><thead><tr>' +
+                '<th>📅 Неделя</th>' +
+                '<th>📖 Теория</th>' +
+                '<th>🧪 Практика</th>' +
+                '<th>🎮 Игры</th>' +
+                '<th>📊 Итого</th>' +
+                '</tr></thead><tbody>';
+            
+            weeksData.forEach(w => {
+                html += `<tr>
+                    <td class="weekly-week-col">Неделя ${w.week}</td>
+                    <td style="color: #4dae64; font-weight: 700;">${w.theory.toFixed(1)}ч</td>
+                    <td style="color: #ffd700; font-weight: 700;">${w.practice.toFixed(1)}ч</td>
+                    <td style="color: #667eea; font-weight: 700;">${w.gaming.toFixed(1)}ч</td>
+                    <td style="color: #fff; font-weight: 800;">${w.total}ч</td>
+                </tr>`;
+            });
+
+            html += '</tbody></table></div>';
+            
+            if (weeksData.length === 0) {
+                html = '<div class="weekly-stats-empty">📊 Нету данных. Начни отслеживать время!</div>';
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function loadDailyLearningStats() {
+            try {
+                return JSON.parse(localStorage.getItem(DAILY_STATS_KEY) || '{}');
+            } catch {
+                return {};
+            }
+        }
+
+        function toMinutes(ms) {
+            return Math.floor((Number(ms) || 0) / 60000);
+        }
+
+        function formatMinutesOnly(mins) {
+            const h = Math.floor(mins / 60);
+            const m = mins % 60;
+            return `${h}ч ${String(m).padStart(2, '0')}м`;
+        }
+
+        function getWeekBucketForDay(day) {
+            if (day <= 7) return 1;
+            if (day <= 14) return 2;
+            if (day <= 21) return 3;
+            return 4;
+        }
+
+        function getIsoWeekKeyForDay(day) {
+            const base = new Date();
+            base.setDate(base.getDate() - (30 - day));
+            const week = getISOWeekNumber(base);
+            return formatWeekNumber(week.year, week.week);
+        }
+
+        function getDailyRowWithGame(day, daily) {
+            const row = daily[String(day)] || {};
+            const theoryMs = Number(row.theoryMs || 0);
+            const practiceMs = Number(row.practiceMs || 0);
+
+            // Если игр за день нет, берём аккуратную оценку из недельной статистики
+            let gamingMs = Number(row.gamingMs || 0);
+            if (gamingMs <= 0) {
+                const planWeekStats = getWeeklyStats(`plan-week-${getWeekBucketForDay(day)}`);
+                const isoWeekStats = getWeeklyStats(getIsoWeekKeyForDay(day));
+                const weeklyGaming = Number(planWeekStats.gamingMs || 0) + Number(isoWeekStats.gamingMs || 0);
+                gamingMs = Math.floor(weeklyGaming / 7);
+            }
+
+            return {
+                theoryMs: Math.max(0, theoryMs),
+                practiceMs: Math.max(0, practiceMs),
+                gamingMs: Math.max(0, gamingMs)
+            };
+        }
+
+        function renderDailyStats() {
+            const container = document.getElementById('weekly-stats-content');
+            const daily = loadDailyLearningStats();
+
+            const dayList = Array.from({ length: 30 }, (_, i) => i + 1);
+
+            let totalTheory = 0;
+            let totalPractice = 0;
+            let totalGaming = 0;
+            dayList.forEach((day) => {
+                const row = getDailyRowWithGame(day, daily);
+                totalTheory += toMinutes(row.theoryMs);
+                totalPractice += toMinutes(row.practiceMs);
+                totalGaming += toMinutes(row.gamingMs);
+            });
+
+            if (!DAILY_SELECTED_DAY || DAILY_SELECTED_DAY < 1 || DAILY_SELECTED_DAY > 30) {
+                DAILY_SELECTED_DAY = 1;
+            }
+
+            const selected = getDailyRowWithGame(DAILY_SELECTED_DAY, daily);
+            const theoryMin = toMinutes(selected.theoryMs);
+            const practiceMin = toMinutes(selected.practiceMs);
+            const gamingMin = toMinutes(selected.gamingMs);
+            const sumMin = theoryMin + practiceMin + gamingMin;
+            const theoryPct = sumMin > 0 ? Math.round((theoryMin / sumMin) * 100) : 0;
+            const practicePct = sumMin > 0 ? Math.round((practiceMin / sumMin) * 100) : 0;
+            const dayButtons = dayList.map((day) => {
+                const row = getDailyRowWithGame(day, daily);
+                const t = toMinutes(row.theoryMs);
+                const p = toMinutes(row.practiceMs);
+                const g = toMinutes(row.gamingMs);
+                const total = t + p + g;
+                const active = day === DAILY_SELECTED_DAY;
+                const faded = total === 0 ? 'opacity:.55;' : '';
+                return `<button class="stats-mode-btn ${active ? 'active' : ''}" style="min-width:120px;${faded}" onclick="selectDailyStatsDay(${day})">День ${day}<br><span style="font-size:11px;opacity:.8;">${total} мин</span></button>`;
+            }).join('');
+
+            const activeDays = dayList.filter((day) => {
+                const row = getDailyRowWithGame(day, daily);
+                return toMinutes(row.theoryMs) + toMinutes(row.practiceMs) + toMinutes(row.gamingMs) > 0;
+            }).length;
+
+            container.innerHTML = `
+                <div class="daily-stats-summary">
+                    <div class="daily-stats-chip">Активных дней: <strong>${activeDays}/30</strong></div>
+                    <div class="daily-stats-chip">Теория: <strong>${formatMinutesOnly(totalTheory)}</strong></div>
+                    <div class="daily-stats-chip">Практика: <strong>${formatMinutesOnly(totalPractice)}</strong></div>
+                    <div class="daily-stats-chip">Игры: <strong>${formatMinutesOnly(totalGaming)}</strong></div>
+                    <div class="daily-stats-chip">Сумма: <strong>${totalTheory + totalPractice + totalGaming} мин</strong></div>
+                </div>
+
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 14px;">
+                    ${dayButtons}
+                </div>
+
+                <div style="background:rgba(75,60,95,.3);border:1px solid rgba(102,126,234,.3);border-radius:12px;padding:14px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                        <strong style="color:#ffd700;">День ${DAILY_SELECTED_DAY}</strong>
+                        <span style="color:#dbe7ff;">${sumMin} мин • ${formatMinutesOnly(sumMin)}</span>
+                    </div>
+
+                    <div style="margin-bottom:8px;color:#b0c4de;font-size:13px;">📖 Теория: ${formatMinutesOnly(theoryMin)} • ${theoryMin} мин (${theoryPct}%)</div>
+                    <div style="height:10px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:10px;">
+                        <div style="width:${theoryPct}%;height:100%;background:linear-gradient(90deg,#4dae64,#7ad68b);"></div>
+                    </div>
+
+                    <div style="margin-bottom:8px;color:#b0c4de;font-size:13px;">🧪 Практика: ${formatMinutesOnly(practiceMin)} • ${practiceMin} мин (${practicePct}%)</div>
+                    <div style="height:10px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:10px;">
+                        <div style="width:${practicePct}%;height:100%;background:linear-gradient(90deg,#ffd700,#ffb700);"></div>
+                    </div>
+
+                    <div style="margin-bottom:8px;color:#b0c4de;font-size:13px;">🎮 Игры: ${formatMinutesOnly(gamingMin)} • ${gamingMin} мин</div>
+                    <div style="font-size:12px;color:#8ea4d6;">Источник: время из хаба игр</div>
+                </div>
+            `;
+        }
+
+        function selectDailyStatsDay(day) {
+            DAILY_SELECTED_DAY = Number(day) || DAILY_SELECTED_DAY;
+            renderDailyStats();
+        }
+
+        function setStatsMode(mode) {
+            STATS_MODE = mode === 'day' ? 'day' : 'week';
+            document.getElementById('statsModeWeek')?.classList.toggle('active', STATS_MODE === 'week');
+            document.getElementById('statsModeDay')?.classList.toggle('active', STATS_MODE === 'day');
+            renderWeeklyStats();
+        }
+
+        function getAchievementProgressPercent(achv) {
+            if (achv.maxLevel && achv.currentLevel) {
+                const p = (achv.currentLevel() / achv.maxLevel) * 100;
+                return Math.max(0, Math.min(100, Math.round(p)));
+            }
+
+            const learning = getLearningStats();
+            const main = getMainProgress();
+            const streak = getCompletedDayStats();
+
+            const targets = {
+                'first-day': learning.readDays / 1,
+                'streak-3': streak.streakDays / 3,
+                'streak-7': streak.streakDays / 7,
+                'week-warrior': learning.readDays / 7,
+                'halfway': learning.readDays / 15,
+                'final-boss': learning.readDays / 30,
+                'super-egg-7': hasSuperEgg(7) ? 1 : 0,
+                'super-egg-14': hasSuperEgg(14) ? 1 : 0,
+                'super-egg-21': hasSuperEgg(21) ? 1 : 0,
+                'super-egg-28': hasSuperEgg(28) ? 1 : 0,
+                'ultra-secret-week': hasUltraWeekSecret() ? 1 : 0
+            };
+
+            if (achv.id.startsWith('tasks-')) {
+                const threshold = Number(achv.id.split('-')[1]) || 1;
+                return Math.max(0, Math.min(100, Math.round((main.completedTasks / threshold) * 100)));
+            }
+
+            const raw = targets[achv.id] ?? (achv.condition() ? 1 : 0);
+            return Math.max(0, Math.min(100, Math.round(raw * 100)));
+        }
+
+        // Функции
+        function switchTab(tabName, tabButton) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            if (tabButton) {
+                tabButton.classList.add('active');
+            }
+            
+            // Render content when tab is active
+            if (tabName === 'weekly-stats') {
+                renderWeeklyStats();
+            } else if (tabName === 'achievements') {
+                renderAchievements();
+            } else if (tabName === 'profile') {
+                updateDisplay();
+            }
+        }
+
+        function goBack() {
+            window.location.href = '30d-main-tasks.html';
+        }
+
+        function goToGoblin() {
+            window.location.href = 'character-profile.html';
+        }
+
+        function freezeStreakNow() {
+            if (!canFreezeThisWeek()) {
+                alert('Вы уже заморозили серию на этой неделе!');
+                return;
+            }
+            freezeStreakThisWeek();
+            renderStreakTimeline();
+            alert('🧊 Серия заморожена! Вы можете пропустить один день без потери серии.');
+        }
+
+        function loadProfileState() {
+            const saved = localStorage.getItem('profileCosmetics');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    profileState.achievements = parsed.achievements || [];
+                    profileState.earnedAchievementXp = parsed.earnedAchievementXp || 0;
+                } catch { }
+                return;
+            }
+
+            const legacy = localStorage.getItem('profile_state');
+            if (legacy) {
+                try {
+                    const parsed = JSON.parse(legacy);
+                    profileState.achievements = parsed.achievements || [];
+                    profileState.earnedAchievementXp = parsed.earnedAchievementXp || 0;
+                } catch { }
+            }
+        }
+
+        function saveProfileState() {
+            localStorage.setItem('profileCosmetics', JSON.stringify(profileState));
+
+            try {
+                const legacy = JSON.parse(localStorage.getItem('profile_state') || '{}');
+                legacy.achievements = profileState.achievements;
+                legacy.earnedAchievementXp = profileState.earnedAchievementXp;
+                localStorage.setItem('profile_state', JSON.stringify(legacy));
+            } catch {
+                localStorage.setItem('profile_state', JSON.stringify({
+                    achievements: profileState.achievements,
+                    earnedAchievementXp: profileState.earnedAchievementXp
+                }));
+            }
+
+            void syncProfileToServer();
+        }
+        function computeProfileXp() {
+            const mainPoints = readNumber('points');
+            return mainPoints;
+        }
+
+        function recomputeAchievementState() {
+            const before = new Set(profileState.achievements || []);
+
+            const unlockedByCondition = ACHIEVEMENTS_CATALOG
+                .filter(achv => achv.condition())
+                .map(achv => achv.id);
+
+            profileState.achievements = Array.from(new Set([
+                ...(profileState.achievements || []),
+                ...unlockedByCondition
+            ]));
+
+            profileState.earnedAchievementXp = ACHIEVEMENTS_CATALOG.reduce((sum, achv) => {
+                if (profileState.achievements.includes(achv.id)) {
+                    return sum + (achv.rewardXp || 0);
+                }
+                return sum;
+            }, 0);
+
+            const newlyUnlocked = profileState.achievements.filter(id => !before.has(id));
+            if (newlyUnlocked.length > 0) {
+                newlyUnlocked.forEach(id => {
+                    const achv = ACHIEVEMENTS_CATALOG.find(item => item.id === id);
+                    if (achv) triggerAchievementAlert(achv);
+                });
+                saveProfileState();
+            }
+        }
+
+        function renderAchievements() {
+            const container = document.getElementById('achievements-grid');
+            container.innerHTML = '';
+
+            recomputeAchievementState();
+
+            ACHIEVEMENTS_CATALOG.forEach(achv => {
+                const unlocked = profileState.achievements.includes(achv.id);
+                const progressPercent = getAchievementProgressPercent(achv);
+                
+                // Определяем текущий уровень для многоуровневых достижений
+                let levelDisplay = '';
+                let progressDisplay = '';
+                
+                if (achv.maxLevel && achv.currentLevel) {
+                    const currentLevel = achv.currentLevel();
+                    levelDisplay = `[Уровень ${currentLevel}/${achv.maxLevel}]`;
+                    
+                    if (unlocked) {
+                        progressDisplay = `✅ Уровень ${currentLevel}/${achv.maxLevel}`;
+                    } else {
+                        progressDisplay = `🔒 Уровень ${currentLevel}/${achv.maxLevel}`;
+                    }
+                } else {
+                    progressDisplay = unlocked ? `✅ +${achv.rewardXp || 0} XP` : '🔒 В процессе';
+
+                    if (!unlocked && achv.id === 'streak-3') {
+                        const nowStreak = getCompletedDayStats().streakDays;
+                        progressDisplay = `🔥 Огонёк: ${nowStreak}/3 дней подряд (по 8/8)`;
+                    }
+                }
+
+                const html = `
+                    <div class="achievement ${unlocked ? 'unlocked' : 'locked'}">
+                        <div class="achievement-ring" style="--progress:${progressPercent};">
+                            <div class="achievement-ring-inner">${achv.icon}</div>
+                        </div>
+                        <div class="achievement-name">${achv.name} ${levelDisplay}</div>
+                        <div class="achievement-desc">${achv.desc}</div>
+                        <div class="achievement-progress">${progressDisplay}</div>
+                        <div class="achievement-percent">Прогресс: ${progressPercent}%</div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        function updateUI() {
+            const learning = getLearningStats();
+            const completedDayStats = getCompletedDayStats();
+
+            renderAchievements();
+            renderStreakTimeline();
+            renderXPBar();
+            renderTimeChart();
+            renderDayTimeline();
+
+            profileState.xp = computeProfileXp();
+            profileState.level = Math.floor(profileState.xp / 500) + 1;
+
+            document.getElementById('profLevelHero').textContent = 'LVL ' + profileState.level;
+            document.getElementById('achvCount').textContent = profileState.achievements.length;
+            document.getElementById('streakDays').textContent = completedDayStats.streakDays;
+            document.getElementById('readDays').textContent = learning.readDays;
+            document.getElementById('theoryHours').textContent = learning.theoryHours;
+            document.getElementById('practiceHours').textContent = learning.practiceHours;
+            document.getElementById('totalTime').textContent = learning.totalHours;
+
+            saveProfileState();
+        }
+
+        function renderXPBar() {
+            const xp = computeProfileXp();
+            const level = Math.floor(xp / 500);
+            const xpToLevel = (level * 500);
+            const xpNextLevel = ((level + 1) * 500);
+            const xpProgress = xp - xpToLevel;
+            const xpMax = xpNextLevel - xpToLevel;
+            const percent = Math.min((xpProgress / xpMax) * 100, 100);
+
+            const fill = document.getElementById('xpFill');
+            if (fill) {
+                fill.style.width = percent + '%';
+                fill.innerHTML = percent > 10 ? `<span id="xpText">${Math.round(percent)}%</span>` : '';
+            }
+
+            const details = document.getElementById('xpDetails');
+            if (details) {
+                details.textContent = `${xpProgress} / ${xpMax} XP до уровня ${level + 2}`;
+            }
+        }
+
+        function renderTimeChart() {
+            const learning = getLearningStats();
+            const completedDayStats = getCompletedDayStats();
+
+            const maxValue = Math.max(
+                learning.theoryHours || 1,
+                learning.practiceHours || 1,
+                learning.readDays || 1,
+                completedDayStats.streakDays || 1
+            );
+
+            // Update bars
+            const theory = document.querySelector('.bar[data-type="theory"]');
+            const practice = document.querySelector('.bar[data-type="practice"]');
+            const reading = document.querySelector('.bar[data-type="reading"]');
+            const streak = document.querySelector('.bar[data-type="streak"]');
+
+            if (theory) {
+                const height = (learning.theoryHours / maxValue) * 100;
+                theory.style.height = Math.max(height, 10) + '%';
+                document.getElementById('val-theory').textContent = learning.theoryHours + 'ч';
+            }
+            if (practice) {
+                const height = (learning.practiceHours / maxValue) * 100;
+                practice.style.height = Math.max(height, 10) + '%';
+                document.getElementById('val-practice').textContent = learning.practiceHours + 'ч';
+            }
+            if (reading) {
+                const height = (learning.readDays / maxValue) * 100;
+                reading.style.height = Math.max(height, 10) + '%';
+                document.getElementById('val-reading').textContent = learning.readDays + 'д';
+            }
+            if (streak) {
+                const height = (completedDayStats.streakDays / maxValue) * 100;
+                streak.style.height = Math.max(height, 10) + '%';
+                document.getElementById('val-streak').textContent = completedDayStats.streakDays + '🔥';
+            }
+        }
+
+        function renderDayTimeline() {
+            const container = document.getElementById('dayTimeline');
+            if (!container) return;
+
+            const completed = JSON.parse(localStorage.getItem('completed') || '{}');
+            const frozen = getStreakFrozen();
+            const dayCounters = {};
+
+            Object.keys(completed).forEach((key) => {
+                const m = key.match(/^day-(\d+)-/);
+                if (!m) return;
+                const day = Number(m[1]);
+                dayCounters[day] = (dayCounters[day] || 0) + 1;
+            });
+
+            const fullDays = Object.keys(dayCounters)
+                .map(Number)
+                .filter((day) => dayCounters[day] >= 8)
+                .sort((a, b) => a - b);
+
+            container.innerHTML = '';
+
+            for (let day = 1; day <= 30; day++) {
+                const isCompleted = fullDays.includes(day);
+                const isFrozen = frozen.frozen && day <= Math.max(...fullDays, 0);
+
+                let className = 'timeline-day ';
+                let icon = day;
+
+                if (isCompleted) {
+                    className += 'completed';
+                    icon = '✅';
+                } else if (day <= Math.max(...fullDays, 0)) {
+                    className += 'missed';
+                    icon = '❌';
+                } else {
+                    icon = day;
+                }
+
+                const dayEl = document.createElement('div');
+                dayEl.className = className;
+                dayEl.innerHTML = icon;
+
+                container.appendChild(dayEl);
+            }
+        }
+
+        function triggerGoldConfetti() {
+            for (let i = 0; i < 100; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti confetti-gold';
+                conf.style.left = Math.random() * 100 + '%';
+                conf.style.top = '-10px';
+                conf.style.backgroundColor = '#FFD700';
+                conf.style.width = Math.random() * 8 + 3 + 'px';
+                conf.style.height = conf.style.width;
+                conf.style.animationDuration = (Math.random() * 2 + 2.5) + 's';
+                document.body.appendChild(conf);
+                
+                setTimeout(() => conf.remove(), 5000);
+            }
+        }
+
+        function triggerAchievementAlert(achv) {
+            const alert = document.createElement('div');
+            alert.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, rgba(255, 215, 0, 0.9), rgba(255, 165, 0, 0.9));
+                border: 2px solid #FFD700;
+                padding: 20px;
+                border-radius: 12px;
+                z-index: 10000;
+                font-weight: 700;
+                color: #000;
+                font-size: 1.1em;
+            `;
+            alert.innerHTML = `🏆 Ачивка разблокирована: ${achv.name} (+${achv.rewardXp || 0} XP)`;
+            document.body.appendChild(alert);
+            
+            setTimeout(() => alert.remove(), 3000);
+        }
+
+        // Инициализация
+        async function initPage() {
+            await hydrateProfileFromServer();
+            updateUI();
+        }
+
+        initPage();
+    </script>
+</body>
+</html>

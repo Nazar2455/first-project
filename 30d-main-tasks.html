@@ -1,0 +1,3640 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 30 дней = $1000+ | Задания и Очки</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0f0f1e, #1a0a2e, #16213e);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255,215,0,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(102,126,234,0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '🏰 🧙‍♂️ 🗡️ 🐉 🧝 ⚔️ 🛡️ 🧛 🐺 💀 🧙‍♀️ 🏰';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: 80px;
+            opacity: 0.02;
+            pointer-events: none;
+            z-index: 0;
+            line-height: 1.2;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            overflow: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(20, 30, 50, 0.9);
+            backdrop-filter: blur(10px);
+            border: 2px solid #ffd700;
+            padding: 15px 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 0 15px rgba(255,215,0,0.1);
+        }
+        
+        .navbar-title {
+            font-size: 1.8em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .navbar-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .stat-badge {
+            background: rgba(255, 215, 0, 0.15);
+            border: 2px solid #ffd700;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255,215,0,0.15);
+        }
+        
+        .stat-badge:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .stat-value {
+            color: #ffd700;
+            font-size: 1.2em;
+            font-weight: 800;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e, #ffa500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            color: #b0c4de;
+            margin-bottom: 5px;
+        }
+
+        /* ===== СЧЁТЧИК ДНЕЙ И ТАЙМЕР ===== */
+        .journey-tracker {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(102, 126, 234, 0.1));
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .journey-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .journey-item h3 {
+            font-size: 0.9em;
+            color: #b0c4de;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .journey-value {
+            font-size: 2.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .journey-subtitle {
+            font-size: 0.75em;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .progress-wrapper {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(102, 126, 234, 0.1));
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .progress-bar-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .progress-item {
+            position: relative;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0f0f1e;
+            font-weight: 800;
+            font-size: 0.85em;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        .progress-fill.bots {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+            color: white;
+        }
+        
+        .progress-fill.parsing {
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+            box-shadow: 0 0 20px rgba(245, 87, 108, 0.5);
+            color: white;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .secrets-panel {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 28px;
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.24);
+            border-radius: 12px;
+            padding: 12px 14px;
+        }
+
+        .secret-badge {
+            font-weight: 700;
+            font-size: 0.9em;
+            color: #ffe58c;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+        }
+        
+        .btn {
+            padding: 12px 28px;
+            border: 2px solid #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.05));
+            color: #ffd700;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.15));
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .day-card {
+            background: linear-gradient(135deg, rgba(20, 30, 50, 0.9), rgba(30, 40, 70, 0.8));
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .day-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        
+        .day-card.parsing::before {
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+        }
+        
+        .day-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffd700;
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.2);
+        }
+        
+        .day-header {
+            font-size: 1.3em;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: #ffed4e;
+        }
+        
+        .task-list {
+            list-style: none;
+        }
+        
+        .task-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .task-item::after {
+            content: attr(data-badge);
+            margin-left: 8px;
+            align-self: center;
+            font-size: 0.72em;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+            color: #0f0f1e;
+            background: #ffd700;
+            border-radius: 999px;
+            padding: 4px 8px;
+            opacity: 0.9;
+        }
+
+        .task-mini-btn {
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.08);
+            color: #e6f2ff;
+            font-size: 0.72em;
+            font-weight: 700;
+            padding: 6px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            margin-left: 6px;
+        }
+
+        .task-mini-btn:hover {
+            border-color: #ffd700;
+            color: #ffd700;
+            transform: translateY(-1px);
+        }
+
+        .task-style-build {
+            border-left-color: #00e5ff;
+            background: linear-gradient(120deg, rgba(0, 229, 255, 0.15), rgba(255, 255, 255, 0.03));
+        }
+
+        .task-style-biz {
+            border-left-color: #ffb300;
+            background: linear-gradient(120deg, rgba(255, 179, 0, 0.18), rgba(255, 255, 255, 0.03));
+        }
+
+        .task-style-deploy {
+            border-left-color: #7c4dff;
+            background: linear-gradient(120deg, rgba(124, 77, 255, 0.2), rgba(255, 255, 255, 0.03));
+        }
+
+        .task-style-refactor {
+            border-left-color: #00c853;
+            background: linear-gradient(120deg, rgba(0, 200, 83, 0.16), rgba(255, 255, 255, 0.03));
+        }
+
+        .task-style-showcase {
+            border-left-color: #ff4081;
+            background: linear-gradient(120deg, rgba(255, 64, 129, 0.16), rgba(255, 255, 255, 0.03));
+        }
+        
+        .task-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #ffd700;
+        }
+        
+        .task-item.completed {
+            opacity: 0.5;
+        }
+        
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: #999;
+        }
+        
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            cursor: pointer;
+            flex-shrink: 0;
+            accent-color: #ffd700;
+        }
+        
+        .task-text {
+            flex: 1;
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: #d0d8df;
+        }
+        
+        .points-popup {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            font-weight: 800;
+            font-size: 1.5em;
+            animation: points-float 1.5s ease-out forwards;
+        }
+
+        .secret-popup {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 10000;
+            min-width: 260px;
+            max-width: 380px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.6);
+            background: linear-gradient(135deg, rgba(255, 205, 64, 0.25), rgba(40, 26, 2, 0.95));
+            color: #fff4cc;
+            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+            animation: secret-in 0.35s ease;
+        }
+
+        /* КОНФЕТИ И ФЕЕРВЕРК */
+        .confetti {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            animation: confetti-fall 2.5s ease-in forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+
+        .confetti.gold {
+            animation: confetti-fall-gold 3s ease-in forwards;
+            filter: drop-shadow(0 0 3px #ffd700);
+        }
+
+        @keyframes confetti-fall-gold {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotateY(720deg);
+            }
+        }
+
+        .firework {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            font-size: 1.5em;
+            animation: firework-burst 1.5s ease-out forwards;
+        }
+
+        @keyframes firework-burst {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0);
+            }
+        }
+
+        .cake-pop {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            font-size: 3em;
+            z-index: 9999;
+            pointer-events: none;
+            animation: cake-appear 1s ease-out forwards;
+        }
+
+        @keyframes cake-appear {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .celebration-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            font-size: 2.5em;
+            font-weight: 900;
+            z-index: 10000;
+            pointer-events: none;
+            animation: celebration-appear 2s ease-out forwards;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        @keyframes celebration-appear {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+        }
+
+        @keyframes notification-slide {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        .quest-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(6, 8, 20, 0.76);
+            z-index: 12000;
+            padding: 18px;
+        }
+
+        .quest-modal.open {
+            display: flex;
+        }
+
+        .quest-card {
+            width: min(760px, 100%);
+            border: 2px solid var(--quest-color, #ffd700);
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(18, 27, 45, 0.98), rgba(17, 14, 34, 0.98));
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(255,215,0,0.05);
+            overflow: hidden;
+            animation: quest-pop 0.25s ease;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quest-body {
+            padding: 16px;
+            display: grid;
+            gap: 14px;
+            overflow-y: auto;
+            max-height: calc(85vh - 80px);
+            padding-right: 10px;
+        }
+
+        .quest-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .quest-body::-webkit-scrollbar-track {
+            background: rgba(255,215,0,0.05);
+            border-radius: 4px;
+        }
+
+        .quest-body::-webkit-scrollbar-thumb {
+            background: rgba(255,215,0,0.3);
+            border-radius: 4px;
+        }
+
+        .quest-body::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,215,0,0.5);
+        }
+
+        @keyframes quest-pop {
+            from { transform: translateY(10px) scale(0.98); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .quest-head {
+            padding: 14px 16px;
+            background: linear-gradient(120deg, var(--quest-bg1, rgba(255, 215, 0, 0.25)), var(--quest-bg2, rgba(255, 255, 255, 0.03)));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .quest-title {
+            font-size: 1.08em;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .quest-sub {
+            color: #d8e6ff;
+            font-size: 0.9em;
+            margin-top: 4px;
+        }
+
+        .quest-close {
+            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+        }
+
+        .quest-block {
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,0.03);
+        }
+
+        .quest-block h4 {
+            font-size: 0.95em;
+            color: var(--quest-color, #ffd700);
+            margin-bottom: 8px;
+        }
+
+        .quest-story {
+            color: #d8e7ff;
+            line-height: 1.45;
+            font-size: 0.92em;
+        }
+
+        .quest-steps {
+            list-style: none;
+            display: grid;
+            gap: 8px;
+            color: #d6e0ef;
+            font-size: 0.9em;
+        }
+
+        .quest-steps li::before {
+            content: '▹ ';
+            color: var(--quest-color, #ffd700);
+            font-weight: 800;
+        }
+
+        .quest-footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+            color: #b9cce8;
+            font-size: 0.86em;
+            flex-wrap: wrap;
+        }
+
+        .quest-icon-area {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--quest-bg1), var(--quest-bg2));
+            border: 2px solid var(--quest-color, #ffd700);
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+
+        .quest-icon-area svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .quest-difficulty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8em;
+            color: #ffed4e;
+            font-weight: 700;
+            padding: 0 8px;
+        }
+
+        .difficulty-coins {
+            display: flex;
+            gap: 2px;
+        }
+
+        .difficulty-coin {
+            font-size: 1.1em;
+            filter: drop-shadow(0 1px 2px rgba(255,215,0,0.4));
+        }
+
+        .quest-instructions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .expand-toggle {
+            padding: 4px 10px;
+            background: rgba(var(--quest-color-rgb, 255,215,0), 0.15);
+            border: 1px solid rgba(255,215,0,0.3);
+            color: #ffed4e;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .expand-toggle:hover {
+            background: rgba(255,215,0,0.25);
+            transform: scale(1.05);
+        }
+
+        .quest-steps-collapsed {
+            max-height: 120px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .quest-steps-collapsed::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(180deg, transparent, rgba(18,27,45,0.95));
+        }
+
+        .quest-steps-expanded {
+            max-height: none;
+        }
+
+        .quest-steps-expanded::after {
+            content: '';
+            display: none;
+        }
+
+        .lore-unlock {
+            font-size: 0.8em;
+            color: #ffed4e;
+            margin-bottom: 8px;
+            padding: 6px 8px;
+            background: rgba(255,215,0,0.1);
+            border-left: 3px solid var(--quest-color, #ffd700);
+            border-radius: 4px;
+            min-height: 20px;
+        }
+
+        .quest-resources {
+            border: 1px solid rgba(255,215,0,0.25);
+            border-radius: 12px;
+            padding: 12px;
+            background: rgba(255,215,0,0.08);
+            margin-top: 12px;
+        }
+
+        .quest-resources h4 {
+            font-size: 0.9em;
+            color: #ffed4e;
+            margin-bottom: 8px;
+        }
+
+        .resource-link {
+            display: block;
+            padding: 6px 10px;
+            margin: 4px 0;
+            background: rgba(255,255,255,0.05);
+            color: #56e8ff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.85em;
+            transition: all 0.3s ease;
+            border-left: 2px solid #56e8ff;
+        }
+
+        .resource-link:hover {
+            background: rgba(86,232,255,0.15);
+            transform: translateX(4px);
+            border-left-color: #7ca8ff;
+        }
+
+        .quest-tips {
+            border-left: 3px solid #ffed4e;
+            padding: 10px 12px;
+            background: rgba(255,215,0,0.1);
+            border-radius: 6px;
+            color: #fffacd;
+            font-size: 0.9em;
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+
+        @keyframes secret-in {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes points-float {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-80px) scale(0.8);
+            }
+        }
+        
+        .synergy-box {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 165, 0, 0.1));
+            border: 2px solid #ffa500;
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 12px;
+            font-size: 0.85em;
+            color: #ffed4e;
+        }
+        
+        .week-separator {
+            text-align: center;
+            margin: 50px 0 30px;
+            position: relative;
+        }
+        
+        .week-separator h2 {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2em;
+            z-index: 1;
+            position: relative;
+        }
+
+        /* MEDIEVAL FANTASY AESTHETIC - Enhanced */
+        .navbar {
+            border: 2px solid #ffd700;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 0 15px rgba(255,215,0,0.1);
+        }
+
+        .day-card {
+            border: 2px solid rgba(102, 126, 234, 0.4);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, rgba(30, 40, 70, 0.9), rgba(20, 30, 50, 0.9));
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-card::before {
+            content: '🏰';
+            position: absolute;
+            right: -30px;
+            top: -20px;
+            font-size: 120px;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+
+        .day-card:hover {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .day-header {
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .day-header::before {
+            content: '⚔️';
+            margin-right: 8px;
+            opacity: 0.6;
+        }
+
+        .task-item {
+            border-left: 4px solid rgba(255, 215, 0, 0.3);
+            border-radius: 6px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.03);
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            border-left-color: rgba(255, 215, 0, 0.6);
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.15);
+        }
+
+        .task-mini-btn {
+            border-radius: 6px;
+            border: 2px solid #ffd700;
+            box-shadow: 0 4px 12px rgba(255,215,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .task-mini-btn:hover {
+            box-shadow: 0 6px 20px rgba(255,215,0,0.3);
+            transform: translateY(-2px);
+        }
+
+        .stat-badge {
+            border-radius: 8px;
+            border: 2px solid #ffd700;
+            box-shadow: 0 4px 12px rgba(255,215,0,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .stat-badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255,215,0,0.25);
+        }
+
+        .btn {
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(255,215,0,0.15);
+            border: 2px solid rgba(255,215,0,0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            box-shadow: 0 8px 25px rgba(255,215,0,0.25);
+            transform: translateY(-2px);
+        }
+
+        .quest-card {
+            border: 2px solid var(--quest-color, #ffd700);
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quest-block {
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.2);
+        }
+
+        .expand-toggle {
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(255,215,0,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .expand-toggle:hover {
+            box-shadow: 0 6px 18px rgba(255,215,0,0.25);
+        }
+
+        .resource-link {
+            border-left: 3px solid #56e8ff;
+            border-radius: 6px;
+            box-shadow: inset 0 0 6px rgba(86,232,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .resource-link:hover {
+            box-shadow: inset 0 0 10px rgba(86,232,255,0.2);
+            background: rgba(86,232,255,0.1);
+        }
+
+        .quest-tips {
+            border-left: 4px solid #ffed4e;
+            border-radius: 8px;
+            box-shadow: inset 0 0 8px rgba(255,215,0,0.1);
+        }
+
+        .progress-bar {
+            border-radius: 10px;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
+        }
+        
+        /* 🆕 CURRENT DAY DISPLAY */
+        .current-day-banner {
+            background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(102,126,234,0.15));
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .day-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .day-counter {
+            font-size: 2.5em;
+            font-weight: 900;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .day-label {
+            font-size: 0.95em;
+            color: #b0c4de;
+            margin-bottom: 10px;
+        }
+
+        .day-info-text {
+            font-size: 0.9em;
+            color: #d0d8df;
+            line-height: 1.6;
+        }
+
+        .day-progress-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+
+        .day-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            border-left: 3px solid #ffd700;
+        }
+
+        .day-stat-value {
+            font-weight: 800;
+            color: #ffed4e;
+        }
+
+        /* 🆕 SIDEBAR FILTER */
+        .sidebar-filter {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(10, 15, 30, 0.98), rgba(20, 30, 50, 0.95));
+            border-right: 3px solid #ffd700;
+            padding: 30px 20px;
+            backdrop-filter: blur(15px);
+            box-shadow: 8px 0 32px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            max-height: 100vh;
+            overflow-y: auto;
+            transform: translateX(-100%);
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .sidebar-filter.active {
+            transform: translateX(0);
+        }
+
+        .filter-title {
+            font-size: 1.1em;
+            font-weight: 800;
+            color: #ffd700;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(245, 87, 108, 0.3);
+            padding-bottom: 10px;
+            text-align: center;
+        }
+
+        .filter-btn {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 2px solid rgba(102, 126, 234, 0.4);
+            color: #b0c4de;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .filter-btn:hover {
+            background: rgba(102, 126, 234, 0.4);
+            color: #ffd700;
+            border-color: #ffd700;
+            transform: translateX(5px);
+        }
+
+        .filter-btn.active {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #ffd700;
+            color: #ffd700;
+        }
+
+        .filter-btn.bots { color: #667eea; border-left: 3px solid #667eea; }
+        .filter-btn.parsing { color: #f093fb; border-left: 3px solid #f093fb; }
+        .filter-btn.portfolio { color: #ff4081; border-left: 3px solid #ff4081; }
+        .filter-btn.sales { color: #ffb300; border-left: 3px solid #ffb300; }
+        .filter-btn.all { color: #ffd700; border-left: 3px solid #ffd700; }
+
+        .filter-search {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9em;
+            margin-top: 15px;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .filter-search:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .filter-search::placeholder {
+            color: #666;
+        }
+
+        /* 🆕 SIDEBAR OVERLAY */
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .sidebar-overlay.active {
+            background: rgba(0, 0, 0, 0.6);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* 🆕 CLOSE BUTTON IN SIDEBAR */
+        .sidebar-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid #ffd700;
+            border-radius: 8px;
+            color: #ffd700;
+            font-size: 1.3em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-close-btn:hover {
+            background: rgba(255, 215, 0, 0.3);
+            transform: rotate(90deg);
+        }
+
+        /* 🆕 DAY NAVIGATOR */
+        .day-navigator {
+            display: flex;
+            gap: 8px;
+            margin: 20px 0;
+            overflow-x: auto;
+            padding: 10px;
+            background: rgba(20, 30, 50, 0.7);
+            border-radius: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            scroll-behavior: smooth;
+        }
+
+        .day-navigator::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .day-navigator::-webkit-scrollbar-track {
+            background: rgba(255, 215, 0, 0.05);
+            border-radius: 3px;
+        }
+
+        .day-navigator::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 3px;
+        }
+
+        .day-nav-btn {
+            padding: 8px 14px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 2px solid rgba(102, 126, 234, 0.4);
+            border-radius: 8px;
+            color: #b0c4de;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85em;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .day-nav-btn:hover {
+            background: rgba(102, 126, 234, 0.4);
+            border-color: #ffd700;
+            color: #ffd700;
+        }
+
+        .day-nav-btn.current {
+            background: rgba(255, 215, 0, 0.3);
+            border-color: #ffd700;
+            color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .day-nav-btn.completed {
+            background: rgba(0, 200, 83, 0.2);
+            border-color: #00c853;
+            color: #00c853;
+        }
+
+        .toggle-sidebar-btn {
+            position: fixed;
+            left: 8px;
+            top: 20px;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(102, 126, 234, 0.2));
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            color: #ffd700;
+            font-size: 1.2em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 101;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-sidebar-btn:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(102, 126, 234, 0.3));
+            transform: scale(1.1);
+        }
+
+        /* 🆕 SCROLL TO TOP BUTTON */
+        .scroll-to-top-btn {
+            position: fixed;
+            right: 30px;
+            bottom: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(102, 126, 234, 0.25));
+            border: 2px solid #ffd700;
+            border-radius: 50%;
+            color: #ffd700;
+            font-size: 1.3em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .scroll-to-top-btn .arrow-up-icon {
+            width: 20px;
+            height: 20px;
+            display: block;
+            background: linear-gradient(180deg, #ffe77a, #ffd700);
+            clip-path: polygon(50% 0, 100% 45%, 72% 45%, 72% 100%, 28% 100%, 28% 45%, 0 45%);
+            filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.75));
+        }
+
+        .scroll-to-top-btn.show {
+            display: flex;
+        }
+
+        .scroll-to-top-btn:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.4), rgba(102, 126, 234, 0.4));
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(255, 215, 0, 0.4);
+        }
+
+        .scroll-to-top-btn:active {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .scroll-to-top-btn {
+                right: 15px;
+                bottom: 15px;
+                width: 45px;
+                height: 45px;
+                font-size: 1.1em;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .days-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .navbar-stats {
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            .current-day-banner {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar-filter {
+                position: fixed;
+                width: 100%;
+            }
+
+            .toggle-sidebar-btn {
+                display: flex;
+            }
+        }
+
+        /* Progress Chart */
+        .progress-chart-container {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.05) 100%);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 24px 0;
+            border: 2px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .progress-chart-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .chart-bars {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+            height: 200px;
+            justify-content: space-around;
+            padding: 0 8px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            min-width: 20px;
+            background: linear-gradient(180deg, #667eea 0%, #667eea 60%, rgba(102, 126, 234, 0.3) 100%);
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .chart-bar:hover {
+            background: linear-gradient(180deg, #f093fb 0%, #f093fb 60%, rgba(240, 147, 251, 0.3) 100%);
+            box-shadow: 0 8px 20px rgba(240, 147, 251, 0.3);
+            transform: scaleY(1.05);
+        }
+
+        .chart-bar-label {
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            white-space: nowrap;
+        }
+
+        .chart-bar-value {
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: bold;
+            color: #ffd700;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .chart-bar:hover .chart-bar-value {
+            opacity: 1;
+        }
+
+        /* Export/Import Section */
+        .export-section {
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.05) 0%, rgba(102, 126, 234, 0.05) 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 24px 0;
+            border: 2px solid rgba(240, 147, 251, 0.1);
+        }
+
+        .export-section-title {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #f093fb;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            padding: 10px 20px;
+            border: 2px solid #f093fb;
+            background: rgba(240, 147, 251, 0.1);
+            color: #f093fb;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+
+        .export-btn:hover {
+            background: #f093fb;
+            color: #1a1a2e;
+            box-shadow: 0 6px 16px rgba(240, 147, 251, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .import-input {
+            display: none;
+        }
+
+        /* Validation Symbols */
+        .validation-ok {
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .validation-error {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        /* ===== ГОБЛИН СОВЕТНИК ===== */
+        .goblin-guide {
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(139, 92, 246, 0.1));
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+        }
+
+        .goblin-avatar {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
+            animation: goblin-float 3s ease-in-out infinite;
+        }
+
+        .goblin-avatar svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 4px 12px rgba(102, 126, 234, 0.3));
+        }
+
+        .goblin-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .goblin-text {
+            font-size: 1.05em;
+            color: #ffd700;
+            font-weight: 600;
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        .goblin-title {
+            font-size: 0.9em;
+            color: #b0c4de;
+            margin-top: 8px;
+        }
+
+        @keyframes goblin-float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="pixel-theme.css">
+</head>
+<body>
+    <!-- 🆕 SCROLL TO TOP BUTTON -->
+    <button class="scroll-to-top-btn" id="scrollToTopBtn" onclick="scrollToTop()" title="Наверх" aria-label="Наверх"><span class="arrow-up-icon" aria-hidden="true"></span></button>
+
+    <!-- 🆕 SIDEBAR OVERLAY -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- 🆕 TOGGLE SIDEBAR BUTTON -->
+    <button class="toggle-sidebar-btn" id="toggleSidebarBtn" onclick="toggleSidebar()">☰</button>
+
+    <!-- 🆕 SIDEBAR FILTER -->
+    <div class="sidebar-filter" id="sidebarFilter">
+        <button class="sidebar-close-btn" onclick="toggleSidebar()">✕</button>
+        <div class="filter-title">📊 ФИЛЬТРЫ</div>
+        <button class="filter-btn all active" onclick="setFilter('all')">✓ Все задания</button>
+        <button class="filter-btn bots" onclick="setFilter('bots')">🤖 Только БОТЫ</button>
+        <button class="filter-btn parsing" onclick="setFilter('parsing')">🕷️ Только ПАРСИНГ</button>
+        <button class="filter-btn portfolio" onclick="setFilter('portfolio')">📚 Портфолио</button>
+        <button class="filter-btn sales" onclick="setFilter('sales')">💰 Продажи</button>
+        <input type="text" class="filter-search" id="filterSearch" placeholder="Найти задание..." onkeyup="filterBySearch()">
+    </div>
+
+    <div class="container">
+        <!-- NAVBAR -->
+        <div class="navbar">
+            <div class="navbar-title">⚡ 30 дней = $1000+</div>
+            <div class="navbar-stats">
+                <div class="stat-badge" onclick="openProfile()">
+                    <span>👤</span>
+                    <span class="stat-value" id="levelDisplay">LVL 1</span>
+                </div>
+                <div class="stat-badge" onclick="window.location.href='games-hub.html'" title="Аркадный гильдии - множество игр">
+                    <span>🕹️</span>
+                    <span class="stat-value">ХАБ</span>
+                </div>
+                <div class="stat-badge" onclick="openCourseGuide()" title="Дневные учебные модули: подробно, от простого к сложному">
+                    <span>📚</span>
+                    <span class="stat-value">КУРС</span>
+                </div>
+                <div class="stat-badge" onclick="openVerification()" title="Проверка выполнения и дополнительные квесты">
+                    <span>✅</span>
+                    <span class="stat-value">CHECK</span>
+                </div>
+                <div class="stat-badge" onclick="resetProgress()" title="Полный сброс прогресса (локально + сервер)">
+                    <span>🧹</span>
+                    <span class="stat-value">RESET</span>
+                </div>
+                <div class="stat-badge">
+                    <span>💰</span>
+                    <span class="stat-value" id="pointsDisplay">0</span>
+                </div>
+                <div class="stat-badge">
+                    <span>🎯</span>
+                    <span class="stat-value" id="tasksDisplay">0/120</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🆕 CURRENT DAY BANNER -->
+        <div class="current-day-banner" id="currentDayBanner">
+            <div class="day-info">
+                <div class="day-counter" id="dayCounter">День 1/30</div>
+                <div class="day-label">📅 Текущий статус</div>
+                <div class="day-info-text" id="dayInfoText">Хм, это выглядит начало пути...</div>
+            </div>
+            <div class="day-progress-info" id="dayProgressInfo">
+                <div class="day-stat">
+                    <span>⏱️ Дней прошло</span>
+                    <span class="day-stat-value" id="daysCompleted">0</span>
+                </div>
+                <div class="day-stat">
+                    <span>📋 Задач на день</span>
+                    <span class="day-stat-value" id="tasksToday">0/8</span>
+                </div>
+                <div class="day-stat">
+                    <span>⚡ Темп прогресса</span>
+                    <span class="day-stat-value" id="progressPace">На графике</span>
+                </div>
+                <div class="day-stat">
+                    <span>🎯 До лвла⬆️</span>
+                    <span class="day-stat-value" id="xpToLevel">500 XP</span>
+                </div>
+                <div class="day-stat" style="background: rgba(102, 126, 234, 0.15); border-left-color: #667eea;">
+                    <span>⏳ До конца дня</span>
+                    <span class="day-stat-value" id="dayTimer" style="font-family: monospace;">00:00:00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🆕 DAY NAVIGATOR -->
+        <div class="day-navigator" id="dayNavigator"></div>
+
+        <!-- 🆕 PROGRESS CHART -->
+        <div class="progress-chart-container" id="progressChartContainer">
+            <div class="progress-chart-title">📊 Прогресс по дням</div>
+            <div class="chart-bars" id="chartBars"></div>
+        </div>
+
+        <!-- 🆕 EXPORT/IMPORT SECTION -->
+        <div class="export-section" id="exportSection">
+            <div class="export-section-title">💾 Сохранить/Загрузить прогресс</div>
+            <div class="export-buttons">
+                <button class="export-btn" onclick="exportProgressJSON()">📥 JSON</button>
+                <button class="export-btn" onclick="exportProgressCSV()">📊 CSV</button>
+                <button class="export-btn" onclick="document.getElementById('importInput').click()">📤 Загрузить</button>
+                <button class="export-btn" onclick="openDungeon()">🎮 Игра</button>
+                <button class="export-btn" onclick="openVerification()">✅ Проверка</button>
+                <input type="file" id="importInput" class="import-input" accept=".json" onchange="importProgressJSON(event)">
+            </div>
+        </div>
+        
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🎮 БОТЫ + ПАРСИНГ</h1>
+            <p>Выполняй задания → Собирай очки → Расти уровнем</p>
+        </div>
+
+        <!-- ГОБЛИН СОВЕТНИК -->
+        <div class="goblin-guide" id="missionGoblin">
+            <div class="goblin-avatar">
+                <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Рисованный гоблин">
+                    <defs>
+                        <linearGradient id="skinCore" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#96ff9f"/>
+                            <stop offset="100%" stop-color="#47af66"/>
+                        </linearGradient>
+                    </defs>
+                    <ellipse cx="58" cy="142" rx="26" ry="52" fill="#4dae64"/>
+                    <ellipse cx="242" cy="142" rx="26" ry="52" fill="#4dae64"/>
+                    <circle cx="150" cy="150" r="94" fill="url(#skinCore)" stroke="#2d7a45" stroke-width="9"/>
+                    <ellipse cx="112" cy="138" rx="22" ry="20" fill="#fff"/>
+                    <ellipse cx="188" cy="138" rx="22" ry="20" fill="#fff"/>
+                    <circle cx="112" cy="140" r="10" fill="#141414"/>
+                    <circle cx="188" cy="140" r="10" fill="#141414"/>
+                    <circle cx="106" cy="134" r="3" fill="#fff"/>
+                    <circle cx="182" cy="134" r="3" fill="#fff"/>
+                    <path d="M102 193 Q150 234 198 193" stroke="#1b5e36" stroke-width="8" fill="none" stroke-linecap="round"/>
+                    <path d="M130 56 L150 22 L170 56" fill="#315f3f"/>
+                    <path d="M126 236 L174 236 L164 272 L136 272 Z" fill="#2d4050"/>
+                </svg>
+            </div>
+            <div class="goblin-content">
+                <div class="goblin-text" id="goblinTip">Привет! Я здесь, чтобы помочь тебе добиться успеха за 30 дней!</div>
+                <div class="goblin-title">— Мудрый Гоблин</div>
+            </div>
+        </div>
+
+        <!-- 📊 JOURNEY TRACKER (День и Таймер) -->
+        <div class="journey-tracker" id="journeyTracker">
+            <div class="journey-item">
+                <h3>📅 Прошло дней</h3>
+                <div class="journey-value" id="dayCounterJourney">1</div>
+                <div class="journey-subtitle">из 30</div>
+            </div>
+            <div class="journey-item">
+                <h3>⏱️ Осталось</h3>
+                <div class="journey-value" id="timeRemainingJourney">29</div>
+                <div class="journey-subtitle" id="timeDetailedJourney">дней</div>
+            </div>
+        </div>
+
+        <!-- PROGRESS -->
+        <div class="progress-wrapper">
+            <div class="progress-bar-group">
+                <div class="progress-item">
+                    <div class="progress-label">
+                        <span>🤖 Боты</span>
+                        <span id="botsPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill bots" id="progressBots" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-label">
+                        <span>🕷️ Парсинг</span>
+                        <span id="parsingPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill parsing" id="progressParsing" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center; color: #ffd700; font-weight: 800; font-size: 1.1em;">
+                🏆 Общий прогресс: <span id="totalPercent">0%</span>
+            </div>
+        </div>
+        
+        <div class="secrets-panel">
+            <div class="secret-badge" id="secretsCount">🗝️ Секретов: 0/8</div>
+            <div class="secret-badge" id="secretHint">Подсказка: README и Deploy прячут бонусы</div>
+        </div>
+        
+        <!-- TASKS -->
+        <div id="tasksContainer"></div>
+    </div>
+
+    <div class="quest-modal" id="taskQuestModal" onclick="backdropCloseQuest(event)">
+        <div class="quest-card" id="questCard">
+            <div class="quest-head">
+                <div class="quest-icon-area" id="questIconArea"></div>
+                <div>
+                    <div class="quest-title" id="questTitle">Квест</div>
+                    <div class="quest-sub" id="questSub">Описание</div>
+                </div>
+                <div class="quest-difficulty" id="questDifficulty"></div>
+                <button class="quest-close" onclick="closeTaskQuest()">✕</button>
+            </div>
+            <div class="quest-body">
+                <div class="quest-block">
+                    <div class="lore-unlock" id="loreUnlock"></div>
+                    <h4>📖 История задания</h4>
+                    <div class="quest-story" id="questStory"></div>
+                </div>
+                <div class="quest-block">
+                    <div class="quest-instructions-header">
+                        <h4>🛠️ Как выполнить (пошагово)</h4>
+                        <button class="expand-toggle" id="expandToggle" onclick="toggleInstructions()">Развернуть</button>
+                    </div>
+                    <div id="questStepsContainer" class="quest-steps-collapsed">
+                        <ul class="quest-steps" id="questSteps"></ul>
+                    </div>
+                </div>
+                <div class="quest-block quest-footer">
+                    <div id="questDoneIf">Готово, если: ...</div>
+                    <div id="questRune">Руна: ...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="api-client.js"></script>
+    <script>
+        const PLANS = {
+            WEEK1: [
+                { day: 1, type: 'both', bots: ['Создать папку lead-bot-v1', 'Файлы .env, requirements.txt, main.py, README.md', 'Установить aiogram==3.13.1, python-dotenv==1.0.1', 'Сделать /start и /help'], parsing: ['Создать папку parser-project-1', 'Установить requests==2.31.0, beautifulsoup4==4.12.2', 'Выбрать первый сайт для парсинга', 'Спарсить первые 100 объектов'], synergy: 'Одна структура, один .env, один GitHub' },
+                { day: 2, type: 'both', bots: ['Создать keyboards/main_kb.py', 'Reply-кнопки: Оставить заявку, FAQ, Контакты', 'Inline-кнопка с callback lead:start', 'Видео-демо 30 сек'], parsing: ['Спарсить 200 объектов', 'Экспорт в CSV', 'Фильтр по цене', 'Скриншот результата'], synergy: 'Первый результат в обоих!' },
+                { day: 3, type: 'both', bots: ['FSM: имя → телефон → комментарий', 'Команда /cancel', 'Проверка полного цикла', 'Commit day-3-fsm'], parsing: ['Фильтры по всем параметрам', 'TOP-10 объектов', 'Функция экспорта', 'Первый скрипт готов!'], synergy: 'Логика работает. Готово показать клиенту' },
+                { day: 4, type: 'both', bots: ['Установить aiosqlite==0.20.0', 'Создать db/database.py и db/repository.py', 'Таблица leads', 'Сохранять лиды при финале FSM'], parsing: ['Установить gspread==6.1.2, google-auth==2.35.0', 'Google Sheets API и service account', 'Функция append_to_sheet()', 'Автоэкспорт в таблицу'], synergy: 'БД + облако. Оба имеют persistence' },
+                { day: 5, type: 'both', bots: ['Создать utils/security.py', '/admin команда', 'Показать последние 10 заявок', 'Проверка доступа по ADMIN_IDS'], parsing: ['Фильтр мин/макс цена', 'JSON/CSV вывод', 'Мониторинг новых объектов', 'Первый клиент?'], synergy: 'Админка в обоих' },
+                { day: 6, type: 'both', bots: ['Создать services/export_service.py', 'Команда /export (админ)', 'CSS-файл с лидами', 'Отправляемый файл в Telegram'], parsing: ['Email отправка результатов', 'Расписание cron', 'Автоматизация 24/7', 'Второй клиент?'], synergy: 'Экспорт + автоматизация готовы' },
+                { day: 7, type: 'both', bots: ['README: проблема-решение-стек-запуск', 'Видео-демо 60-90 сек', 'GitHub release-v1', 'Кейс в портфолио'], parsing: ['README для парсера', 'Видео результатов', 'GitHub release-v1', 'Кейс в портфолио'], synergy: '2 кейса + 2 видео + портфолио!' }
+            ],
+            WEEK2: [
+                { day: 8, type: 'both', bots: ['Новый проект faq-bot-v1', '10 FAQ на inline-кнопках', 'Кнопка Связаться с менеджером', 'Отправка контактов менеджеру'], parsing: ['Новый parser-project-2', 'Другая категория/сайт', 'Адаптировать CSS селекторы', 'Второй рабочий парсер'], synergy: 'Трафик растёт. Видим паттерны' },
+                { day: 9, type: 'both', bots: ['Развернуть на Render/Railway', 'Настроить .env на хостинге', 'Проверить логи и работу 24/7', 'Добавить ссылку в README'], parsing: ['Развернуть парсер на хостинге', 'Настроить cron расписание', 'Проверить результаты в Sheets', 'Первый живой парсер'], synergy: 'Оба на облаке 24/7' },
+                { day: 10, type: 'both', bots: ['Зарегистрироваться на Kwork/FL/Upwork', '3 оффера (цена, сроки)', 'Заполнить профиль + кейсы', '20 откликов'], parsing: ['Начать продавать парсеры', '20 откликов в темы/форумы', 'Первые потенциальные клиенты', 'Таблица лидов'], synergy: '40 откликов в день!' },
+                { day: 11, type: 'both', bots: ['Google Sheets API (если нет)', 'Service account JSON', 'Функция save_lead_to_sheets()', 'Лиды дублируются в таблицу'], parsing: ['Google Sheets для результатов', 'Автоматическое обновление', 'Клиент видит real-time', 'Юзеры любят Sheets'], synergy: 'Google Sheets у обоих' },
+                { day: 12, type: 'both', bots: ['Новый проект quiz-bot-v1', '7 вопросов на FSM', 'Система баллов', 'Команда /my_result'], parsing: ['parser-project-3 (третий сайт)', 'Копируешь код 1-2, адаптируешь', 'Третий рабочий парсер', 'Готов масштабировать'], synergy: '3 бота + 3 парсера!' },
+                { day: 13, type: 'both', bots: ['Рефакторинг под шаблон', 'Структура: handlers/, keyboards/, services/, db/, states/, utils/', 'Вынести логику из хендлеров', 'Commit refactor-commercial'], parsing: ['Рефакторинг 3 парсеров', 'Функции переиспользования', 'Нет копипасты', 'Commit refactor-commercial'], synergy: 'Новый проект за 30 минут!' },
+                { day: 14, type: 'both', bots: ['README для faq и quiz', 'GIF/видео-демо', 'Блок \"Для кого подходит\"', '3 поста в чаты'], parsing: ['README для 3 парсеров', 'Скриншоты результатов', 'Примеры использования', '3 поста в релевантные'], synergy: '3 кейса бота + 3 парсинга!' }
+            ],
+            WEEK3_4: [
+                { day: 15, type: 'both', bots: ['Собрать telegram-bot-template', 'Включить: auth, FSM, SQLite, export, error handler', 'Старт за 30 минут', 'Commit init-template'], parsing: ['parser-template', 'config, BeautifulSoup, gspread, error handling', 'Старт за 15 минут', 'Commit init-template'], synergy: 'Шаблоны готовы' },
+                { day: 16, type: 'both', bots: ['Установить loguru==0.7.2', 'Логирование: входящие, ошибки, действия', 'Global error handler', 'Email админу при ошибке'], parsing: ['loguru для парсеров', 'Логирование: start, end, errors, объекты', 'Email при ошибке', 'Лог-файлы'], synergy: 'Профессиональное логирование' },
+                { day: 17, type: 'both', bots: ['Платежный сценарий (mock)', 'Выбор тариф → подтверждение → статус', 'БД записывает статус', 'Fallback при ошибке'], parsing: ['Отправка результатов по email', 'Система уведомлений', 'Retry логика', 'Client уведомлен'], synergy: 'Оба уведомляют автоматом' },
+                { day: 18, type: 'both', bots: ['Мини-CRM: статусы new/in_work/done', 'Команды: /lead_list, /lead_set_status', 'Фильтр по статусам', 'Уведомления при изменении'], parsing: ['Dashboard админа: статистика', 'Таблица статусов парсеров', 'Команда перезапуска', 'Всё видно'], synergy: 'Админка в обоих' },
+                { day: 19, type: 'both', bots: ['20 уточняющих вопросов', 'Шаблон ТЗ', '10 ответов на возражения', 'Чеклист перед сдачей'], parsing: ['15 уточняющих вопросов', 'Шаблон ТЗ', 'Примеры откликов', 'Чеклист'], synergy: 'Sales playbook готов' },
+                { day: 20, type: 'both', bots: ['30 откликов', 'Для каждого - релевантный кейс', '5 видео-откликов'], parsing: ['30 откликов', 'Персональные письма', 'Примеры результатов'], synergy: '60 откликов в день!' },
+                { day: 21, type: 'both', bots: ['1 заказ (цена ниже ради отзыва)', '3 этапа с дедлайнами', 'Сдать в срок', 'Первый отзыв'], parsing: ['1 заказ по парсингу', 'За 4-6 часов', 'Первый платеж', 'Первый отзыв'], synergy: 'Первые 2 заказа закрыты!' },
+                { day: 22, type: 'both', bots: ['20 откликов', 'Поднять цену на 15%', '1 улучшение шаблона'], parsing: ['20 откликов', 'Комбо-услуга', '1 улучшение'], synergy: 'Обе воронки генерируют лиды' },
+                { day: 23, type: 'both', bots: ['2-й заказ', 'Сдать в срок', '2-й отзыв'], parsing: ['2-й заказ', 'Сдать в срок', '2-й отзыв'], synergy: '4 заказа в сумме!' },
+                { day: 24, type: 'both', bots: ['Услуга \"Доработка бота\"', 'Фикс-прайс на 5 работ'], parsing: ['Услуга \"Мониторинг цен\"', 'Подписка $20-50/мес'], synergy: '2 услуги + 1 подписка' },
+                { day: 25, type: 'both', bots: ['Упаковать 2 кейса', 'Метрики: время, экономия'], parsing: ['Упаковать 2 кейса', 'Метрики: объекты/мин, точность'], synergy: '2 доказательства на услугу' },
+                { day: 26, type: 'both', bots: ['Услуга \"Поддержка 30 дней\"', 'SLA: ответ 2ч, фиксы 24ч'], parsing: ['Услуга \"Сопровождение парсера\"', 'SLA: 24/7 работа, alert при ошибке'], synergy: 'Пассивный доход' },
+                { day: 27, type: 'both', bots: ['20 откликов на дорогие', 'Убрать дешёвые заказы'], parsing: ['20 откликов на enterprise', 'Позиционировать как pro'], synergy: 'Средний чек растёт' },
+                { day: 28, type: 'both', bots: ['1 заказ среднего чека', 'Шаблон на 90%', 'Экономия 4ч → 1,5ч'], parsing: ['1 заказ среднего чека', 'Шаблон экономит 60%', 'Качество + детали'], synergy: 'Шаблоны окупились!' },
+                { day: 29, type: 'both', bots: ['Метрики месяца', 'Отклики/диалоги/продажи/чек', 'Стратегия'], parsing: ['Метрики месяца', 'Парсеры/объекты/чек/ретейнеры', 'Стратегия'], synergy: 'Анализируем данные' },
+                { day: 30, type: 'both', bots: ['График месяц 2', 'Целевой доход', 'Roadmap: ООП, API, webhook'], parsing: ['График месяц 2', 'Целевой доход', 'Roadmap: API, dashboard, proxy'], synergy: 'Месяц 1 закрыт. Месяц 2 спланирован!' }
+            ]
+        };
+        
+        const GAME_STATE = {
+            points: parseInt(localStorage.getItem('points')) || 0,
+            level: parseInt(localStorage.getItem('level')) || 1,
+            completed: JSON.parse(localStorage.getItem('completed')) || {},
+            secretFlags: JSON.parse(localStorage.getItem('secretFlags')) || {},
+            titleClicks: parseInt(localStorage.getItem('titleClicks')) || 0
+        };
+
+        const RESET_LOCAL_KEYS = [
+            'points', 'level', 'completed', 'secretFlags', 'titleClicks',
+            'achievements', 'cosmetics', 'profileCosmetics', 'profile_state',
+            'characterProfileAchievements', 'characterProfileEarnedAchievementXp',
+            'verificationState', 'verificationDrafts', 'burnoutState',
+            'gameStats', 'botBuilderXP', 'botBuilderLevel', 'dungeonXP',
+            'dungeonBestRoom', 'parserDefenseXP', 'gameXPApplied',
+            'planStartDate', 'streak_days', 'streak_frozen_this_week'
+        ];
+
+        const RESET_SERVER_KEYS = [
+            'main_tracker',
+            'verification',
+            'burnout',
+            'character_profile',
+            'profile_cosmetics',
+            'shop_achievements',
+            'code_dungeon',
+            'bot_builder',
+            'game_stats',
+            'parser_defense'
+        ];
+
+        let API_BASE = localStorage.getItem('planApiBase') || '';
+        const API_BASE_FALLBACKS = ['http://127.0.0.1:8001/api', 'http://127.0.0.1:8000/api'];
+
+        async function apiRequest(path, options = {}) {
+            if (window.PlanApiClient?.request) {
+                return window.PlanApiClient.request(path, options, API_BASE);
+            }
+
+            const bases = [API_BASE, ...API_BASE_FALLBACKS].filter(Boolean);
+            const uniqueBases = Array.from(new Set(bases));
+
+            for (const base of uniqueBases) {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 3000);
+                try {
+                    const response = await fetch(`${base}${path}`, {
+                        ...options,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...(options.headers || {})
+                        },
+                        signal: controller.signal
+                    });
+
+                    if (!response.ok) continue;
+                    API_BASE = base;
+                    localStorage.setItem('planApiBase', base);
+                    return await response.json();
+                } catch (_) {
+                    // try next base
+                } finally {
+                    clearTimeout(timeout);
+                }
+            }
+
+            return null;
+        }
+
+        async function hydrateMainTrackerFromServer() {
+            const data = await apiRequest('/state/main_tracker');
+            if (!data?.value || typeof data.value !== 'object') return;
+
+            const incoming = data.value;
+            if (typeof incoming.points === 'number') localStorage.setItem('points', String(incoming.points));
+            if (typeof incoming.level === 'number') localStorage.setItem('level', String(incoming.level));
+            if (incoming.completed && typeof incoming.completed === 'object') localStorage.setItem('completed', JSON.stringify(incoming.completed));
+            if (incoming.secretFlags && typeof incoming.secretFlags === 'object') localStorage.setItem('secretFlags', JSON.stringify(incoming.secretFlags));
+            if (typeof incoming.titleClicks === 'number') localStorage.setItem('titleClicks', String(incoming.titleClicks));
+            if (incoming.equippedCosmetics && typeof incoming.equippedCosmetics === 'object') localStorage.setItem('equippedCosmetics', JSON.stringify(incoming.equippedCosmetics));
+
+            GAME_STATE.points = parseInt(localStorage.getItem('points')) || GAME_STATE.points;
+            GAME_STATE.level = parseInt(localStorage.getItem('level')) || GAME_STATE.level;
+            GAME_STATE.completed = JSON.parse(localStorage.getItem('completed') || '{}');
+            GAME_STATE.secretFlags = JSON.parse(localStorage.getItem('secretFlags') || '{}');
+            GAME_STATE.titleClicks = parseInt(localStorage.getItem('titleClicks') || '0');
+        }
+
+        async function syncMainTrackerToServer() {
+            await apiRequest('/state/main_tracker', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    value: {
+                        points: GAME_STATE.points,
+                        level: GAME_STATE.level,
+                        completed: GAME_STATE.completed,
+                        secretFlags: GAME_STATE.secretFlags,
+                        titleClicks: GAME_STATE.titleClicks,
+                        equippedCosmetics: JSON.parse(localStorage.getItem('equippedCosmetics') || '{}')
+                    }
+                })
+            });
+        }
+
+        async function hydrateProfileFromServer() {
+            const data = await apiRequest('/state/profile_cosmetics');
+            if (!data?.value || typeof data.value !== 'object') return;
+
+            const incoming = data.value;
+            if (incoming.achievements && Array.isArray(incoming.achievements)) {
+                localStorage.setItem('achievements', JSON.stringify(incoming.achievements));
+            }
+            if (incoming.cosmetics && typeof incoming.cosmetics === 'object') {
+                localStorage.setItem('cosmetics', JSON.stringify(incoming.cosmetics));
+            }
+            if (typeof incoming.streamDays === 'number') {
+                localStorage.setItem('streak_days', String(incoming.streamDays));
+            }
+            if (incoming.streakFrozen && typeof incoming.streakFrozen === 'object') {
+                localStorage.setItem('streak_frozen_this_week', JSON.stringify(incoming.streakFrozen));
+            }
+        }
+
+        async function syncProfileToServer() {
+            await apiRequest('/state/profile_cosmetics', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    value: {
+                        achievements: JSON.parse(localStorage.getItem('achievements') || '[]'),
+                        cosmetics: JSON.parse(localStorage.getItem('cosmetics') || '{}'),
+                        streamDays: parseInt(localStorage.getItem('streak_days') || '0'),
+                        streakFrozen: JSON.parse(localStorage.getItem('streak_frozen_this_week') || '{}')
+                    }
+                })
+            });
+        }
+
+        async function hydrateCourseFromServer() {
+            const data = await apiRequest('/state/character_profile');
+            if (!data?.value || typeof data.value !== 'object') return;
+
+            const incoming = data.value;
+            if (incoming.readDays && typeof incoming.readDays === 'object') {
+                localStorage.setItem('course_days_read_v1', JSON.stringify(incoming.readDays));
+            }
+            if (typeof incoming.theoryMs === 'number') {
+                localStorage.setItem('course_theory_time_ms', String(incoming.theoryMs));
+            }
+            if (typeof incoming.practiceMs === 'number') {
+                localStorage.setItem('course_practice_time_ms', String(incoming.practiceMs));
+            }
+            if (incoming.superEggs && typeof incoming.superEggs === 'object') {
+                localStorage.setItem('course_super_eggs_found_v1', JSON.stringify(incoming.superEggs));
+            }
+            if (incoming.dayFragments && typeof incoming.dayFragments === 'object') {
+                localStorage.setItem('day_fragments_v1', JSON.stringify(incoming.dayFragments));
+            }
+            if (incoming.ultraSecret && typeof incoming.ultraSecret === 'object') {
+                localStorage.setItem('course_ultra_week_secret_v1', JSON.stringify(incoming.ultraSecret));
+            }
+            if (incoming.dailyLearningStats && typeof incoming.dailyLearningStats === 'object') {
+                localStorage.setItem('course_daily_learning_stats_v1', JSON.stringify(incoming.dailyLearningStats));
+            }
+            if (incoming.planStartDate) {
+                localStorage.setItem('planStartDate', incoming.planStartDate);
+            }
+        }
+
+        async function syncCourseToServer() {
+            await apiRequest('/state/character_profile', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    value: {
+                        readDays: JSON.parse(localStorage.getItem('course_days_read_v1') || '{}'),
+                        theoryMs: parseInt(localStorage.getItem('course_theory_time_ms') || '0'),
+                        practiceMs: parseInt(localStorage.getItem('course_practice_time_ms') || '0'),
+                        superEggs: JSON.parse(localStorage.getItem('course_super_eggs_found_v1') || '{}'),
+                        dayFragments: JSON.parse(localStorage.getItem('day_fragments_v1') || '{}'),
+                        ultraSecret: JSON.parse(localStorage.getItem('course_ultra_week_secret_v1') || '{}'),
+                        dailyLearningStats: JSON.parse(localStorage.getItem('course_daily_learning_stats_v1') || '{}'),
+                        planStartDate: localStorage.getItem('planStartDate') || ''
+                    }
+                })
+            });
+        }
+
+        async function syncWeeklyStatsToServer() {
+            const weekStatsObj = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('weekly_stats_')) {
+                    weekStatsObj[key] = JSON.parse(localStorage.getItem(key) || '{}');
+                }
+            }
+
+            await apiRequest('/state/game_stats', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    value: {
+                        weeklyStats: weekStatsObj
+                    }
+                })
+            });
+        }
+
+        async function syncAllToServer() {
+            await Promise.all([
+                syncMainTrackerToServer(),
+                syncProfileToServer(),
+                syncCourseToServer(),
+                syncWeeklyStatsToServer()
+            ]);
+        }
+
+        const SECRET_TOTAL = 8;
+
+        const TASK_DETAILS = {};
+        
+        function renderTasks() {
+            const container = document.getElementById('tasksContainer');
+            container.innerHTML = '';
+            Object.keys(TASK_DETAILS).forEach(k => delete TASK_DETAILS[k]);
+            
+            let weekNum = 1;
+            
+            const addWeek = (planArray, weekLabel) => {
+                if (weekNum > 1) {
+                    const weekSep = document.createElement('div');
+                    weekSep.className = 'week-separator';
+                    weekSep.innerHTML = `<h2>${weekLabel}</h2>`;
+                    container.appendChild(weekSep);
+                }
+                weekNum++;
+                
+                planArray.forEach(dayData => {
+                    const dayWrapper = document.createElement('div');
+                    dayWrapper.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;';
+                    
+                    const botCard = createCard(dayData, 'bots');
+                    const parsingCard = createCard(dayData, 'parsing');
+                    
+                    dayWrapper.appendChild(botCard);
+                    dayWrapper.appendChild(parsingCard);
+                    container.appendChild(dayWrapper);
+                });
+            };
+            
+            addWeek(PLANS.WEEK1, '📅 НЕДЕЛЯ 1: Стартовый спринт');
+            addWeek(PLANS.WEEK2, '📅 НЕДЕЛЯ 2: Расширение и продажи');
+            addWeek(PLANS.WEEK3_4, '📅 НЕДЕЛИ 3-4: Первая продажа и доход');
+
+            applyFantasyThemesMain();
+        }
+
+        function applyFantasyThemesMain() {
+            const paint = (selector, cls, icon) => {
+                const el = document.querySelector(selector);
+                if (!el) return;
+                el.classList.add('fantasy-zone', 'theme-transition-soft', cls);
+                if (icon) el.setAttribute('data-biome-icon', icon);
+            };
+
+            paint('.navbar', 'theme-medieval-city', '🏘️');
+            paint('.header', 'theme-knight-order', '🛡️');
+            paint('.progress-wrapper', 'theme-castle', '🏰');
+            paint('.controls', 'theme-sun-temple', '⚜️');
+            paint('.secrets-panel', 'theme-night-witch', '🧪');
+
+            const dayThemes = [
+                { cls: 'theme-dragon-field', icon: '🐉' },
+                { cls: 'theme-night-witch', icon: '🧙' },
+                { cls: 'theme-elven-forest', icon: '🧝' },
+                { cls: 'theme-medieval-city', icon: '🏘️' },
+                { cls: 'theme-dwarf-mountain', icon: '⛰️' },
+                { cls: 'theme-knight-order', icon: '⚔️' },
+                { cls: 'theme-goblin-cave', icon: '🕳️' },
+                { cls: 'theme-arcane-ruins', icon: '🔮' },
+                { cls: 'theme-frost-north', icon: '❄️' },
+                { cls: 'theme-desert-caravan', icon: '🏜️' },
+                { cls: 'theme-sun-temple', icon: '☀️' },
+                { cls: 'theme-castle', icon: '🏰' }
+            ];
+
+            document.querySelectorAll('.day-card').forEach((card, idx) => {
+                const theme = dayThemes[idx % dayThemes.length];
+                card.classList.add('fantasy-zone', 'theme-transition-soft', theme.cls);
+                card.setAttribute('data-biome-icon', theme.icon);
+            });
+        }
+        
+        function createCard(dayData, category) {
+            const card = document.createElement('div');
+            card.className = `day-card ${category}`;
+            card.setAttribute('data-day', dayData.day);
+            
+            const tasks = category === 'bots' ? dayData.bots : dayData.parsing;
+            const emoji = category === 'bots' ? '🤖' : '🕷️';
+            
+            let html = `<div class="day-header">${emoji} День ${dayData.day} — ${category === 'bots' ? 'Боты' : 'Парсинг'}</div>`;
+            html += '<ul class="task-list">';
+            
+            tasks.forEach((task, idx) => {
+                const key = `day-${dayData.day}-${category}-${idx}`;
+                const checked = GAME_STATE.completed[key] ? 'checked' : '';
+                const completedClass = GAME_STATE.completed[key] ? 'completed' : '';
+                const styleData = getTaskStyle(task, dayData.day, category, idx);
+                TASK_DETAILS[key] = {
+                    key,
+                    day: dayData.day,
+                    category,
+                    idx,
+                    task,
+                    styleData
+                };
+                
+                html += `
+                    <li class="task-item ${completedClass} ${styleData.className}" data-badge="${styleData.badge}">
+                        <input type="checkbox" class="checkbox" id="${key}" ${checked} 
+                            onchange="toggleTask('${key}')">
+                        <label for="${key}" style="flex: 1; cursor: pointer; padding: 0; margin: 0;">
+                            <span class="task-text">${task}</span>
+                        </label>
+                        <button class="task-mini-btn" onclick="openTaskQuest('${key}')" type="button">КВЕСТ</button>
+                    </li>
+                `;
+            });
+            
+            html += '</ul>';
+            if (dayData.synergy) {
+                html += `<div class="synergy-box">⚡ ${dayData.synergy}</div>`;
+            }
+            
+            card.innerHTML = html;
+            return card;
+        }
+        
+        function toggleTask(key) {
+            const checkbox = document.getElementById(key);
+            const wasCompleted = GAME_STATE.completed[key];
+            
+            if (checkbox.checked && !GAME_STATE.completed[key]) {
+                GAME_STATE.points += 50;
+                GAME_STATE.level = Math.floor(GAME_STATE.points / 500) + 1;
+                GAME_STATE.completed[key] = true;
+                showPointsPopup(50, checkbox);
+                triggerSecrets(key);
+                
+                // НОВОЕ: Анимации!
+                triggerTaskConfetti();
+                const meta = parseTaskKey(key);
+                setTimeout(() => {
+                    if (isFullDayCompleted(meta.day)) {
+                        triggerGoldenConfetti();
+                        showNotification('🏆 День ' + meta.day + ' завершён!');
+                    }
+                }, 500);
+                
+                if (meta.day === 15) {
+                    setTimeout(() => {
+                        triggerCelebration('🎯 ПОЛОВИНА ПУТИ! 🎯');
+                        triggerCake();
+                    }, 1000);
+                }
+                
+                if (meta.day === 30) {
+                    setTimeout(() => {
+                        triggerCelebration('🏆 ВЫ - ЛЕГЕНДА! 🏆');
+                        for (let i = 0; i < 3; i++) {
+                            setTimeout(() => triggerFireworks(), i * 300);
+                            setTimeout(() => triggerCake(), i * 300);
+                        }
+                    }, 1000);
+                }
+            } else if (!checkbox.checked && GAME_STATE.completed[key]) {
+                GAME_STATE.points -= 50;
+                GAME_STATE.level = Math.floor(GAME_STATE.points / 500) + 1;
+                delete GAME_STATE.completed[key];
+            }
+            saveState();
+            updateDisplay();
+        }
+        
+        function showPointsPopup(points, element) {
+            const rect = element.getBoundingClientRect();
+            const popup = document.createElement('div');
+            popup.className = 'points-popup';
+            popup.style.left = rect.left + Math.random() * 100 + 'px';
+            popup.style.top = rect.top - 30 + 'px';
+            popup.textContent = '+' + points + ' 🎯';
+            popup.style.color = '#ffd700';
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 1500);
+        }
+        
+        function updateDisplay() {
+            const completed = Object.keys(GAME_STATE.completed).length;
+            const total = getAllTasks().length;
+            
+            document.getElementById('pointsDisplay').textContent = GAME_STATE.points;
+            document.getElementById('levelDisplay').textContent = 'LVL ' + GAME_STATE.level;
+            document.getElementById('tasksDisplay').textContent = completed + '/' + total;
+            document.getElementById('secretsCount').textContent = `🗝️ Секретов: ${Object.keys(GAME_STATE.secretFlags).length}/${SECRET_TOTAL}`;
+            
+            updateProgress();
+            updateCurrentDayDisplay();
+            updateStreakStatus();
+            renderDayNavigator();
+            checkTaskAchievements();
+        }
+
+        function checkTaskAchievements() {
+            const completedCount = Object.keys(GAME_STATE.completed).filter(k => GAME_STATE.completed[k] === true).length;
+            
+            // Load existing achievements from localStorage
+            let achievements = [];
+            let earnedXp = 0;
+            try {
+                const profile = JSON.parse(localStorage.getItem('profileCosmetics') || localStorage.getItem('profile_state') || '{"level":1,"xp":0,"achievements":[]}');
+                achievements = profile.achievements || [];
+                earnedXp = profile.earnedAchievementXp || 0;
+            } catch {
+                achievements = [];
+            }
+            
+            // Check each milestone and unlock if needed
+            const achvMilestones = [
+                { id: 'tasks-10', count: 10, xp: 50 },
+                { id: 'tasks-20', count: 20, xp: 100 },
+                { id: 'tasks-30', count: 30, xp: 180 },
+                { id: 'tasks-40', count: 40, xp: 300 },
+                { id: 'tasks-50', count: 50, xp: 520 }
+            ];
+            
+            achvMilestones.forEach(milestone => {
+                if (completedCount >= milestone.count && !achievements.includes(milestone.id)) {
+                    achievements.push(milestone.id);
+                    earnedXp += milestone.xp;
+                    showAchievementNotification(milestone.id, milestone.xp);
+                }
+            });
+            
+            // Save achievements and XP back to localStorage
+            if (achievements.length > 0) {
+                try {
+                    const profileCosmetics = JSON.parse(localStorage.getItem('profileCosmetics') || '{}');
+                    profileCosmetics.achievements = achievements;
+                    profileCosmetics.earnedAchievementXp = earnedXp;
+                    localStorage.setItem('profileCosmetics', JSON.stringify(profileCosmetics));
+
+                    const legacyProfile = JSON.parse(localStorage.getItem('profile_state') || '{"level":1,"xp":0}');
+                    legacyProfile.achievements = achievements;
+                    legacyProfile.earnedAchievementXp = earnedXp;
+                    localStorage.setItem('profile_state', JSON.stringify(legacyProfile));
+                } catch {
+                    // Fallback: save just the achievements
+                    localStorage.setItem('profile_achievements', JSON.stringify(achievements));
+                }
+            }
+        }
+
+        function updateStreakStatus() {
+            // Check if today's tasks are completed (8+ tasks)
+            const currentDay = getCurrentDay();
+            const tasksForDay = Object.keys(GAME_STATE.completed).filter(k => {
+                const match = k.match(/^day-(\d+)-/);
+                return match && Number(match[1]) === currentDay;
+            });
+            const tasksCompleted = tasksForDay.filter(k => GAME_STATE.completed[k] === true).length;
+            
+            // If 8+ tasks done, update streak
+            if (tasksCompleted >= 8) {
+                // Mark this day as completed in weekly tracking
+                const dayKey = `day_${currentDay}_completed`;
+                localStorage.setItem(dayKey, Date.now().toString());
+            }
+        }
+
+        function showAchievementNotification(achvId, xpReward) {
+            // Map achievement IDs to display info
+            const achvInfo = {
+                'tasks-10': { name: '10 Задач Выполнено!', icon: '✅', color: '#ffd700' },
+                'tasks-20': { name: '20 Задач Выполнено!', icon: '✅', color: '#ffd700' },
+                'tasks-30': { name: '30 Задач Выполнено!', icon: '✅', color: '#ffd700' },
+                'tasks-40': { name: '40 Задач Выполнено!', icon: '✅', color: '#ffd700' },
+                'tasks-50': { name: '50 Задач Выполнено!', icon: '✅', color: '#667eea' }
+            };
+            
+            const info = achvInfo[achvId];
+            if (!info) return;
+            
+            // Create notification with XP
+            const notification = document.createElement('div');
+            const xpText = xpReward ? `<br><span style="font-size: 0.8em; opacity: 0.9;">+${xpReward} XP</span>` : '';
+            notification.innerHTML = `${info.icon} <strong>${info.name}</strong>${xpText}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, ${info.color}, #fff);
+                color: #000;
+                padding: 20px 30px;
+                border-radius: 10px;
+                font-weight: bold;
+                font-size: 1.1em;
+                z-index: 10000;
+                box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+                animation: slideInRight 0.5s ease;
+                text-align: center;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.5s ease';
+                setTimeout(() => notification.remove(), 500);
+            }, 3000);
+        }
+
+        function getTaskStyle(task, day, category, idx) {
+            const t = task.toLowerCase();
+            if (t.includes('deploy') || t.includes('render') || t.includes('railway') || t.includes('cron')) {
+                return { className: 'task-style-deploy', badge: 'DEPLOY' };
+            }
+            if (t.includes('отклик') || t.includes('клиент') || t.includes('цена') || t.includes('kwork') || t.includes('upwork')) {
+                return { className: 'task-style-biz', badge: 'MONEY' };
+            }
+            if (t.includes('readme') || t.includes('видео') || t.includes('кейс') || t.includes('портфолио')) {
+                return { className: 'task-style-showcase', badge: 'SHOW' };
+            }
+            if (t.includes('рефакторинг') || t.includes('template') || t.includes('шаблон') || t.includes('error handler')) {
+                return { className: 'task-style-refactor', badge: 'PRO' };
+            }
+            if (category === 'parsing' || idx % 2 === 0 || day % 3 === 0) {
+                return { className: 'task-style-build', badge: 'BUILD' };
+            }
+            return { className: 'task-style-biz', badge: 'QUEST' };
+        }
+
+        function getQuestTheme(styleClass, category) {
+            if (styleClass === 'task-style-deploy') {
+                return { color: '#a98bff', bg1: 'rgba(124,77,255,0.35)', bg2: 'rgba(58,35,108,0.2)', role: 'Архимаг Деплоя' };
+            }
+            if (styleClass === 'task-style-biz') {
+                return { color: '#ffcb65', bg1: 'rgba(255,179,0,0.35)', bg2: 'rgba(93,56,0,0.2)', role: 'Охотник за клиентами' };
+            }
+            if (styleClass === 'task-style-showcase') {
+                return { color: '#ff73b2', bg1: 'rgba(255,64,129,0.35)', bg2: 'rgba(94,23,58,0.2)', role: 'Мастер презентации' };
+            }
+            if (styleClass === 'task-style-refactor') {
+                return { color: '#57e08c', bg1: 'rgba(0,200,83,0.32)', bg2: 'rgba(10,67,35,0.22)', role: 'Инженер структуры' };
+            }
+            if (category === 'parsing') {
+                return { color: '#56e8ff', bg1: 'rgba(0,229,255,0.28)', bg2: 'rgba(0,72,92,0.22)', role: 'Следопыт данных' };
+            }
+            return { color: '#7ca8ff', bg1: 'rgba(102,126,234,0.35)', bg2: 'rgba(38,48,102,0.2)', role: 'Кодовый ремесленник' };
+        }
+
+        function buildQuestStory(meta) {
+            const seed = (meta.day * 37 + meta.idx * 19 + meta.key.length * 11) % 7;
+            const openings = [
+                'В тумане фриланса появилась новая миссия.',
+                'Гоблин открыл тебе скрытый контракт в гильдии.',
+                'На доске заказов вспыхнула руна задачи.',
+                'В твоём кодовом лагере сработал тревожный кристалл.',
+                'Торговец данными передал срочный свиток.',
+                'Из облака прилетел сигнал высокого приоритета.',
+                'Старший наставник оставил пометку в журнале.'
+            ];
+            const tensions = [
+                'Клиент хочет результат быстро, но без хаоса.',
+                'Нужно сделать аккуратно, иначе цепочка сломается дальше.',
+                'Это задание открывает путь к следующему уровню доверия.',
+                'Если всё сделать чисто, шаблон сэкономит тебе часы.',
+                'От качества этого шага зависит, придёт ли повторный заказ.',
+                'На кону — скорость и стабильность твоего портфолио.',
+                'Это точка, где новичок превращается в профи.'
+            ];
+
+            return `${openings[seed]} ${tensions[(seed + meta.day) % tensions.length]} Текущая цель: «${meta.task}».`;
+        }
+
+        function buildDetailedGuide(task, category, day) {
+            const t = task.toLowerCase();
+            if (t.includes('readme')) {
+                return {
+                    steps: [
+                        '1️⃣ Создай файл README.md в корне проекта',
+                        '2️⃣ Начни с заголовка (H1) и описания проблемы, которую решает твой проект',
+                        '3️⃣ Добавь секцию "Стек" (язык, фреймворки, библиотеки)',
+                        '4️⃣ Напиши "Как запустить" — пошаговые команды (git clone, pip install, python main.py)',
+                        '5️⃣ Добавь структуру проекта (какие папки/файлы за что отвечают)',
+                        '6️⃣ Вставь скриншот или GIF результатов работы',
+                        '7️⃣ Добавь "Для кого подходит" (кто это будет использовать и зачем)',
+                        '8️⃣ Проверь: можно ли по README за 5 минут запустить и понять проект'
+                    ],
+                    resources: [
+                        { name: 'GitHub README Best Practices', url: 'https://github.com/matiassingers/awesome-readme' },
+                        { name: 'Make a README', url: 'https://www.makeareadme.com/' },
+                        { name: 'Markdown Guide', url: 'https://www.markdownguide.org/' }
+                    ],
+                    tips: 'README — это первый контакт клиента. Ясность здесь = деньги в кармане.',
+                    emoji: '📝'
+                };
+            }
+            if (t.includes('видео') || t.includes('демо')) {
+                return {
+                    steps: [
+                        '1️⃣ Напиши сценарий на 30-60 секунд: Что, Как, Результат',
+                        '2️⃣ Запиши экран (Screencast): запуск → ввод данных → результат',
+                        '3️⃣ Используй инструмент: OBS Studio (бесплатно) или ScreenFlow (mac)',
+                        '4️⃣ Закончи видео с call-to-action: "Буду благодарен отзывам"',
+                        '5️⃣ Загрузи на YouTube (можно скрытым) или VK',
+                        '6️⃣ Вставь ссылку на видео в README и в описания проектов на фрилансе',
+                        '7️⃣ Проверь: видно ли все ясно? Есть ли субтитры? Нет пауз?'
+                    ],
+                    resources: [
+                        { name: 'OBS Studio', url: 'https://obsproject.com/' },
+                        { name: 'YouTube Upload', url: 'https://www.youtube.com/upload' },
+                        { name: 'How to Screencast', url: 'https://www.techsmith.com/overview-screencast' }
+                    ],
+                    tips: 'Видео в 10x раз эффективнее текста. Показывает компетентность.',
+                    emoji: '🎥'
+                };
+            }
+            if (t.includes('папка') || t.includes('файл') || t.includes('main.py') || t.includes('.env')) {
+                return {
+                    steps: [
+                        '1️⃣ Создай новую папку: mkdir ' + (category === 'bots' ? 'bot-v' + day : 'parser-v' + day),
+                        '2️⃣ Инициализируй Git: git init',
+                        '3️⃣ Создай основные файлы: touch .env main.py requirements.txt README.md',
+                        '4️⃣ Создай папку для доп логики: mkdir handlers utilities',
+                        '5️⃣ Добавь .gitignore: echo "__pycache__/\\n.env\\n*.pyc" > .gitignore',
+                        '6️⃣ Создай initial commit: git add . && git commit -m "init project structure"',
+                        '7️⃣ Загрузи на GitHub'
+                    ],
+                    resources: [
+                        { name: 'Python Project Structure', url: 'https://docs.python-guide.org/writing/structure/' },
+                        { name: 'Git Getting Started', url: 'https://git-scm.com/book/en/v2' }
+                    ],
+                    tips: 'Правильная структура = экономия часов в будущем. Переиспользуемость кода.',
+                    emoji: '📁'
+                };
+            }
+            if (t.includes('install') || t.includes('установить')) {
+                return {
+                    steps: [
+                        '1️⃣ Открой terminal/PowerShell',
+                        '2️⃣ Если нет venv, создай: python -m venv venv',
+                        '3️⃣ Активируй: . venv/bin/activate (Mac/Linux) или venv\\Scripts\\activate (Windows)',
+                        '4️⃣ Проверь pip версию: pip --version',
+                        '5️⃣ Обнови pip: pip install --upgrade pip',
+                        '6️⃣ Установи зависимости из лекции: pip install библиотека==версия',
+                        '7️⃣ Проверь: pip list | grep библиотека',
+                        '8️⃣ Сохрани зависимости: pip freeze > requirements.txt'
+                    ],
+                    resources: [
+                        { name: 'pip documentation', url: 'https://pip.pypa.io/' },
+                        { name: 'Virtual Environments', url: 'https://docs.python.org/3/tutorial/venv.html' },
+                        { name: 'requirements.txt', url: 'https://pip.readthedocs.io/en/1.1/requirements.html' }
+                    ],
+                    tips: 'Всегда используй виртуальное окружение. Избежишь конфликтов версий.',
+                    emoji: '📦'
+                };
+            }
+            if (t.includes('deploy') || t.includes('render') || t.includes('railway') || t.includes('cron')) {
+                return {
+                    steps: [
+                        '1️⃣ Зарегистрируйся на Render.com или Railway.app',
+                        '2️⃣ Подключи репозиторий GitHub (дай разрешения)',
+                        '3️⃣ Создай новый Web Service (для бота) и добавь переменные окружения из .env',
+                        '4️⃣ Укажи команду старта: python main.py',
+                        '5️⃣ Deploy запустится автоматически после push в GitHub',
+                        '6️⃣ Проверь логи: если ошибка, смотри там причину',
+                        '7️⃣ После успеха — бот будет работать 24/7',
+                        '8️⃣ Дай ссылку на хостинг в портфолио'
+                    ],
+                    resources: [
+                        { name: 'Render.com Deploy Docs', url: 'https://render.com/docs' },
+                        { name: 'Railway.app Docs', url: 'https://docs.railway.app/' },
+                        { name: 'Telegram Bot Polling', url: 'https://docs.aiogram.dev/en/latest/' }
+                    ],
+                    tips: '24/7 хостинг = клиент доверяет тебе. Это критично для доверия.',
+                    emoji: '🚀'
+                };
+            }
+            if (t.includes('бд') || t.includes('sqlite') || t.includes('таблица') || t.includes('sheets')) {
+                return {
+                    steps: [
+                        '1️⃣ Определи какие данные хранить (юзер ID, имя, телефон, статус)',
+                        '2️⃣ Создай файл db/database.py с функциями create_table(), add_record(), get_records()',
+                        '3️⃣ Используй SQLite или Google Sheets (Sheets удобнее для просмотра)',
+                        '4️⃣ На каждом этапе (конец FSM, покупка) сохраняй в БД',
+                        '5️⃣ Проверь 2-3 раза вручную: отправил данные → посмотрел в БД → есть ли там?',
+                        '6️⃣ Добавь валидацию: не пусти пустые данные в БД',
+                        '7️⃣ Настрой экспорт: сможешь ли ты выгрузить данные клиенту в CSV?'
+                    ],
+                    resources: [
+                        { name: 'SQLite Python Guide', url: 'https://docs.python.org/3/library/sqlite3.html' },
+                        { name: 'aiosqlite docs', url: 'https://github.com/omnilib/aiosqlite' },
+                        { name: 'Google Sheets API', url: 'https://developers.google.com/sheets/api' },
+                        { name: 'gspread library', url: 'https://docs.gspread.org/' }
+                    ],
+                    tips: 'БД = профнессионализм. Без этого ты не фрилансер, а любитель.',
+                    emoji: '🗂️'
+                };
+            }
+            if (t.includes('отклик') || t.includes('клиент') || t.includes('цена') || t.includes('оффер')) {
+                return {
+                    steps: [
+                        '1️⃣ Прочитай ТЗ полностью (может 2-3 раза)',
+                        '2️⃣ Найди похожий проект в своём портфолио (или предыдущие гайды)',
+                        '3️⃣ Напиши "Я сделал похожий проект. Смотри здесь: [ссылка]"',
+                        '4️⃣ Предложи сроки: обычно парсеры за 4-6 часов, боты за 1-2 дня',
+                        '5️⃣ Укажи цену: +30% к твоему стандарту за скорость',
+                        '6️⃣ Напиши: "После 1-го дня пришлю первые результаты для ревью"',
+                        '7️⃣ Закрой возражение: "Если не нравится — вернуть честно, без проблем"',
+                        '8️⃣ Отправь. Не переживай о отказе — это нормально.'
+                    ],
+                    resources: [
+                        { name: 'Flver.com Profile Tips', url: 'https://freelancer.com' },
+                        { name: 'Kwork Profile Optimization', url: 'https://kwork.ru' },
+                        { name: 'Upwork Proposals', url: 'https://support.upwork.com/hc/en-us' }
+                    ],
+                    tips: 'Отклики это статистика. 100 откликов → 5-10 конверсий. Массовость.',
+                    emoji: '💬'
+                };
+            }
+            if (t.includes('fsm') || t.includes('state') || t.includes('команда') || t.includes('кнопка')) {
+                return {
+                    steps: [
+                        '1️⃣ Нарисуй на бумаге: Старт → Вопрос 1 → Вопрос 2 → Финиш',
+                        '2️⃣ Создай файл handlers/state_machine.py с классом StatesGroup',
+                        '3️⃣ Определи состояния: waiting_name = State(), waiting_phone = State(), etc',
+                        '4️⃣ На /start → переход в waiting_name',
+                        '5️⃣ На сообщение → сохрани данные, переход на следующий State',
+                        '6️⃣ На Finish → сохрани все в БД, спасибо юзеру',
+                        '7️⃣ Добавь кнопку /cancel на каждом шаге',
+                        '8️⃣ Протести весь цикл от начала до конца 3 раза'
+                    ],
+                    resources: [
+                        { name: 'aiogram FSM Guide', url: 'https://docs.aiogram.dev/en/latest/guide/finite_state_machine/' },
+                        { name: 'Telegram Bot State Management', url: 'https://docs.aiogram.dev/en/latest/dispatcher/fsm/' }
+                    ],
+                    tips: 'FSM это мозг бота. Правильная логика = клиент нажимает бизнес кнопку.',
+                    emoji: '🧠'
+                };
+            }
+            if (t.includes('рефакторинг') || t.includes('шаблон') || t.includes('template') || t.includes('error')) {
+                return {
+                    steps: [
+                        '1️⃣ Посмотри свой код: что повторяется 2+ раза?',
+                        '2️⃣ Вынеси повторяющийся код в функцию utils/helpers.py',
+                        '3️⃣ Создашь структуру: handlers/, states/, db/, keyboards/, utils/', 
+                        '4️⃣ Каждый тип логики в разный файл будет очень приятнее читать',
+                        '5️⃣ Добавь global error_handler: перехвати ошибки и логируй',
+                        '6️⃣ Протести: всё ещё работает как раньше?',
+                        '7️⃣ Commit: git commit -m "refactor: split into modules"',
+                        '8️⃣ Совет: после рефакторинга код переиспользуется 80% быстрее'
+                    ],
+                    resources: [
+                        { name: 'Python Code Organization', url: 'https://docs.python-guide.org/writing/style/' },
+                        { name: 'Clean Code Python', url: 'https://github.com/zedr/clean-code-python' }
+                    ],
+                    tips: 'Шаблон экономит 60% времени на новый проект. Стоит инвестировать.',
+                    emoji: '🔧'
+                };
+            }
+            if (category === 'parsing') {
+                return {
+                    steps: [
+                        '1️⃣ Выбери сайт для парсинга (доступный, не защищённый)',
+                        '2️⃣ Откройте сайт → DevTools (F12) → Find CSS селектор нужного элемента',
+                        '3️⃣ Используй BeautifulSoup: soup.select(".class-name") или soup.find("tag")',
+                        '4️⃣ Спарсь 10-50 объектов, сохрани в список',
+                        '5️⃣ Добавь фильтрацию (по цене, дате, статусу)',
+                        '6️⃣ Экспортируй в CSV: pandas.DataFrame(data).to_csv("results.csv")',
+                        '7️⃣ Проверь вручную: открой CSV, все ли ясно и полностью?',
+                        '8️⃣ Добавь логирование: когда спарсил, сколько объектов, было ли ошибок'
+                    ],
+                    resources: [
+                        { name: 'BeautifulSoup docs', url: 'https://www.crummy.com/software/BeautifulSoup/bs4/doc/' },
+                        { name: 'CSS Selectors', url: 'https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors' },
+                        { name: 'Requests library', url: 'https://requests.readthedocs.io/' },
+                        { name: 'Pandas to CSV', url: 'https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_csv.html' }
+                    ],
+                    tips: 'Парсинг = сбор данных. Эти данные потом продаёшь. Золотой навык.',
+                    emoji: '🕵️'
+                };
+            }
+            if (t.includes('commit') || t.includes('github') || t.includes('push')) {
+                return {
+                    steps: [
+                        '1️⃣ Убедись что код работает локально',
+                        '2️⃣ git add . (или git add file.py для конкретного файла)',
+                        '3️⃣ git commit -m "feat: краткое описание что ты добавил"',
+                        '4️⃣ git push origin main',
+                        '5️⃣ Проверь на GitHub что ты видишь последние изменения',
+                        '6️⃣ Если deploy автоматизирован, подожди 2 минут',
+                        '7️⃣ Проверь live версию: работает ли она?',
+                        '8️⃣ Готово! История сохранена, код в облаке.'
+                    ],
+                    resources: [
+                        { name: 'Git Tutorial', url: 'https://git-scm.com/book/en/v2/Getting-Started-The-Basics' },
+                        { name: 'Commit Message Best Practices', url: 'https://www.conventionalcommits.org/' }
+                    ],
+                    tips: 'Commit ежедневно = сохраняешь прогресс. Без этого = потеря кода = беда.',
+                    emoji: '💾'
+                };
+            }
+            return category === 'parsing'
+                ? {
+                    steps: [
+                        '1️⃣ Разбери задачу на микрошаги (каждый шаг 5-10 минут)',
+                        '2️⃣ Начни с самого простого: что нужна сделать в первую очередь?',
+                        '3️⃣ Сделай минимум, чтобы работало (даже если криво)',
+                        '4️⃣ Протести: запускается ли без ошибок?',
+                        '5️⃣ Теперь добавляй фишки: фильтры, сортировка, формат',
+                        '6️⃣ После каждого изменения — новый commit',
+                        '7️⃣ Напиши в README что ты сделал и как это использовать',
+                        '8️⃣ Загрузи на GitHub с примерами результатов'
+                    ],
+                    resources: [
+                        { name: 'Problem Solving', url: 'https://www.freecodecamp.org/' }
+                    ],
+                    tips: 'Любое задание = маленькие шаги. Step by step. Не пытайся все сразу.',
+                    emoji: '📋'
+                  }
+                : {
+                    steps: [
+                        '1️⃣ Разбери задачу: что точно нужно делать?',
+                        '2️⃣ Напиши план на бумаге (или комментарии в коде)',
+                        '3️⃣ Начни с простого: работающий код > идеальный код',
+                        '4️⃣ Протести вручную: нажми все кнопки, введи разные данные',
+                        '5️⃣ После каждого шага — git commit',
+                        '6️⃣ Логируй: что работает, что сломалось',
+                        '7️⃣ После финиша напиши README и загрузи на GitHub',
+                        '8️⃣ Готово! Один проект в портфолио'
+                    ],
+                    resources: [
+                        { name: 'Problem Solving', url: 'https://www.freecodecamp.org/' }
+                    ],
+                    tips: 'Начинай кодить с первого же дня. Теория потом.',
+                    emoji: '💻'
+                };
+        }
+
+        function buildHowToSteps(task, category) {
+            const guide = buildDetailedGuide(task, category, 1);
+            return guide.steps;
+        }
+
+        function buildDoneIf(meta) {
+            if (meta.category === 'parsing') {
+                return 'Готово, если: есть валидный вывод данных + понятный формат (CSV/JSON/Sheets) и это можно показать клиенту.';
+            }
+            return 'Готово, если: сценарий работает от начала до конца, ошибок нет, и результат можно продемонстрировать за 30-60 секунд.';
+        }
+
+        function getDifficultyLevel(day, category, task) {
+            const t = task.toLowerCase();
+            let base = day <= 7 ? 1 : day <= 21 ? 2 : 3;
+            if (t.includes('deploy') || t.includes('render') || t.includes('fsm')) base += 2;
+            if (t.includes('readme') || t.includes('видео')) base += 1;
+            if (t.includes('бд') || t.includes('sheets') || t.includes('api')) base += 2;
+            if (category === 'parsing') base += 1;
+            return Math.min(Math.max(base, 1), 5);
+        }
+
+        function generateQuestIcon(styleClass, category, task) {
+            const t = task.toLowerCase();
+            let icon = '📋';
+            if (styleClass === 'task-style-deploy') icon = '🚀';
+            else if (styleClass === 'task-style-biz') icon = '💰';
+            else if (styleClass === 'task-style-showcase') icon = '🎬';
+            else if (styleClass === 'task-style-refactor') icon = '🔧';
+            else if (t.includes('readme')) icon = '📝';
+            else if (t.includes('видео') || t.includes('демо')) icon = '🎥';
+            else if (t.includes('бд') || t.includes('sheets')) icon = '🗂️';
+            else if (category === 'parsing') icon = '🕵️';
+            return icon;
+        }
+
+        function toggleInstructions() {
+            const container = document.getElementById('questStepsContainer');
+            const btn = document.getElementById('expandToggle');
+            container.classList.toggle('quest-steps-collapsed');
+            container.classList.toggle('quest-steps-expanded');
+            btn.textContent = container.classList.contains('quest-steps-expanded') ? 'Свернуть' : 'Развернуть';
+        }
+
+        function getUnlockedLore(completedDays) {
+            const lore = [];
+            if (completedDays >= 1) lore.push('📖 Гоблин проснулся из вечного сна золота.');
+            if (completedDays >= 3) lore.push('⚔️ Первый артефакт кода обнаружен.');
+            if (completedDays >= 7) lore.push('👑 Легенда первой недели рождается!');
+            if (completedDays >= 15) lore.push('🌟 Середина пути — прибыль видна впереди.');
+            if (completedDays >= 21) lore.push('💎 Священный камень фриланса заблеск.');
+            if (completedDays >= 30) lore.push('🏆 Миф о гоблине навеки вписан в историю.');
+            return lore.length > 0 ? lore[lore.length - 1] : '🔒 Лор: Выполняй задания, открывай историю...';
+        }
+
+        function generateTaskIllustration(task, category) {
+            const t = task.toLowerCase();
+            const svgs = {
+                readme: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="80" height="80" fill="rgba(255,215,0,0.2)" stroke="#ffd700" stroke-width="2" rx="5"/><text x="50" y="40" font-size="14" text-anchor="middle" fill="#ffd700" font-weight="bold">README</text><line x1="20" y1="50" x2="80" y2="50" stroke="#ffd700" stroke-width="1"/><text x="50" y="70" font-size="11" text-anchor="middle" fill="#d8e6ff">Описание</text></svg>',
+                video: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="15" width="80" height="70" fill="rgba(255,107,107,0.2)" stroke="#ff6b6b" stroke-width="2" rx="5"/><polygon points="40,35 40,65 65,50" fill="#ff6b6b"/><text x="50" y="85" font-size="11" text-anchor="middle" fill="#ffd700">Видео</text></svg>',
+                code: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="20" width="80" height="60" fill="rgba(102,126,234,0.2)" stroke="#667eea" stroke-width="2" rx="5"/><text x="35" y="40" font-size="12" font-family="monospace" fill="#667eea">{}</text><text x="50" y="55" font-size="10" text-anchor="middle" fill="#d8e6ff">def</text><text x="50" y="75" font-size="10" text-anchor="middle" fill="#667eea">Код</text></svg>',
+                db: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="30" rx="25" ry="12" fill="rgba(0,200,83,0.2)" stroke="#00c853" stroke-width="2"/><rect x="25" y="30" width="50" height="30" fill="rgba(0,200,83,0.15)" stroke="#00c853" stroke-width="2"/><ellipse cx="50" cy="60" rx="25" ry="12" fill="rgba(0,200,83,0.2)" stroke="#00c853" stroke-width="2"/><text x="50" y="50" font-size="11" text-anchor="middle" fill="#00c853">DB</text></svg>',
+                deploy: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,20 80,70 20,70" fill="rgba(169,139,255,0.2)" stroke="#a98bff" stroke-width="2"/><circle cx="50" cy="50" r="8" fill="#a98bff"/><text x="50" y="85" font-size="11" text-anchor="middle" fill="#a98bff">Deploy</text></svg>',
+                sales: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="15" y="40" width="70" height="40" fill="rgba(255,203,101,0.2)" stroke="#ffcb65" stroke-width="2" rx="3"/><circle cx="30" cy="50" r="5" fill="#ffcb65"/><circle cx="50" cy="45" r="5" fill="#ffcb65"/><circle cx="70" cy="55" r="5" fill="#ffcb65"/><text x="50" y="85" font-size="11" text-anchor="middle" fill="#ffcb65">Sales</text></svg>',
+                parsing: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="15" y="20" width="25" height="60" fill="rgba(86,232,255,0.2)" stroke="#56e8ff" stroke-width="2"/><rect x="45" y="20" width="25" height="60" fill="rgba(86,232,255,0.2)" stroke="#56e8ff" stroke-width="2"/><rect x="75" y="20" width="10" height="60" fill="rgba(86,232,255,0.2)" stroke="#56e8ff" stroke-width="2"/><text x="50" y="90" font-size="10" text-anchor="middle" fill="#56e8ff">📊</text></svg>'
+            };
+            
+            if (t.includes('readme')) return svgs.readme;
+            if (t.includes('видео') || t.includes('демо')) return svgs.video;
+            if (t.includes('deploy') || t.includes('render')) return svgs.deploy;
+            if (t.includes('бд') || t.includes('sqlite') || t.includes('sheets')) return svgs.db;
+            if (t.includes('отклик') || t.includes('цена') || t.includes('клиент')) return svgs.sales;
+            if (category === 'parsing') return svgs.parsing;
+            return svgs.code;
+        }
+
+        const TASK_THEORY_SESSION_KEY = 'main_task_theory_session_v1';
+
+        function getISOWeekNumber(date = new Date()) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            const weekNum = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return { year: d.getUTCFullYear(), week: weekNum };
+        }
+
+        function formatWeekNumber(year, week) {
+            return `${year}-W${String(week).padStart(2, '0')}`;
+        }
+
+        function getDailyLearningStats() {
+            try {
+                return JSON.parse(localStorage.getItem('course_daily_learning_stats_v1') || '{}');
+            } catch {
+                return {};
+            }
+        }
+
+        function saveDailyLearningStats(stats) {
+            localStorage.setItem('course_daily_learning_stats_v1', JSON.stringify(stats));
+        }
+
+        function getWeekBucketForDay(day) {
+            if (day <= 7) return 1;
+            if (day <= 14) return 2;
+            if (day <= 21) return 3;
+            return 4;
+        }
+
+        function addTaskTheoryMs(day, ms) {
+            if (!Number.isFinite(ms) || ms <= 0) return;
+
+            const rounded = Math.round(ms);
+            const currentTheory = Number(localStorage.getItem('course_theory_time_ms') || '0');
+            localStorage.setItem('course_theory_time_ms', String(currentTheory + rounded));
+
+            const dailyStats = getDailyLearningStats();
+            const dayKey = String(day || getCurrentDay());
+            if (!dailyStats[dayKey] || typeof dailyStats[dayKey] !== 'object') {
+                dailyStats[dayKey] = { theoryMs: 0, practiceMs: 0, gamingMs: 0 };
+            }
+            dailyStats[dayKey].theoryMs = (Number(dailyStats[dayKey].theoryMs) || 0) + rounded;
+            saveDailyLearningStats(dailyStats);
+
+            const week = getISOWeekNumber();
+            const isoWeekKey = `weekly_stats_${formatWeekNumber(week.year, week.week)}`;
+            const planWeekKey = `weekly_stats_plan-week-${getWeekBucketForDay(Number(day) || getCurrentDay())}`;
+
+            [isoWeekKey, planWeekKey].forEach((storageKey) => {
+                try {
+                    const existing = JSON.parse(localStorage.getItem(storageKey) || '{"theoryMs":0,"practiceMs":0,"gamingMs":0}');
+                    existing.theoryMs = (existing.theoryMs || 0) + rounded;
+                    localStorage.setItem(storageKey, JSON.stringify(existing));
+                } catch {
+                    localStorage.setItem(storageKey, JSON.stringify({ theoryMs: rounded, practiceMs: 0, gamingMs: 0 }));
+                }
+            });
+        }
+
+        function startTaskTheorySession(day, key, title) {
+            stopTaskTheorySession();
+            localStorage.setItem(TASK_THEORY_SESSION_KEY, JSON.stringify({
+                day,
+                key,
+                title,
+                startedAt: Date.now()
+            }));
+        }
+
+        function stopTaskTheorySession() {
+            let session = null;
+            try {
+                session = JSON.parse(localStorage.getItem(TASK_THEORY_SESSION_KEY) || 'null');
+            } catch {
+                session = null;
+            }
+
+            if (!session || typeof session.startedAt !== 'number') return;
+
+            const elapsed = Date.now() - session.startedAt;
+            localStorage.removeItem(TASK_THEORY_SESSION_KEY);
+
+            if (!Number.isFinite(elapsed) || elapsed < 1000) return;
+
+            addTaskTheoryMs(session.day, elapsed);
+        }
+
+        window.addEventListener('pagehide', stopTaskTheorySession);
+        window.addEventListener('beforeunload', stopTaskTheorySession);
+
+        function openTaskQuest(key) {
+            const meta = TASK_DETAILS[key];
+            if (!meta) return;
+            startTaskTheorySession(meta.day, meta.key, meta.task);
+            const modal = document.getElementById('taskQuestModal');
+            const card = document.getElementById('questCard');
+            const theme = getQuestTheme(meta.styleData.className, meta.category);
+
+            card.style.setProperty('--quest-color', theme.color);
+            card.style.setProperty('--quest-bg1', theme.bg1);
+            card.style.setProperty('--quest-bg2', theme.bg2);
+
+            // Add quest icon with SVG illustration
+            const illustration = generateTaskIllustration(meta.task, meta.category);
+            document.getElementById('questIconArea').innerHTML = `<svg width="50" height="50" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${illustration}</svg>`;
+
+            // Add difficulty indicator
+            const difficulty = getDifficultyLevel(meta.day, meta.category, meta.task);
+            const coinsHtml = Array(difficulty).fill('🪙').join('');
+            document.getElementById('questDifficulty').innerHTML = `<div class="difficulty-coins">${coinsHtml}</div><div>Награда</div>`;
+
+            // Add lore unlock info
+            const completedCount = Object.keys(GAME_STATE.completed).length;
+            const loreText = getUnlockedLore(completedCount);
+            document.getElementById('loreUnlock').textContent = loreText;
+
+            document.getElementById('questTitle').textContent = `${meta.styleData.badge} • День ${meta.day} • ${meta.category === 'bots' ? 'Боты' : 'Парсинг'}`;
+            document.getElementById('questSub').textContent = `${theme.role} · ${meta.task}`;
+            document.getElementById('questStory').textContent = buildQuestStory(meta);
+
+            // Get detailed guide with all info
+            const guide = buildDetailedGuide(meta.task, meta.category, meta.day);
+            
+            // Show detailed steps
+            const stepsList = document.getElementById('questSteps');
+            stepsList.innerHTML = guide.steps.map(s => `<li>${s}</li>`).join('');
+
+            // Reset instructions to collapsed state
+            const stepsContainer = document.getElementById('questStepsContainer');
+            stepsContainer.classList.remove('quest-steps-expanded');
+            stepsContainer.classList.add('quest-steps-collapsed');
+            document.getElementById('expandToggle').textContent = 'Развернуть';
+
+            // Show resources
+            let resourcesHtml = '';
+            if (guide.resources && guide.resources.length > 0) {
+                resourcesHtml = '<div class="quest-resources"><h4>🔗 Полезные ресурсы</h4>';
+                guide.resources.forEach(res => {
+                    resourcesHtml += `<a href="${res.url}" target="_blank" class="resource-link">→ ${res.name}</a>`;
+                });
+                resourcesHtml += '</div>';
+            }
+
+            // Show tips
+            let tipsHtml = '';
+            if (guide.tips) {
+                tipsHtml = `<div class="quest-tips">💡 ${guide.tips}</div>`;
+            }
+
+            // Add resources and tips to quest body
+            const questBody = card.querySelector('.quest-body');
+            let existingResources = questBody.querySelector('.quest-resources');
+            let existingTips = questBody.querySelector('.quest-tips');
+            if (existingResources) existingResources.remove();
+            if (existingTips) existingTips.remove();
+            
+            if (resourcesHtml) questBody.insertAdjacentHTML('beforeend', resourcesHtml);
+            if (tipsHtml) questBody.insertAdjacentHTML('beforeend', tipsHtml);
+
+            document.getElementById('questDoneIf').textContent = buildDoneIf(meta);
+            document.getElementById('questRune').textContent = `Руна задания: ${meta.key.toUpperCase()}`;
+
+            modal.classList.add('open');
+        }
+
+        function closeTaskQuest() {
+            stopTaskTheorySession();
+            document.getElementById('taskQuestModal').classList.remove('open');
+        }
+
+        function backdropCloseQuest(event) {
+            if (event.target.id === 'taskQuestModal') {
+                closeTaskQuest();
+            }
+        }
+
+        function parseTaskKey(key) {
+            const parts = key.split('-');
+            return {
+                day: parseInt(parts[1]),
+                category: parts[2],
+                idx: parseInt(parts[3])
+            };
+        }
+
+        function getTaskTextByKey(key) {
+            const data = parseTaskKey(key);
+            const allPlans = [...PLANS.WEEK1, ...PLANS.WEEK2, ...PLANS.WEEK3_4];
+            const dayData = allPlans.find(d => d.day === data.day);
+            if (!dayData) return '';
+            const arr = data.category === 'bots' ? dayData.bots : dayData.parsing;
+            return arr[data.idx] || '';
+        }
+
+        function awardSecret(flag, points, title, text) {
+            if (GAME_STATE.secretFlags[flag]) return;
+            GAME_STATE.secretFlags[flag] = true;
+            GAME_STATE.points += points;
+            GAME_STATE.level = Math.floor(GAME_STATE.points / 500) + 1;
+            showSecretPopup(title, text + ` +${points} XP`);
+            saveState();
+            updateDisplay();
+        }
+
+        function triggerSecrets(key) {
+            const meta = parseTaskKey(key);
+            const taskText = getTaskTextByKey(key).toLowerCase();
+            const secretIcons = {
+                'readme-rune': '📜',
+                'deploy-ritual': '🛰️',
+                'pair-bonus': '⚔️',
+                'full-day': '🏁',
+                'week-one': '👑',
+                'title-clicker': '🎯',
+                'week-two': '💼',
+                'week-three': '💎'
+            };
+
+            if (taskText.includes('readme')) {
+                awardSecret('readme-rune', 120, '📜 Тайная руна README', 'Гоблин доволен твоей упаковкой. Ясное описание = деньги подходят близко.');
+            }
+
+            if (taskText.includes('render') || taskText.includes('railway') || taskText.includes('deploy') || taskText.includes('cron')) {
+                awardSecret('deploy-ritual', 180, '🛰️ Ритуал Деплоя', 'Ты активировал облачный тотем. Лицензия на 24/7 доход разблокирована.');
+            }
+
+            const pairKey = `day-${meta.day}-${meta.category === 'bots' ? 'parsing' : 'bots'}-${meta.idx}`;
+            if (GAME_STATE.completed[pairKey]) {
+                awardSecret(`pair-${meta.day}-${meta.idx}`, 75, '⚔️ Двойной удар', 'Оба трека в один день! Гоблин почувствовал синергию.');
+            }
+
+            if (isFullDayCompleted(meta.day)) {
+                awardSecret(`full-day-${meta.day}`, 250, `🏁 День ${meta.day} закрыт`, 'Весь день без прерываний! Ты вошёл в боевой транс.');
+            }
+
+            if (isWeekOneCompleted()) {
+                awardSecret('week-one-legend', 500, '👑 Легенда первой недели', 'Все задания дней 1-7 выполнены. Ты уже зарабатываешь как профи.');
+            }
+
+            const week2Done = [8,9,10,11,12,13,14].every(d => isFullDayCompleted(d));
+            if (week2Done) {
+                awardSecret('week-two-warrior', 650, '💼 Воин второй недели', 'Расширение и продажи взяты. Клиенты уже знают твоё имя.');
+            }
+
+            const week3Done = [15,16,17,18,19,20,21].every(d => isFullDayCompleted(d));
+            if (week3Done) {
+                awardSecret('week-three-legend', 800, '💎 Мастер месяца', 'Три недели окончены. Возьми свой первый крупный заказ.');
+            }
+
+            const allDone = isFullDayCompleted(30);
+            if (allDone) {
+                awardSecret('god-mode', 1000, '🏆 Гобтамен 30 дней', 'ВСЕ 30 ДНЕЙ ЗАВЕРШЕНЫ! Ты легенда, твой доход лишь начинается.');
+            }
+        }
+
+        function isFullDayCompleted(day) {
+            for (let i = 0; i < 4; i++) {
+                if (!GAME_STATE.completed[`day-${day}-bots-${i}`]) return false;
+                if (!GAME_STATE.completed[`day-${day}-parsing-${i}`]) return false;
+            }
+            return true;
+        }
+
+        function isWeekOneCompleted() {
+            for (let d = 1; d <= 7; d++) {
+                if (!isFullDayCompleted(d)) return false;
+            }
+            return true;
+        }
+
+        function showSecretPopup(title, text) {
+            const popup = document.createElement('div');
+            popup.className = 'secret-popup';
+            popup.innerHTML = `<div style="font-weight:800; margin-bottom:6px;">${title}</div><div style="font-size:0.92em;">${text}</div>`;
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 3200);
+        }
+        
+        function updateProgress() {
+            const allTasks = getAllTasks();
+            const botsCompleted = Object.keys(GAME_STATE.completed).filter(k => k.includes('-bots-')).length;
+            const parsingCompleted = Object.keys(GAME_STATE.completed).filter(k => k.includes('-parsing-')).length;
+            const botsTotal = allTasks.filter(k => k.includes('-bots-')).length;
+            const parsingTotal = allTasks.filter(k => k.includes('-parsing-')).length;
+            
+            const botsPercent = Math.round((botsCompleted / botsTotal) * 100);
+            const parsingPercent = Math.round((parsingCompleted / parsingTotal) * 100);
+            const totalPercent = Math.round((Object.keys(GAME_STATE.completed).length / allTasks.length) * 100);
+            
+            document.getElementById('progressBots').style.width = botsPercent + '%';
+            document.getElementById('progressBots').textContent = botsPercent + '%';
+            document.getElementById('botsPercent').textContent = botsPercent + '%';
+            
+            document.getElementById('progressParsing').style.width = parsingPercent + '%';
+            document.getElementById('progressParsing').textContent = parsingPercent + '%';
+            document.getElementById('parsingPercent').textContent = parsingPercent + '%';
+            
+            document.getElementById('totalPercent').textContent = totalPercent + '%';
+        }
+        
+        function getAllTasks() {
+            let result = [];
+            const allPlans = [...PLANS.WEEK1, ...PLANS.WEEK2, ...PLANS.WEEK3_4];
+            allPlans.forEach((day, dayIdx) => {
+                day.bots.forEach((_, taskIdx) => {
+                    result.push(`day-${day.day}-bots-${taskIdx}`);
+                });
+                day.parsing.forEach((_, taskIdx) => {
+                    result.push(`day-${day.day}-parsing-${taskIdx}`);
+                });
+            });
+            return result;
+        }
+        
+        function toggleAllDays() {
+            const allCheckboxes = document.querySelectorAll('.checkbox');
+            const allChecked = Array.from(allCheckboxes).every(cb => cb.checked);
+            allCheckboxes.forEach(cb => {
+                if (cb.checked !== !allChecked) {
+                    cb.checked = !allChecked;
+                    cb.onchange();
+                }
+            });
+        }
+        
+        async function resetBackendState() {
+            await Promise.all(
+                RESET_SERVER_KEYS.map((key) =>
+                    apiRequest(`/state/${key}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ value: {} })
+                    })
+                )
+            );
+        }
+
+        async function resetProgress() {
+            const shouldReset = confirm('Сбросить весь прогресс? Это очистит локальные данные и состояние на сервере.');
+            if (!shouldReset) return;
+
+            const currentApiBase = localStorage.getItem('planApiBase');
+            RESET_LOCAL_KEYS.forEach((key) => localStorage.removeItem(key));
+            
+            // Явно установить новую стартовую дату
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            localStorage.setItem('planStartDate', today.toISOString());
+            
+            if (currentApiBase) {
+                localStorage.setItem('planApiBase', currentApiBase);
+            }
+
+            await resetBackendState();
+
+            GAME_STATE.points = 0;
+            GAME_STATE.level = 1;
+            GAME_STATE.completed = {};
+            GAME_STATE.secretFlags = {};
+            GAME_STATE.titleClicks = 0;
+
+            renderTasks();
+            updateDisplay();
+            updateCurrentDayDisplay();
+            updateJourneyTracker();
+            showNotification('🧹 Прогресс полностью сброшен');
+        }
+        
+        function syncGameXP() {
+            // Синхронизация XP из разных игр
+            const botBuilderXP = parseInt(localStorage.getItem('botBuilderXP')) || 0;
+            const dungeonXP = parseInt(localStorage.getItem('dungeonXP')) || 0;
+            const parserDefenseXP = parseInt(localStorage.getItem('parserDefenseXP')) || 0;
+            
+            // Комбинированный XP со скидкой (2% за каждые 100 XP)
+            const totalGameXP = Math.floor((botBuilderXP + dungeonXP + parserDefenseXP) * 0.5);
+            const alreadyApplied = parseInt(localStorage.getItem('gameXPApplied') || '0');
+            const delta = Math.max(0, totalGameXP - alreadyApplied);
+            
+            if (delta > 0) {
+                GAME_STATE.points += delta;
+                // Обновить уровень каждые 500 очков
+                const newLevel = Math.floor(GAME_STATE.points / 500) + 1;
+                if (newLevel > GAME_STATE.level) {
+                    GAME_STATE.level = newLevel;
+                    console.log(`🎉 Ты поднялся на уровень ${GAME_STATE.level}!`);
+                }
+                localStorage.setItem('gameXPApplied', String(alreadyApplied + delta));
+                saveState();
+                updateDisplay();
+            }
+        }
+        
+        function saveState() {
+            localStorage.setItem('points', GAME_STATE.points);
+            localStorage.setItem('level', GAME_STATE.level);
+            localStorage.setItem('completed', JSON.stringify(GAME_STATE.completed));
+            localStorage.setItem('secretFlags', JSON.stringify(GAME_STATE.secretFlags));
+            localStorage.setItem('titleClicks', GAME_STATE.titleClicks);
+            void syncAllToServer();
+        }
+        
+        function savePDF() {
+            alert('Функция экспорта скоро! Пока сохранишь вручную (Ctrl+S)');
+        }
+        
+        function openProfile() {
+            window.location.href = 'profile-cosmetics.html';
+        }
+
+        function openCourseGuide() {
+            window.location.href = 'course/index.html';
+        }
+
+        function openVerification() {
+            window.location.href = 'task-verification.html';
+        }
+
+        function openDungeon() {
+            window.location.href = 'code-dungeon.html';
+        }
+
+        function bindEasterEggs() {
+            const title = document.querySelector('.navbar-title');
+            const hint = document.getElementById('secretHint');
+
+            title.addEventListener('click', () => {
+                GAME_STATE.titleClicks += 1;
+                if (GAME_STATE.titleClicks >= 7) {
+                    awardSecret('title-click-relic', 200, '🧪 Реликвия заголовка', 'Ты нашёл скрытый клик-квест.');
+                    GAME_STATE.titleClicks = 0;
+                }
+                saveState();
+            });
+
+            const hints = [
+                'Подсказка: README и Deploy прячут бонусы',
+                'Подсказка: закрывай оба столбца одного дня',
+                'Подсказка: у парных задач есть двойной удар',
+                'Подсказка: нажми на заголовок 7 раз'
+            ];
+            setInterval(() => {
+                hint.textContent = hints[Math.floor(Math.random() * hints.length)];
+            }, 6500);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeTaskQuest();
+                }
+            });
+        }
+        
+        // 🆕 CURRENT DAY & NAVIGATION
+        let CURRENT_FILTER = 'all';
+
+        function getPlanStartDate() {
+            const stored = localStorage.getItem('planStartDate');
+            if (stored) {
+                const parsed = new Date(stored);
+                if (!Number.isNaN(parsed.getTime())) {
+                    parsed.setHours(0, 0, 0, 0);
+                    return parsed;
+                }
+            }
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            localStorage.setItem('planStartDate', today.toISOString());
+            return today;
+        }
+
+        function getCurrentDay() {
+            const startDate = getPlanStartDate();
+            const currentDate = new Date();
+            
+            // Установить время в 0:00 для правильного сравнения дат
+            startDate.setHours(0, 0, 0, 0);
+            currentDate.setHours(0, 0, 0, 0);
+            
+            const diffTime = currentDate - startDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            
+            return Math.min(Math.max(diffDays, 1), 30);
+        }
+
+        function updateCurrentDayDisplay() {
+            const currentDay = getCurrentDay();
+            const allTasks = getAllTasks();
+            const completedCount = Object.keys(GAME_STATE.completed).length;
+            const completedDays = Math.floor(completedCount / 8);
+            
+            document.getElementById('dayCounter').textContent = `День ${currentDay}/30`;
+            document.getElementById('daysCompleted').textContent = completedDays;
+            
+            // Tasks today
+            const tasksIndex = (currentDay - 1) * 8;
+            const tasksCompleted = Object.keys(GAME_STATE.completed).filter(k => {
+                const meta = parseTaskKey(k);
+                return meta.day === currentDay;
+            }).length;
+            document.getElementById('tasksToday').textContent = `${tasksCompleted}/8`;
+            
+            // Progress pace
+            const expectedCompleted = (currentDay / 30) * allTasks.length;
+            const actualCompleted = completedCount;
+            const pace = actualCompleted >= expectedCompleted ? '✓ На графике' : '⚠️ Позади';
+            document.getElementById('progressPace').textContent = pace;
+            
+            // XP to level
+            const xpToLevel = (GAME_STATE.level * 500) - GAME_STATE.points;
+            document.getElementById('xpToLevel').textContent = `${Math.max(0, xpToLevel)} XP`;
+            
+            // Update day timer (до конца дня с точностью до минуты)
+            updateDayTimer();
+            
+            // Day info text
+            let infoText = '';
+            if (completedDays === 0) infoText = '🚀 Начало пути! Выполни первые задания.';
+            else if (completedDays < 7) infoText = '⚔️ Первая неделя на финише. Держи темп!';
+            else if (completedDays < 14) infoText = '💪 Половина пути позади. Отлично!';
+            else if (completedDays < 21) infoText = '🌟 Три недели! Финиш видно. Финишируй!';
+            else infoText = '🏆 Почти легенда! Завершай последнюю неделю!';
+            document.getElementById('dayInfoText').textContent = infoText;
+        }
+
+        function updateDayTimer() {
+            // Считаем время до конца сегодняшнего дня (23:59:59)
+            const now = new Date();
+            const endOfDay = new Date();
+            endOfDay.setHours(23, 59, 59, 999);
+            
+            const timeRemaining = endOfDay - now;
+            const hours = Math.floor((timeRemaining) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+            
+            const timerEl = document.getElementById('dayTimer');
+            if (timerEl) {
+                timerEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                
+                // Мигание красным когда до конца дня остается < 1 часа
+                if (hours === 0 && minutes < 60) {
+                    timerEl.style.color = minutes < 10 ? '#ff6b6b' : '#ffa500';
+                } else {
+                    timerEl.style.color = 'inherit';
+                }
+            }
+        }
+
+        function updateJourneyTracker() {
+            const currentDay = getCurrentDay();
+            
+            // Update day counter
+            const dayCounterEl = document.getElementById('dayCounterJourney');
+            if (dayCounterEl) {
+                dayCounterEl.textContent = currentDay;
+            }
+            
+            // Calculate remaining time with hours
+            const startDate = getPlanStartDate();
+            const endDate = new Date(startDate);
+            endDate.setDate(endDate.getDate() + 29);
+            const now = new Date();
+            
+            startDate.setHours(0, 0, 0, 0);
+            endDate.setHours(23, 59, 59, 999);
+            now.setSeconds(now.getSeconds()); // Reset for accurate display
+            
+            const timeRemaining = endDate - now;
+            const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+            
+            // Update remaining display
+            const timeRemainingEl = document.getElementById('timeRemainingJourney');
+            const timeDetailedEl = document.getElementById('timeDetailedJourney');
+            
+            if (timeRemainingEl && timeDetailedEl) {
+                if (days > 0) {
+                    timeRemainingEl.textContent = days;
+                    timeDetailedEl.textContent = `дней ${hours}ч`;
+                } else if (hours > 0) {
+                    timeRemainingEl.textContent = hours;
+                    timeDetailedEl.textContent = `часов ${minutes}м`;
+                } else {
+                    timeRemainingEl.textContent = minutes;
+                    timeDetailedEl.textContent = `минут ${seconds}с`;
+                }
+                
+                // Color change when time is running out
+                if (days === 0 && hours < 6) {
+                    timeRemainingEl.style.color = '#ff6b6b'; // Red warning
+                } else if (days <= 3) {
+                    timeRemainingEl.style.color = '#ffd700'; // Gold warning
+                } else {
+                    timeRemainingEl.style.color = 'inherit'; // Default
+                }
+            }
+        }
+
+        function renderDayNavigator() {
+            const navigator = document.getElementById('dayNavigator');
+            navigator.innerHTML = '';
+            const currentDay = getCurrentDay();
+            
+            for (let day = 1; day <= 30; day++) {
+                const btn = document.createElement('button');
+                btn.className = 'day-nav-btn';
+                
+                if (day === currentDay) btn.classList.add('current');
+                if (isFullDayCompleted(day)) btn.classList.add('completed');
+                
+                btn.textContent = `День ${day}`;
+                btn.onclick = () => scrollToDay(day);
+                navigator.appendChild(btn);
+            }
+        }
+
+        function scrollToDay(day) {
+            const dayCard = document.querySelector(`[data-day="${day}"]`);
+            if (dayCard) {
+                dayCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                dayCard.style.boxShadow = '0 0 30px rgba(255, 215, 0, 0.6)';
+                setTimeout(() => {
+                    dayCard.style.boxShadow = '';
+                }, 2000);
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebarFilter');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Show/hide scroll to top button
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('scrollToTopBtn');
+            if (window.scrollY > 300) {
+                btn.classList.add('show');
+            } else {
+                btn.classList.remove('show');
+            }
+        });
+
+        function setFilter(type) {
+            CURRENT_FILTER = type;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            filterTasks();
+            // Автоматически закрыть sidebar на мобильных устройствах
+            if (window.innerWidth <= 1024) {
+                setTimeout(() => toggleSidebar(), 300);
+            }
+        }
+
+        function filterBySearch() {
+            filterTasks();
+        }
+
+        function filterTasks() {
+            const searchTerm = document.getElementById('filterSearch').value.toLowerCase();
+            const dayCards = document.querySelectorAll('.day-card');
+            let visibleCount = 0;
+            
+            dayCards.forEach(card => {
+                let show = true;
+                const isBot = card.classList.contains('bots');
+                
+                // Filter by type
+                if (CURRENT_FILTER === 'bots') {
+                    show = isBot;
+                } else if (CURRENT_FILTER === 'parsing') {
+                    show = !isBot;
+                } else if (CURRENT_FILTER === 'portfolio') {
+                    show = card.textContent.includes('README') || card.textContent.includes('видео') || card.textContent.includes('кейс');
+                } else if (CURRENT_FILTER === 'sales') {
+                    show = card.textContent.includes('отклик') || card.textContent.includes('клиент') || card.textContent.includes('цена') || card.textContent.includes('Upwork') || card.textContent.includes('Kwork');
+                }
+                
+                // Filter by search
+                if (searchTerm && !card.textContent.toLowerCase().includes(searchTerm)) {
+                    show = false;
+                }
+                
+                card.style.display = show ? 'block' : 'none';
+                if (show) visibleCount++;
+            });
+        }
+
+        function triggerTaskConfetti() {
+            const colors = ['#FFD700', '#FFA500', '#FF6B6B', '#4ECDC4', '#87CEEB'];
+            for (let i = 0; i < 30; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti';
+                conf.style.left = Math.random() * 100 + '%';
+                conf.style.top = '-10px';
+                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.width = Math.random() * 8 + 4 + 'px';
+                conf.style.height = conf.style.width;
+                conf.style.borderRadius = Math.random() > 0.5 ? '50%' : '0%';
+                conf.style.animationDuration = (Math.random() * 1 + 2) + 's';
+                document.body.appendChild(conf);
+                setTimeout(() => conf.remove(), 3000);
+            }
+        }
+
+        function triggerGoldenConfetti() {
+            for (let i = 0; i < 80; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti gold';
+                conf.style.left = Math.random() * 100 + '%';
+                conf.style.top = '-10px';
+                conf.style.backgroundColor = '#FFD700';
+                conf.style.width = Math.random() * 6 + 3 + 'px';
+                conf.style.height = conf.style.width;
+                conf.style.animationDuration = (Math.random() * 1.5 + 2.5) + 's';
+                document.body.appendChild(conf);
+                setTimeout(() => conf.remove(), 5000);
+            }
+        }
+
+        function triggerFireworks() {
+            const count = 40;
+            const texts = ['✨', '🎉', '⭐', '💫', '🌟'];
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'firework';
+                particle.textContent = texts[Math.floor(Math.random() * texts.length)];
+                particle.style.left = window.innerWidth / 2 + 'px';
+                particle.style.top = window.innerHeight / 2 + 'px';
+                
+                const angle = (i / count) * Math.PI * 2;
+                const velocity = Math.random() * 250 + 150;
+                const tx = Math.cos(angle) * velocity;
+                const ty = Math.sin(angle) * velocity;
+                
+                particle.style.setProperty('--tx', tx + 'px');
+                particle.style.setProperty('--ty', ty + 'px');
+                
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 1500);
+            }
+        }
+
+        function triggerCelebration(text) {
+            const celebration = document.createElement('div');
+            celebration.className = 'celebration-text';
+            celebration.textContent = text;
+            document.body.appendChild(celebration);
+            triggerFireworks();
+            setTimeout(() => celebration.remove(), 2000);
+        }
+
+        function triggerCake() {
+            const cake = document.createElement('div');
+            cake.className = 'cake-pop';
+            cake.textContent = '🎂';
+            document.body.appendChild(cake);
+            setTimeout(() => cake.remove(), 1000);
+        }
+
+        function showNotification(text) {
+            const notif = document.createElement('div');
+            notif.style.cssText = `
+                position: fixed;
+                bottom: 30px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, rgba(255, 215, 0, 0.9), rgba(255, 165, 0, 0.9));
+                border: 2px solid #FFD700;
+                padding: 15px 30px;
+                border-radius: 12px;
+                color: #000;
+                font-weight: 800;
+                font-size: 1.1em;
+                z-index: 10000;
+            `;
+            notif.textContent = text;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 2500);
+        }
+
+        // ===== ГОБЛИН СОВЕТНИК =====
+        const GOBLIN_TIPS = [
+            "🎯 Совет: Начни с простых заданий, чтобы набрать уверенность!",
+            "⚡ Быстрый совет: Выполняй хотя бы одно задание каждый день!",
+            "💡 Знаешь ли ты: Секреты скрыты в коде? Попробуй искать в README!",
+            "🚀 Лайфхак: Сосредоточься на качестве работы, а не только на количестве!"
+        ];
+
+        function updateGoblinTip() {
+            const tipElement = document.getElementById('goblinTip');
+            if (!tipElement) return;
+            const randomTip = GOBLIN_TIPS[Math.floor(Math.random() * GOBLIN_TIPS.length)];
+            tipElement.textContent = randomTip;
+        }
+
+        async function initPage() {
+            // Гидратация всех данных с сервера
+            await hydrateMainTrackerFromServer();
+            await hydrateProfileFromServer();
+            await hydrateCourseFromServer();
+            renderTasks();
+            syncGameXP();
+            updateDisplay();
+            updateCurrentDayDisplay();
+            updateJourneyTracker();
+            renderDayNavigator();
+            bindEasterEggs();
+        }
+
+        initPage();
+
+        // Update journey tracker every second (timer countdown)
+        setInterval(updateJourneyTracker, 1000);
+        
+        // Обновляй таймер дня каждую секунду (минутная точность)
+        setInterval(updateDayTimer, 1000);
+        
+        // Обновляй совет гоблина каждые 5 секунд
+        setInterval(updateGoblinTip, 5000);
+    </script>
+</body>
+</html>

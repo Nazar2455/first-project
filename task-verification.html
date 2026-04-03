@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ Проверка заданий | 30-дневный план</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0f0f1e, #1a0a2e, #16213e);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            background: rgba(20, 30, 50, 0.9);
+            border: 2px solid #ffd700;
+            border-radius: 12px;
+            padding: 14px 18px;
+        }
+
+        .title {
+            font-size: 1.4em;
+            font-weight: 800;
+            color: #ffd700;
+        }
+
+        .top-stats {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255,215,0,0.15);
+            border: 1px solid rgba(255,215,0,0.4);
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-weight: 700;
+            color: #ffed4e;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+
+        .panel {
+            background: linear-gradient(135deg, rgba(20, 30, 50, 0.95), rgba(30, 40, 70, 0.9));
+            border: 1px solid rgba(102,126,234,0.5);
+            border-radius: 14px;
+            padding: 16px;
+        }
+
+        .panel h2 {
+            font-size: 1.05em;
+            color: #ffd700;
+            margin-bottom: 12px;
+        }
+
+        .hint {
+            color: #b0c4de;
+            font-size: 0.92em;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .module {
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+            background: rgba(255,255,255,0.03);
+        }
+
+        .module:last-child { margin-bottom: 0; }
+
+        .module-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .module-title {
+            font-weight: 800;
+            color: #d9e4ff;
+        }
+
+        .reward {
+            font-size: 0.85em;
+            font-weight: 800;
+            color: #ffd700;
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.35);
+            border-radius: 999px;
+            padding: 4px 10px;
+        }
+
+        .req {
+            margin-bottom: 8px;
+            display: grid;
+            gap: 6px;
+        }
+
+        .req label {
+            font-size: 0.88em;
+            color: #cfdaf1;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-family: inherit;
+            font-size: 0.9em;
+        }
+
+        textarea { min-height: 72px; resize: vertical; }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            border: 1px solid #ffd700;
+            background: rgba(255,215,0,0.1);
+            color: #ffd700;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .btn:hover { transform: translateY(-1px); background: rgba(255,215,0,0.2); }
+        .btn.alt { border-color: #667eea; color: #cdd8ff; background: rgba(102,126,234,0.12); }
+        .btn.done { border-color: #00c853; color: #81f1a7; background: rgba(0,200,83,0.12); cursor: default; }
+
+        .status-ok { color: #81f1a7; font-weight: 700; }
+        .status-warn { color: #ffd28a; font-weight: 700; }
+        .status-bad { color: #ff9aa6; font-weight: 700; }
+
+        .feedback {
+            margin-top: 8px;
+            border: 1px dashed rgba(255,255,255,0.18);
+            border-radius: 8px;
+            padding: 8px 10px;
+            background: rgba(255,255,255,0.03);
+            font-size: 0.84em;
+            color: #cdd9f4;
+        }
+
+        .feedback-list {
+            margin: 6px 0 0 18px;
+            display: grid;
+            gap: 4px;
+        }
+
+        .quest-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 10px;
+        }
+
+        .quest {
+            border: 1px solid rgba(240,147,251,0.35);
+            border-radius: 10px;
+            padding: 10px;
+            background: rgba(240,147,251,0.08);
+        }
+
+        .quest h4 {
+            color: #f8c0ff;
+            font-size: 0.95em;
+            margin-bottom: 6px;
+        }
+
+        .small {
+            font-size: 0.82em;
+            color: #b7c5e9;
+        }
+
+        .toast {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            background: rgba(12,18,34,0.95);
+            border: 1px solid rgba(255,215,0,0.4);
+            border-radius: 10px;
+            padding: 10px 12px;
+            color: #fff7c2;
+            z-index: 1000;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+        }
+
+        @media (max-width: 768px) {
+            .title { font-size: 1.1em; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="topbar">
+        <div class="title">✅ Страница проверки выполнения</div>
+        <div class="top-stats">
+            <div class="badge">LVL: <span id="lvl">1</span></div>
+            <div class="badge">Монеты: <span id="coins">0</span></div>
+            <div class="badge">Проверено модулей: <span id="verifiedCount">0</span></div>
+        </div>
+        <div class="row">
+            <button class="btn alt" onclick="goMain()">⬅️ Назад в план</button>
+            <button class="btn alt" onclick="goDungeon()">🎮 Code Dungeon</button>
+            <button class="btn alt" onclick="goProfile()">👤 Профиль</button>
+        </div>
+    </div>
+
+    <div class="layout">
+        <section class="panel">
+            <h2>🎯 Проверка на готовность к доходу</h2>
+            <p class="hint">Здесь ты не просто ставишь галочки, а доказываешь результат. Когда критерии выполнены, получаешь монеты (XP), которые синхронизируются с основным планом.</p>
+            <div id="modules"></div>
+        </section>
+
+        <section class="panel">
+            <h2>🧪 Дополнительная практика (с наградами)</h2>
+            <p class="hint">Это усилители навыка и дохода. Выполнил, приложил доказательство, забрал монеты.</p>
+            <div class="quest-grid" id="extraQuests"></div>
+        </section>
+
+        <section class="panel">
+            <h2>🫶 Анти-выгорание режим (буфер-дни + темп)</h2>
+            <p class="hint">Не рвёмся на спринте до травмы. Настрой лимит задач в день и буфер-дни — система сама пересчитает темп.</p>
+            <div class="req">
+                <label>Максимум задач в день (рекомендуем 4-8)</label>
+                <input id="burnMaxDaily" type="text" placeholder="например 6">
+            </div>
+            <div class="req">
+                <label>План буфер-дней на месяц (0-6)</label>
+                <input id="burnBufferDays" type="text" placeholder="например 4">
+            </div>
+            <div class="req">
+                <label>Использовано буфер-дней</label>
+                <input id="burnUsedDays" type="text" placeholder="например 1">
+            </div>
+            <div class="row">
+                <button class="btn" onclick="recalcBurnoutPlan()">Пересчитать темп</button>
+                <button class="btn alt" onclick="markBufferDayUsed()">+1 буфер использован</button>
+            </div>
+            <div id="burnoutResult" class="hint" style="margin-top:10px;"></div>
+        </section>
+
+        <section class="panel">
+            <h2>📈 Реалистичный контроль дохода</h2>
+            <p class="hint">Цель $1000 возможна, но это воронка. Следи за цифрами: отклики → диалоги → заказы → средний чек.</p>
+            <div class="req">
+                <label>Сколько откликов отправил за 7 дней?</label>
+                <input id="mReplies" type="text" placeholder="например 70">
+            </div>
+            <div class="req">
+                <label>Сколько диалогов получил?</label>
+                <input id="mDialogs" type="text" placeholder="например 12">
+            </div>
+            <div class="req">
+                <label>Сколько заказов закрыл?</label>
+                <input id="mDeals" type="text" placeholder="например 3">
+            </div>
+            <div class="req">
+                <label>Средний чек ($)</label>
+                <input id="mCheck" type="text" placeholder="например 120">
+            </div>
+            <div class="row">
+                <button class="btn" onclick="estimateIncome()">Рассчитать прогноз</button>
+                <span id="incomeResult" class="small"></span>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>🚦 Готовность к первому клиенту (скоринг)</h2>
+            <p class="hint">Итоговый статус считает прогресс, проверенные модули, практику и продажи. Это твой реальный индикатор «можно брать заказ».</p>
+            <div class="row" style="margin-bottom:10px;">
+                <button class="btn" onclick="recalcReadinessScore()">Обновить скоринг</button>
+            </div>
+            <div id="readinessScore" class="badge" style="display:inline-block; margin-bottom:10px;">Score: 0/100</div>
+            <div id="readinessVerdict" class="hint"></div>
+            <div id="readinessAdvice" class="small"></div>
+        </section>
+    </div>
+</div>
+
+<script src="api-client.js"></script>
+<script>
+const GAME_STATE = {
+    points: parseInt(localStorage.getItem('points') || '0'),
+    level: parseInt(localStorage.getItem('level') || '1'),
+    completed: JSON.parse(localStorage.getItem('completed') || '{}')
+};
+
+const API_BASE = localStorage.getItem('planApiBase') || 'http://127.0.0.1:8000/api';
+
+const VERIFICATION_STATE = JSON.parse(localStorage.getItem('verificationState') || '{"modules":{},"quests":{}}');
+const VERIFICATION_DRAFTS = JSON.parse(localStorage.getItem('verificationDrafts') || '{}');
+const BURNOUT_STATE = JSON.parse(localStorage.getItem('burnoutState') || '{"maxDaily":6,"bufferDays":4,"usedBufferDays":0}');
+const START_DATE = new Date(2026, 2, 31);
+const TOTAL_TASKS = 240;
+
+async function apiRequest(path, options = {}) {
+    if (window.PlanApiClient?.request) {
+        return window.PlanApiClient.request(path, options, API_BASE);
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+
+    try {
+        const response = await fetch(`${API_BASE}${path}`, {
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...(options.headers || {})
+            },
+            signal: controller.signal
+        });
+
+        if (!response.ok) return null;
+        return await response.json();
+    } catch (_) {
+        return null;
+    } finally {
+        clearTimeout(timeout);
+    }
+}
+
+async function hydrateVerificationFromServer() {
+    const [mainState, verificationState, burnoutState] = await Promise.all([
+        apiRequest('/state/main_tracker'),
+        apiRequest('/state/verification'),
+        apiRequest('/state/burnout')
+    ]);
+
+    if (mainState?.value && typeof mainState.value === 'object') {
+        const incoming = mainState.value;
+        if (typeof incoming.points === 'number') GAME_STATE.points = incoming.points;
+        if (typeof incoming.level === 'number') GAME_STATE.level = incoming.level;
+        if (incoming.completed && typeof incoming.completed === 'object') GAME_STATE.completed = incoming.completed;
+    }
+
+    if (verificationState?.value && typeof verificationState.value === 'object') {
+        const incoming = verificationState.value;
+
+        if (incoming.modules && typeof incoming.modules === 'object') {
+            Object.keys(VERIFICATION_STATE.modules || {}).forEach(k => delete VERIFICATION_STATE.modules[k]);
+            Object.assign(VERIFICATION_STATE.modules, incoming.modules);
+        }
+
+        if (incoming.quests && typeof incoming.quests === 'object') {
+            Object.keys(VERIFICATION_STATE.quests || {}).forEach(k => delete VERIFICATION_STATE.quests[k]);
+            Object.assign(VERIFICATION_STATE.quests, incoming.quests);
+        }
+
+        if (incoming.drafts && typeof incoming.drafts === 'object') {
+            Object.keys(VERIFICATION_DRAFTS).forEach(k => delete VERIFICATION_DRAFTS[k]);
+            Object.assign(VERIFICATION_DRAFTS, incoming.drafts);
+        }
+    }
+
+    if (burnoutState?.value && typeof burnoutState.value === 'object') {
+        const incoming = burnoutState.value;
+        if (typeof incoming.maxDaily === 'number') BURNOUT_STATE.maxDaily = incoming.maxDaily;
+        if (typeof incoming.bufferDays === 'number') BURNOUT_STATE.bufferDays = incoming.bufferDays;
+        if (typeof incoming.usedBufferDays === 'number') BURNOUT_STATE.usedBufferDays = incoming.usedBufferDays;
+    }
+
+    saveAll();
+}
+
+async function syncVerificationToServer() {
+    const verificationPayload = {
+        modules: VERIFICATION_STATE.modules,
+        quests: VERIFICATION_STATE.quests,
+        drafts: VERIFICATION_DRAFTS
+    };
+
+    const burnoutPayload = {
+        maxDaily: BURNOUT_STATE.maxDaily,
+        bufferDays: BURNOUT_STATE.bufferDays,
+        usedBufferDays: BURNOUT_STATE.usedBufferDays
+    };
+
+    const mainPayload = {
+        points: GAME_STATE.points,
+        level: GAME_STATE.level,
+        completed: GAME_STATE.completed
+    };
+
+    await Promise.all([
+        apiRequest('/state/verification', {
+            method: 'PUT',
+            body: JSON.stringify({ value: verificationPayload })
+        }),
+        apiRequest('/state/burnout', {
+            method: 'PUT',
+            body: JSON.stringify({ value: burnoutPayload })
+        }),
+        apiRequest('/state/main_tracker', {
+            method: 'PUT',
+            body: JSON.stringify({ value: mainPayload })
+        })
+    ]);
+}
+
+const MODULES = [
+    {
+        id: 'mvp-bot',
+        title: '🤖 Bot MVP готов к клиенту',
+        reward: 220,
+        checks: [
+            { key: 'auto_tasks16', label: 'Авто: выполнено минимум 16 задач в трекере', type: 'auto' },
+            { key: 'link_repo_bot', label: 'Ссылка на GitHub-репозиторий бота', type: 'text' },
+            { key: 'link_video_bot', label: 'Ссылка на демо-видео (или скринкаст)', type: 'text' }
+        ]
+    },
+    {
+        id: 'mvp-parser',
+        title: '🕷️ Parser MVP с экспортом',
+        reward: 220,
+        checks: [
+            { key: 'auto_parser_tasks', label: 'Авто: минимум 8 parsing-задач выполнено', type: 'auto' },
+            { key: 'proof_csv', label: 'Ссылка/путь на CSV результат', type: 'text' },
+            { key: 'proof_filters', label: 'Кратко: какие фильтры реализованы', type: 'textarea' }
+        ]
+    },
+    {
+        id: 'deploy-proof',
+        title: '🚀 Деплой и стабильность',
+        reward: 260,
+        checks: [
+            { key: 'auto_has_deploy', label: 'Авто: есть выполненные задачи с Deploy/Render/Railway', type: 'auto' },
+            { key: 'link_live', label: 'Ссылка на живой сервис / доказательство uptime', type: 'text' },
+            { key: 'error_policy', label: 'Опиши обработку ошибок (2-3 предложения)', type: 'textarea' }
+        ]
+    },
+    {
+        id: 'sales-readiness',
+        title: '💰 Готовность к первым продажам',
+        reward: 300,
+        checks: [
+            { key: 'auto_full_day', label: 'Авто: закрыт хотя бы 1 полный день (8/8)', type: 'auto' },
+            { key: 'offers_text', label: 'Вставь 2 шаблона отклика', type: 'textarea' },
+            { key: 'portfolio_link', label: 'Ссылка на кейс/портфолио', type: 'text' }
+        ]
+    }
+];
+
+const EXTRA_QUESTS = [
+    { id: 'q-debug', title: '🐞 Debug Sprint', reward: 90, desc: 'Почини 3 разных бага и опиши причины + фиксы.' },
+    { id: 'q-api', title: '🔌 API Practice', reward: 120, desc: 'Сделай мини-интеграцию с внешним API и лог ошибок.' },
+    { id: 'q-oop', title: '🏗️ OOP Mini', reward: 110, desc: 'Создай 2 класса и вынеси бизнес-логику в методы.' },
+    { id: 'q-sales20', title: '📨 20 откликов', reward: 140, desc: 'Сделай 20 персональных откликов за 48 часов.' },
+    { id: 'q-case', title: '🎬 Кейс + видео', reward: 100, desc: 'Упакуй 1 кейс: README + 60-сек демо.' }
+];
+
+function saveAll() {
+    localStorage.setItem('points', GAME_STATE.points);
+    localStorage.setItem('level', GAME_STATE.level);
+    localStorage.setItem('verificationState', JSON.stringify(VERIFICATION_STATE));
+    localStorage.setItem('verificationDrafts', JSON.stringify(VERIFICATION_DRAFTS));
+    localStorage.setItem('burnoutState', JSON.stringify(BURNOUT_STATE));
+    void syncVerificationToServer();
+}
+
+function recalcLevel() {
+    GAME_STATE.level = Math.floor(GAME_STATE.points / 500) + 1;
+}
+
+function toast(msg) {
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2400);
+}
+
+function isFullDayCompleted(day) {
+    for (let i = 0; i < 4; i++) {
+        if (!GAME_STATE.completed[`day-${day}-bots-${i}`]) return false;
+        if (!GAME_STATE.completed[`day-${day}-parsing-${i}`]) return false;
+    }
+    return true;
+}
+
+function autoCheck(key) {
+    const completedKeys = Object.keys(GAME_STATE.completed);
+    if (key === 'auto_tasks16') return completedKeys.length >= 16;
+    if (key === 'auto_parser_tasks') return completedKeys.filter(k => k.includes('-parsing-')).length >= 8;
+    if (key === 'auto_has_deploy') {
+        return completedKeys.some(k => {
+            return [8,9,15,16,17].some(day => k.startsWith(`day-${day}-`));
+        });
+    }
+    if (key === 'auto_full_day') {
+        for (let day = 1; day <= 30; day++) if (isFullDayCompleted(day)) return true;
+        return false;
+    }
+    return false;
+}
+
+function addCoins(amount, reason) {
+    GAME_STATE.points += amount;
+    recalcLevel();
+    saveAll();
+    renderHeader();
+    toast(`+${amount} монет: ${reason}`);
+}
+
+function renderHeader() {
+    document.getElementById('lvl').textContent = GAME_STATE.level;
+    document.getElementById('coins').textContent = GAME_STATE.points;
+    const verified = Object.keys(VERIFICATION_STATE.modules || {}).length;
+    document.getElementById('verifiedCount').textContent = verified;
+}
+
+function moduleInputId(moduleId, checkKey) {
+    return `${moduleId}__${checkKey}`;
+}
+
+function getDraft(moduleId, checkKey) {
+    return VERIFICATION_DRAFTS?.[moduleId]?.[checkKey] || '';
+}
+
+function setDraft(moduleId, checkKey, value) {
+    if (!VERIFICATION_DRAFTS[moduleId]) VERIFICATION_DRAFTS[moduleId] = {};
+    VERIFICATION_DRAFTS[moduleId][checkKey] = value;
+    saveAll();
+}
+
+function isLikelyLinkOrPath(value) {
+    const v = (value || '').trim();
+    if (!v) return false;
+    return /^https?:\/\//i.test(v) || /[\\/]/.test(v) || /\.csv$/i.test(v) || /github\.com/i.test(v);
+}
+
+function nonEmptyLinesCount(value) {
+    return String(value || '')
+        .split('\n')
+        .map(s => s.trim())
+        .filter(Boolean)
+        .length;
+}
+
+function keywordHits(value, keywords) {
+    const text = (value || '').toLowerCase();
+    return keywords.filter(k => text.includes(k)).length;
+}
+
+function validateManualCheck(moduleId, check) {
+    const inputId = moduleInputId(moduleId, check.key);
+    const el = document.getElementById(inputId);
+    const value = (el?.value || '').trim();
+
+    if (!value) {
+        return { ok: false, reason: `Поле «${check.label}» пустое` };
+    }
+
+    const linkKeys = ['link_repo_bot', 'link_video_bot', 'proof_csv', 'link_live', 'portfolio_link'];
+    if (linkKeys.includes(check.key)) {
+        if (value.length < 8) return { ok: false, reason: `Слишком короткое значение для «${check.label}»` };
+        if (!isLikelyLinkOrPath(value)) return { ok: false, reason: `«${check.label}» не похоже на ссылку/путь` };
+        if (check.key === 'proof_csv' && !/\.csv/i.test(value)) {
+            return { ok: false, reason: 'Для CSV-доказательства укажи путь/ссылку с .csv' };
+        }
+        return { ok: true };
+    }
+
+    if (check.key === 'offers_text') {
+        if (value.length < 80) return { ok: false, reason: 'Шаблоны откликов слишком короткие (минимум 80 символов)' };
+        if (nonEmptyLinesCount(value) < 2) return { ok: false, reason: 'Нужно минимум 2 отдельных шаблона отклика (2 строки)' };
+        return { ok: true };
+    }
+
+    if (check.key === 'proof_filters') {
+        const hits = keywordHits(value, ['цена', 'price', 'min', 'max', 'город', 'дата', 'категор', 'rating', 'фильтр']);
+        if (value.length < 40) return { ok: false, reason: 'Слишком короткое описание фильтров (минимум 40 символов)' };
+        if (hits < 2) return { ok: false, reason: 'Укажи конкретику: хотя бы 2 фильтра/критерия' };
+        return { ok: true };
+    }
+
+    if (check.key === 'error_policy') {
+        const hits = keywordHits(value, ['try', 'except', 'лог', 'log', 'retry', 'timeout', 'fallback']);
+        if (value.length < 90) return { ok: false, reason: 'Опиши обработку ошибок подробнее (минимум 90 символов)' };
+        if (hits < 2) return { ok: false, reason: 'Добавь 2+ конкретных механизма (например try/except, retry, логи)' };
+        return { ok: true };
+    }
+
+    if (check.type === 'textarea' && value.length < 30) {
+        return { ok: false, reason: `Слишком короткий ответ для «${check.label}» (минимум 30 символов)` };
+    }
+
+    if (check.type === 'text' && value.length < 6) {
+        return { ok: false, reason: `Слишком короткий ввод для «${check.label}»` };
+    }
+
+    return { ok: true };
+}
+
+function setModuleFeedback(moduleId, html, isError = false) {
+    const el = document.getElementById(`moduleFeedback_${moduleId}`);
+    if (!el) return;
+    el.innerHTML = html;
+    el.className = `feedback ${isError ? 'status-bad' : ''}`;
+}
+
+function renderModules() {
+    const root = document.getElementById('modules');
+    root.innerHTML = '';
+
+    MODULES.forEach(module => {
+        const isDone = !!VERIFICATION_STATE.modules[module.id];
+        const box = document.createElement('div');
+        box.className = 'module';
+
+        let inner = `
+            <div class="module-head">
+                <div class="module-title">${module.title}</div>
+                <div class="reward">Награда: +${module.reward} 🪙</div>
+            </div>
+        `;
+
+        module.checks.forEach(ch => {
+            if (ch.type === 'auto') {
+                const ok = autoCheck(ch.key);
+                inner += `
+                    <div class="req">
+                        <label>${ch.label}</label>
+                        <div class="${ok ? 'status-ok' : 'status-warn'}">${ok ? '✅ Условие выполнено' : '⚠️ Пока не выполнено'}</div>
+                    </div>
+                `;
+            } else if (ch.type === 'textarea') {
+                inner += `
+                    <div class="req">
+                        <label>${ch.label}</label>
+                        <textarea id="${moduleInputId(module.id, ch.key)}" placeholder="Вставь доказательство/описание"></textarea>
+                    </div>
+                `;
+            } else {
+                inner += `
+                    <div class="req">
+                        <label>${ch.label}</label>
+                        <input id="${moduleInputId(module.id, ch.key)}" type="text" placeholder="https://... или краткое доказательство">
+                    </div>
+                `;
+            }
+        });
+
+        inner += `<div class="row">`;
+        if (isDone) {
+            inner += `<button class="btn done">✅ Награда получена</button>`;
+        } else {
+            inner += `<button class="btn" onclick="verifyModule('${module.id}')">Проверить и получить награду</button>`;
+        }
+        inner += `</div>`;
+        inner += `<div class="feedback" id="moduleFeedback_${module.id}">Проверка ждёт доказательства и авто-критерии.</div>`;
+
+        box.innerHTML = inner;
+        root.appendChild(box);
+
+        module.checks.forEach(ch => {
+            if (ch.type === 'auto') return;
+            const input = document.getElementById(moduleInputId(module.id, ch.key));
+            if (!input) return;
+            const draft = getDraft(module.id, ch.key);
+            if (draft) input.value = draft;
+            input.addEventListener('input', () => setDraft(module.id, ch.key, input.value));
+        });
+
+        if (isDone) {
+            const doneAt = new Date(VERIFICATION_STATE.modules[module.id].at).toLocaleString('ru-RU');
+            setModuleFeedback(module.id, `✅ Модуль подтверждён. Награда выдана: +${module.reward} 🪙 (${doneAt})`);
+        }
+    });
+}
+
+function verifyModule(moduleId) {
+    const module = MODULES.find(m => m.id === moduleId);
+    if (!module || VERIFICATION_STATE.modules[moduleId]) return;
+
+    let allGood = true;
+    const failReasons = [];
+
+    for (const ch of module.checks) {
+        if (ch.type === 'auto') {
+            if (!autoCheck(ch.key)) {
+                allGood = false;
+                failReasons.push(`Не выполнен авто-критерий: ${ch.label}`);
+            }
+        } else {
+            const checkResult = validateManualCheck(module.id, ch);
+            if (!checkResult.ok) {
+                allGood = false;
+                failReasons.push(checkResult.reason);
+            }
+        }
+    }
+
+    if (!allGood) {
+        const list = failReasons.map(r => `<li>${r}</li>`).join('');
+        setModuleFeedback(moduleId, `❌ Модуль не принят. Что исправить:<ul class="feedback-list">${list}</ul>`, true);
+        toast('Проверка не пройдена: смотри список, что исправить');
+        return;
+    }
+
+    VERIFICATION_STATE.modules[moduleId] = {
+        at: new Date().toISOString(),
+        reward: module.reward
+    };
+    addCoins(module.reward, module.title);
+    saveAll();
+    renderModules();
+}
+
+function renderExtraQuests() {
+    const root = document.getElementById('extraQuests');
+    root.innerHTML = '';
+
+    EXTRA_QUESTS.forEach(q => {
+        const done = !!VERIFICATION_STATE.quests[q.id];
+        const item = document.createElement('div');
+        item.className = 'quest';
+        item.innerHTML = `
+            <h4>${q.title}</h4>
+            <p class="small" style="margin-bottom:8px;">${q.desc}</p>
+            <div class="small" style="margin-bottom:6px;">Награда: +${q.reward} 🪙</div>
+            <textarea id="proof_${q.id}" placeholder="Короткое доказательство (что сделал, где посмотреть)"></textarea>
+            <div class="row" style="margin-top:8px;">
+                ${done ? '<button class="btn done">✅ Получено</button>' : `<button class="btn" onclick="claimQuest('${q.id}')">Забрать награду</button>`}
+            </div>
+        `;
+        root.appendChild(item);
+    });
+}
+
+function claimQuest(id) {
+    const quest = EXTRA_QUESTS.find(q => q.id === id);
+    if (!quest || VERIFICATION_STATE.quests[id]) return;
+
+    const proof = document.getElementById(`proof_${id}`);
+    const proofText = (proof?.value || '').trim();
+    const detailScore = proofText.length;
+    const hasEvidenceShape = /https?:\/\//i.test(proofText) || /\d/.test(proofText) || /fix|commit|issue|readme|csv|видео|скрин/i.test(proofText);
+
+    if (!proofText) {
+        toast('Добавь доказательство выполнения для этого квеста');
+        return;
+    }
+
+    if (detailScore < 25 || !hasEvidenceShape) {
+        toast('Доказательство слишком слабое: добавь конкретику (ссылка/цифры/что именно сделал)');
+        return;
+    }
+
+    VERIFICATION_STATE.quests[id] = {
+        at: new Date().toISOString(),
+        proof: proofText,
+        reward: quest.reward
+    };
+
+    addCoins(quest.reward, quest.title);
+    saveAll();
+    renderExtraQuests();
+    renderHeader();
+}
+
+function estimateIncome() {
+    const replies = parseInt(document.getElementById('mReplies').value || '0');
+    const dialogs = parseInt(document.getElementById('mDialogs').value || '0');
+    const deals = parseInt(document.getElementById('mDeals').value || '0');
+    const avgCheck = parseInt(document.getElementById('mCheck').value || '0');
+
+    const conv1 = replies > 0 ? ((dialogs / replies) * 100).toFixed(1) : '0.0';
+    const conv2 = dialogs > 0 ? ((deals / dialogs) * 100).toFixed(1) : '0.0';
+    const income = deals * avgCheck;
+
+    let verdict = 'Стартовая динамика';
+    if (income >= 1000) verdict = 'Цель $1000 достижима при сохранении темпа';
+    else if (income >= 500) verdict = 'Неплохой прогресс, усили продажи и упаковку';
+    else verdict = 'Фокус на откликах и кейсах: нужен разгон воронки';
+
+    document.getElementById('incomeResult').textContent = `Прогноз: $${income} | reply→dialog ${conv1}% | dialog→deal ${conv2}% | ${verdict}`;
+
+    recalcReadinessScore();
+}
+
+function getCurrentDay() {
+    const now = new Date();
+    const start = new Date(START_DATE);
+    start.setHours(0, 0, 0, 0);
+    now.setHours(0, 0, 0, 0);
+    const diffDays = Math.floor((now - start) / (1000 * 60 * 60 * 24)) + 1;
+    return Math.min(Math.max(diffDays, 1), 30);
+}
+
+function recalcBurnoutPlan() {
+    const maxDailyInput = parseInt(document.getElementById('burnMaxDaily').value || `${BURNOUT_STATE.maxDaily}`);
+    const bufferDaysInput = parseInt(document.getElementById('burnBufferDays').value || `${BURNOUT_STATE.bufferDays}`);
+    const usedDaysInput = parseInt(document.getElementById('burnUsedDays').value || `${BURNOUT_STATE.usedBufferDays}`);
+
+    BURNOUT_STATE.maxDaily = Math.min(Math.max(isNaN(maxDailyInput) ? 6 : maxDailyInput, 2), 12);
+    BURNOUT_STATE.bufferDays = Math.min(Math.max(isNaN(bufferDaysInput) ? 4 : bufferDaysInput, 0), 10);
+    BURNOUT_STATE.usedBufferDays = Math.min(Math.max(isNaN(usedDaysInput) ? 0 : usedDaysInput, 0), BURNOUT_STATE.bufferDays);
+
+    const completed = Object.keys(GAME_STATE.completed).length;
+    const remainingTasks = Math.max(0, TOTAL_TASKS - completed);
+    const currentDay = getCurrentDay();
+    const rawRemainingDays = Math.max(1, 30 - currentDay + 1);
+    const remainingBuffer = Math.max(0, BURNOUT_STATE.bufferDays - BURNOUT_STATE.usedBufferDays);
+    const effectiveWorkDays = Math.max(1, rawRemainingDays - remainingBuffer);
+    const idealPerDay = Math.ceil(remainingTasks / effectiveWorkDays);
+    const suggestedDaily = Math.min(idealPerDay, BURNOUT_STATE.maxDaily);
+
+    const capacityLeft = effectiveWorkDays * BURNOUT_STATE.maxDaily;
+    const feasible = capacityLeft >= remainingTasks;
+
+    const expectedByToday = currentDay * 8;
+    const paceDelta = completed - expectedByToday;
+    let paceText = 'На темпе';
+    if (paceDelta >= 8) paceText = 'Идёшь быстрее графика ✅';
+    else if (paceDelta <= -8) paceText = 'Ниже темпа, включай буфер-план ⚠️';
+
+    const result = document.getElementById('burnoutResult');
+    result.innerHTML = `
+        День: <b>${currentDay}/30</b><br>
+        Выполнено: <b>${completed}/${TOTAL_TASKS}</b>, осталось: <b>${remainingTasks}</b><br>
+        Рабочих дней (с учетом буфера): <b>${effectiveWorkDays}</b><br>
+        Нужный темп: <b>${idealPerDay}</b>/день, рекомендуемый с лимитом: <b>${suggestedDaily}</b>/день<br>
+        Оценка плана: <b>${feasible ? 'Реалистично ✅' : 'Нереалистично в текущем темпе ❗'}</b><br>
+        Текущий статус: <b>${paceText}</b>
+    `;
+
+    saveAll();
+}
+
+function markBufferDayUsed() {
+    BURNOUT_STATE.usedBufferDays = Math.min(BURNOUT_STATE.usedBufferDays + 1, BURNOUT_STATE.bufferDays);
+    document.getElementById('burnUsedDays').value = BURNOUT_STATE.usedBufferDays;
+    recalcBurnoutPlan();
+}
+
+function recalcReadinessScore() {
+    const completed = Object.keys(GAME_STATE.completed).length;
+    const modulesDone = Object.keys(VERIFICATION_STATE.modules || {}).length;
+    const questsDone = Object.keys(VERIFICATION_STATE.quests || {}).length;
+
+    const replies = parseInt(document.getElementById('mReplies')?.value || '0') || 0;
+    const dialogs = parseInt(document.getElementById('mDialogs')?.value || '0') || 0;
+    const deals = parseInt(document.getElementById('mDeals')?.value || '0') || 0;
+
+    const progressScore = Math.min(30, (completed / TOTAL_TASKS) * 30);
+    const moduleScore = Math.min(30, (modulesDone / MODULES.length) * 30);
+    const questScore = Math.min(10, (questsDone / EXTRA_QUESTS.length) * 10);
+
+    const replyToDialog = replies > 0 ? dialogs / replies : 0;
+    const dialogToDeal = dialogs > 0 ? deals / dialogs : 0;
+    const salesScore = Math.min(20, replyToDialog * 8 + dialogToDeal * 12 + Math.min(deals, 3));
+
+    const deployDone = VERIFICATION_STATE.modules?.['deploy-proof'] ? 1 : 0;
+    const bonusScore = deployDone ? 10 : 0;
+
+    const total = Math.round(progressScore + moduleScore + questScore + salesScore + bonusScore);
+
+    let verdict = 'Пока рано брать платный заказ';
+    let advice = 'Фокус: закрыть модули MVP + деплой + 20 откликов.';
+
+    if (total >= 80) {
+        verdict = 'Готов к первому клиенту ✅';
+        advice = 'Бери заказ малого/среднего чека, но строго с четким ТЗ и дедлайном.';
+    } else if (total >= 60) {
+        verdict = 'Почти готов ⚡';
+        advice = 'Добей 1-2 модуля верификации и усили конверсию откликов.';
+    } else if (total >= 40) {
+        verdict = 'База есть, но нужна шлифовка';
+        advice = 'Подтверди результаты кейсами и введи стабильный дневной темп.';
+    }
+
+    document.getElementById('readinessScore').textContent = `Score: ${total}/100`;
+    document.getElementById('readinessVerdict').innerHTML = `Статус: <b>${verdict}</b>`;
+    document.getElementById('readinessAdvice').textContent = `Рекомендация: ${advice}`;
+}
+
+function initBurnoutInputs() {
+    document.getElementById('burnMaxDaily').value = BURNOUT_STATE.maxDaily;
+    document.getElementById('burnBufferDays').value = BURNOUT_STATE.bufferDays;
+    document.getElementById('burnUsedDays').value = BURNOUT_STATE.usedBufferDays;
+}
+
+function goMain() { window.location.href = '30d-main-tasks.html'; }
+function goDungeon() { window.location.href = 'code-dungeon.html'; }
+function goProfile() { window.location.href = 'character-profile.html'; }
+
+async function initPage() {
+    await hydrateVerificationFromServer();
+    renderHeader();
+    renderModules();
+    renderExtraQuests();
+    initBurnoutInputs();
+    recalcBurnoutPlan();
+    recalcReadinessScore();
+}
+
+initPage();
+</script>
+</body>
+</html>

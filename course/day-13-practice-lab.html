@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Модуль 13 · Практикум (bot-template + parser-template)</title>
+	<style>
+		* { box-sizing: border-box; margin: 0; padding: 0; }
+		@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+		body { font-family:'Montserrat',sans-serif; background:linear-gradient(135deg,#0f0f1e,#1a0a2e,#16213e); color:#eaf2ff; min-height:100vh; padding:20px; }
+		.wrap { max-width:1100px; margin:0 auto; }
+		.card { background:rgba(19,28,46,.86); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:18px; margin-bottom:14px; }
+		h1 { color:#ffed4e; margin-bottom:8px; }
+		h2 { color:#56e8ff; font-size:1.14em; margin-bottom:8px; }
+		h3 { color:#9ec0ff; font-size:1em; margin:10px 0 7px; }
+		p, li { color:#d7e6ff; line-height:1.6; }
+		ul, ol { margin-left:20px; margin-top:8px; }
+		.hint { border-left:3px solid #ffd700; background:rgba(255,215,0,.08); border-radius:8px; padding:10px 12px; margin-top:8px; font-size:.92em; }
+		.actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+		.btn { display:inline-block; text-decoration:none; border:1px solid rgba(255,215,0,.45); border-radius:10px; background:rgba(255,215,0,.12); color:#ffed4e; font-weight:700; padding:9px 12px; cursor:pointer; }
+		.btn.alt { border-color:rgba(86,232,255,.55); color:#56e8ff; background:rgba(86,232,255,.12); }
+		.codebox { margin-top:10px; border:1px solid rgba(102,126,234,.35); border-radius:10px; overflow:hidden; background:#0b1220; }
+		.codebox-title { background:rgba(102,126,234,.12); color:#9ec0ff; font-size:.8em; font-weight:700; padding:8px 10px; border-bottom:1px solid rgba(102,126,234,.25); }
+		textarea { width:100%; min-height:190px; border:none; resize:vertical; padding:12px; font-family:Consolas,'Courier New',monospace; font-size:.88em; line-height:1.45; color:#e7f1ff; background:#0b1220; outline:none; }
+		.checks { margin-top:10px; display:grid; gap:6px; font-size:.92em; }
+		.ok { color:#6ff3a3; } .bad { color:#ff8f8f; } .warn { color:#ffd78a; }
+		.result { margin-top:10px; border-radius:10px; padding:10px 12px; font-size:.92em; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.03); }
+		.status-pill { display:inline-block; margin-top:8px; border:1px solid rgba(255,215,0,.45); border-radius:999px; padding:4px 10px; color:#ffed4e; font-size:.8em; font-weight:700; background:rgba(255,215,0,.1); }
+	</style>
+	<link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+	<div class="wrap">
+		<section class="card">
+			<h1>🧪 Модуль 13 · Практикум</h1>
+			<p>Собираем reusable-архитектуру: bot-template и parser-template с измеримой скоростью старта.</p>
+			<div class="actions">
+				<a class="btn" href="day-13-index.html">← Теория Модуля 13</a>
+				<a class="btn alt" href="index.html">Ко всем модулям</a>
+				<a class="btn" href="day-14-index.html">День 14 →</a>
+			</div>
+			<div class="course-top-tools">
+				<button id="readToggleBtn" class="read-toggle-btn" type="button">📘 Отметить день как прочитанный</button>
+				<span class="status-pill">Практика дня 13</span>
+			</div>
+		</section>
+
+		<section class="card">
+			<h2>🤖 БОТЫ: bot-template</h2>
+			<p><strong>Цель:</strong> превратить набор файлов в переиспользуемый шаблон, с которым новый бот стартует быстрее и стабильнее.</p>
+			<p><strong>Связь с теорией дня 13:</strong> закрепляешь слоистую архитектуру, единую сборку приложения и fail-fast конфиг.</p>
+			<div class="hint"><strong>Фокус на смысл:</strong> шаблон нужен, чтобы экономить время на каждом новом проекте и снижать количество повторяющихся ошибок.</div>
+			<h3>Что нужно сделать (конкретно)</h3>
+			<ol>
+				<li>Есть слои handlers/services/repositories/utils.</li>
+				<li>Единая сборка через create_app + load_settings.</li>
+				<li>Fail-fast по TELEGRAM_BOT_TOKEN.</li>
+				<li>Минимальные команды /start, /health, admin guard.</li>
+			</ol>
+			<h3>Критерии готовности (Definition of Done)</h3>
+			<ul>
+				<li>Структура шаблона понятна и повторяемо запускается.</li>
+				<li>При отсутствии токена запуск падает сразу с понятным сообщением.</li>
+				<li>Базовый набор команд и guard работают из коробки.</li>
+			</ul>
+			<h3>Что сдать на проверку</h3>
+			<ul>
+				<li>Код шаблона с create_app/load_settings.</li>
+				<li>Лог запуска и короткий замер bootstrap-time.</li>
+			</ul>
+			<div class="codebox"><div class="codebox-title">Код bot-template</div><textarea id="botCode"></textarea></div>
+			<div class="codebox"><div class="codebox-title">Логи / измерение bootstrap-time</div><textarea id="botOutput"></textarea></div>
+			<div class="actions"><button class="btn" id="checkBotBtn" type="button">Проверить БОТЫ</button></div>
+			<div class="result" id="botResult">Пока не проверяли.</div>
+			<div class="checks" id="botChecks"></div>
+		</section>
+
+		<section class="card">
+			<h2>🕷️ ПАРСИНГ: parser-template</h2>
+			<p><strong>Цель:</strong> собрать parser-template, который подключает новые источники через адаптер, не ломая ядро пайплайна.</p>
+			<p><strong>Связь с теорией дня 13:</strong> закрепляешь BaseAdapter, run_pipeline и quality-report как стандарт для любых ниш.</p>
+			<div class="hint"><strong>Фокус на смысл:</strong> новый сайт = новый адаптер, а не переписывание всего проекта.</div>
+			<h3>Что нужно сделать (конкретно)</h3>
+			<ol>
+				<li>Есть BaseAdapter + SiteAdapter с selectors.</li>
+				<li>Pipeline: fetch → parse → validate → export.</li>
+				<li>Есть quality-report total/valid/skipped/time.</li>
+				<li>Экспорт в CSV/JSON и переиспользуемый run_pipeline.</li>
+			</ol>
+			<h3>Критерии готовности (Definition of Done)</h3>
+			<ul>
+				<li>Адаптерный контракт соблюдается и расширяется без хаоса.</li>
+				<li>Метрики качества выводятся после каждого запуска.</li>
+				<li>Файлы выгрузки формируются стабильно в одном формате.</li>
+			</ul>
+			<h3>Что сдать на проверку</h3>
+			<ul>
+				<li>Код BaseAdapter/SiteAdapter + run_pipeline.</li>
+				<li>Лог прогона с total/valid/skipped/time.</li>
+			</ul>
+			<div class="codebox"><div class="codebox-title">Код parser-template</div><textarea id="parserCode"></textarea></div>
+			<div class="codebox"><div class="codebox-title">Логи</div><textarea id="parserOutput"></textarea></div>
+			<div class="actions"><button class="btn" id="checkParserBtn" type="button">Проверить ПАРСИНГ</button></div>
+			<div class="result" id="parserResult">Пока не проверяли.</div>
+			<div class="checks" id="parserChecks"></div>
+		</section>
+	</div>
+
+	<script src="course-tools.js"></script>
+	<script>
+		const LAB_KEY='course_day13_practice_lab_v1';
+		const has=(t,p)=>p.test(t);
+		const norm=t=>String(t||'').replace(/\r\n/g,'\n').toLowerCase();
+		const lines=t=>String(t||'').split('\n').map(x=>x.trim()).filter(Boolean).length;
+		function rc(id,it){document.getElementById(id).innerHTML=it.map(i=>`<div class="${i.level==='warn'?'warn':(i.ok?'ok':'bad')}">${i.level==='warn'?'⚠️':(i.ok?'✅':'❌')} ${i.label}${i.note?` — ${i.note}`:''}</div>`).join('')}
+		function sm(id,c){const f=c.filter(x=>x.required&&!x.ok);const s=c.reduce((a,x)=>a+(x.ok?(x.weight||1):0),0);const m=c.reduce((a,x)=>a+(x.weight||1),0);const p=m?Math.round(s*100/m):0;document.getElementById(id).innerHTML=`<strong>${s}/${m}</strong> баллов (${p}%). ${f.length===0&&p>=75?'✅ Зачёт.':'❌ Пока не зачёт.'}${f.length?`<br><span class="bad">Недочёты: ${f.map(x=>x.short||x.label).join(', ')}</span>`:''}`}
+		function checkBot(){const c=norm(botCode.value),o=norm(botOutput.value);const k=[{label:'Достаточный объём',short:'мало кода',ok:lines(c)>=18,required:true,weight:2,note:`${lines(c)} строк`},{label:'Есть template-слои',short:'нет слоёв шаблона',ok:has(c,/handlers|services|repositories|utils/),required:true,weight:3},{label:'Есть create_app/load_settings',short:'нет сборки приложения',ok:has(c,/create_app|load_settings/),required:true,weight:3},{label:'Fail-fast по токену',short:'нет проверки token',ok:has(c,/telegram_bot_token|token/)&&has(c,/raise\s+valueerror|missing|if\s+not\s+token/),required:true,weight:3},{label:'Есть /start + /health',short:'нет базовых команд',ok:has(c,/\/start/)&&has(c,/\/health/),required:true,weight:2},{label:'Есть admin guard',short:'нет защиты admin',ok:has(c,/admin_ids|нет\s+доступа|not\s+in/),required:true,weight:2},{label:'Логи/замер bootstrap добавлены',ok:o.trim().length>0,required:false,level:'warn',weight:1,note:o.trim()?'добавлены':'не добавлены'}];rc('botChecks',k);sm('botResult',k);ps()}
+		function checkParser(){const c=norm(parserCode.value),o=norm(parserOutput.value);const k=[{label:'Достаточный объём',short:'мало кода',ok:lines(c)>=18,required:true,weight:2,note:`${lines(c)} строк`},{label:'Есть BaseAdapter + SiteAdapter',short:'нет адаптеров',ok:has(c,/class\s+baseadapter/)&&has(c,/class\s+site|adapter/),required:true,weight:3},{label:'Есть selectors config',short:'нет selectors',ok:has(c,/selectors\s*=\s*\{/),required:true,weight:3},{label:'Есть pipeline-этапы',short:'нет run_pipeline',ok:has(c,/run_pipeline|fetch|parse|validate|export/),required:true,weight:3},{label:'Есть quality report',short:'нет total/valid/skipped/time',ok:has(c,/total/)&&has(c,/valid/)&&has(c,/skipped|time/),required:true,weight:3},{label:'Есть CSV/JSON экспорт',short:'нет выгрузки',ok:has(c,/csv|json|export/),required:true,weight:2},{label:'Логи добавлены',ok:o.trim().length>0,required:false,level:'warn',weight:1,note:o.trim()?'добавлены':'не добавлены'}];rc('parserChecks',k);sm('parserResult',k);ps()}
+		function ps(){localStorage.setItem(LAB_KEY,JSON.stringify({botCode:botCode.value,botOutput:botOutput.value,parserCode:parserCode.value,parserOutput:parserOutput.value}))}
+		function rs(){try{const s=JSON.parse(localStorage.getItem(LAB_KEY)||'{}');if(s.botCode)botCode.value=s.botCode;if(s.botOutput)botOutput.value=s.botOutput;if(s.parserCode)parserCode.value=s.parserCode;if(s.parserOutput)parserOutput.value=s.parserOutput}catch{}}
+		checkBotBtn.addEventListener('click',checkBot);checkParserBtn.addEventListener('click',checkParser);['botCode','botOutput','parserCode','parserOutput'].forEach(id=>document.getElementById(id).addEventListener('input',ps));rs();CourseTools.initModulePage(13);
+	</script>
+</body>
+</html>
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Модуль 13 · Практикум (bot-template + parser-template)</title><style>*{box-sizing:border-box;margin:0;padding:0}@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');body{font-family:'Montserrat',sans-serif;background:linear-gradient(135deg,#0f0f1e,#1a0a2e,#16213e);color:#eaf2ff;min-height:100vh;padding:20px}.wrap{max-width:1100px;margin:0 auto}.card{background:rgba(19,28,46,.86);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:18px;margin-bottom:14px}h1{color:#ffed4e;margin-bottom:8px}h2{color:#56e8ff;font-size:1.14em;margin-bottom:8px}p,li{color:#d7e6ff;line-height:1.6}ul,ol{margin-left:20px;margin-top:8px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.btn{display:inline-block;text-decoration:none;border:1px solid rgba(255,215,0,.45);border-radius:10px;background:rgba(255,215,0,.12);color:#ffed4e;font-weight:700;padding:9px 12px;cursor:pointer}.btn.alt{border-color:rgba(86,232,255,.55);color:#56e8ff;background:rgba(86,232,255,.12)}.codebox{margin-top:10px;border:1px solid rgba(102,126,234,.35);border-radius:10px;overflow:hidden;background:#0b1220}.codebox-title{background:rgba(102,126,234,.12);color:#9ec0ff;font-size:.8em;font-weight:700;padding:8px 10px;border-bottom:1px solid rgba(102,126,234,.25)}textarea{width:100%;min-height:190px;border:none;resize:vertical;padding:12px;font-family:Consolas,'Courier New',monospace;font-size:.88em;line-height:1.45;color:#e7f1ff;background:#0b1220;outline:none}.checks{margin-top:10px;display:grid;gap:6px;font-size:.92em}.ok{color:#6ff3a3}.bad{color:#ff8f8f}.warn{color:#ffd78a}.result{margin-top:10px;border-radius:10px;padding:10px 12px;font-size:.92em;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03)}.status-pill{display:inline-block;margin-top:8px;border:1px solid rgba(255,215,0,.45);border-radius:999px;padding:4px 10px;color:#ffed4e;font-size:.8em;font-weight:700;background:rgba(255,215,0,.1)}</style><link rel="stylesheet" href="course-tools.css"/></head><body><div class="wrap"><section class="card"><h1>🧪 Модуль 13 · Практикум</h1><p>Собираем reusable-архитектуру: bot-template и parser-template с измеримой скоростью старта.</p><div class="actions"><a class="btn" href="day-13-index.html">← Теория Модуля 13</a><a class="btn alt" href="index.html">Ко всем модулям</a><a class="btn" href="day-14-index.html">День 14 →</a></div><div class="course-top-tools"><button id="readToggleBtn" class="read-toggle-btn" type="button">📘 Отметить день как прочитанный</button><span class="status-pill">Практика дня 13</span></div></section><section class="card"><h2>🤖 БОТЫ: bot-template</h2><ol><li>Есть слои handlers/services/repositories/utils.</li><li>Единая сборка через create_app + load_settings.</li><li>Fail-fast по TELEGRAM_BOT_TOKEN.</li><li>Минимальные команды /start, /health, admin guard.</li></ol><div class="codebox"><div class="codebox-title">Код bot-template</div><textarea id="botCode"></textarea></div><div class="codebox"><div class="codebox-title">Логи / измерение bootstrap-time</div><textarea id="botOutput"></textarea></div><div class="actions"><button class="btn" id="checkBotBtn" type="button">Проверить БОТЫ</button></div><div class="result" id="botResult">Пока не проверяли.</div><div class="checks" id="botChecks"></div></section><section class="card"><h2>🕷️ ПАРСИНГ: parser-template</h2><ol><li>Есть BaseAdapter + SiteAdapter с selectors.</li><li>Pipeline: fetch → parse → validate → export.</li><li>Есть quality-report total/valid/skipped/time.</li><li>Экспорт в CSV/JSON и переиспользуемый run_pipeline.</li></ol><div class="codebox"><div class="codebox-title">Код parser-template</div><textarea id="parserCode"></textarea></div><div class="codebox"><div class="codebox-title">Логи</div><textarea id="parserOutput"></textarea></div><div class="actions"><button class="btn" id="checkParserBtn" type="button">Проверить ПАРСИНГ</button></div><div class="result" id="parserResult">Пока не проверяли.</div><div class="checks" id="parserChecks"></div></section></div><script src="course-tools.js"></script><script>const LAB_KEY='course_day13_practice_lab_v1';const has=(t,p)=>p.test(t);const norm=t=>String(t||'').replace(/\r\n/g,'\n').toLowerCase();const lines=t=>String(t||'').split('\n').map(x=>x.trim()).filter(Boolean).length;function rc(id,it){document.getElementById(id).innerHTML=it.map(i=>`<div class="${i.level==='warn'?'warn':(i.ok?'ok':'bad')}">${i.level==='warn'?'⚠️':(i.ok?'✅':'❌')} ${i.label}${i.note?` — ${i.note}`:''}</div>`).join('')}function sm(id,c){const f=c.filter(x=>x.required&&!x.ok);const s=c.reduce((a,x)=>a+(x.ok?(x.weight||1):0),0);const m=c.reduce((a,x)=>a+(x.weight||1),0);const p=m?Math.round(s*100/m):0;document.getElementById(id).innerHTML=`<strong>${s}/${m}</strong> баллов (${p}%). ${f.length===0&&p>=75?'✅ Зачёт.':'❌ Пока не зачёт.'}${f.length?`<br><span class="bad">Недочёты: ${f.map(x=>x.short||x.label).join(', ')}</span>`:''}`}function checkBot(){const c=norm(botCode.value),o=norm(botOutput.value);const k=[{label:'Достаточный объём',short:'мало кода',ok:lines(c)>=18,required:true,weight:2,note:`${lines(c)} строк`},{label:'Есть template-слои',short:'нет слоёв шаблона',ok:has(c,/handlers|services|repositories|utils/),required:true,weight:3},{label:'Есть create_app/load_settings',short:'нет сборки приложения',ok:has(c,/create_app|load_settings/),required:true,weight:3},{label:'Fail-fast по токену',short:'нет проверки token',ok:has(c,/telegram_bot_token|token/)&&has(c,/raise\s+valueerror|missing|if\s+not\s+token/),required:true,weight:3},{label:'Есть /start + /health',short:'нет базовых команд',ok:has(c,/\/start/)&&has(c,/\/health/),required:true,weight:2},{label:'Есть admin guard',short:'нет защиты admin',ok:has(c,/admin_ids|нет\s+доступа|not\s+in/),required:true,weight:2},{label:'Логи/замер bootstrap добавлены',ok:o.trim().length>0,required:false,level:'warn',weight:1,note:o.trim()?'добавлены':'не добавлены'}];rc('botChecks',k);sm('botResult',k);ps()}function checkParser(){const c=norm(parserCode.value),o=norm(parserOutput.value);const k=[{label:'Достаточный объём',short:'мало кода',ok:lines(c)>=18,required:true,weight:2,note:`${lines(c)} строк`},{label:'Есть BaseAdapter + SiteAdapter',short:'нет адаптеров',ok:has(c,/class\s+baseadapter/)&&has(c,/class\s+site|adapter/),required:true,weight:3},{label:'Есть selectors config',short:'нет selectors',ok:has(c,/selectors\s*=\s*\{/),required:true,weight:3},{label:'Есть pipeline-этапы',short:'нет run_pipeline',ok:has(c,/run_pipeline|fetch|parse|validate|export/),required:true,weight:3},{label:'Есть quality report',short:'нет total/valid/skipped/time',ok:has(c,/total/)&&has(c,/valid/)&&has(c,/skipped|time/),required:true,weight:3},{label:'Есть CSV/JSON экспорт',short:'нет выгрузки',ok:has(c,/csv|json|export/),required:true,weight:2},{label:'Логи добавлены',ok:o.trim().length>0,required:false,level:'warn',weight:1,note:o.trim()?'добавлены':'не добавлены'}];rc('parserChecks',k);sm('parserResult',k);ps()}function ps(){localStorage.setItem(LAB_KEY,JSON.stringify({botCode:botCode.value,botOutput:botOutput.value,parserCode:parserCode.value,parserOutput:parserOutput.value}))}function rs(){try{const s=JSON.parse(localStorage.getItem(LAB_KEY)||'{}');if(s.botCode)botCode.value=s.botCode;if(s.botOutput)botOutput.value=s.botOutput;if(s.parserCode)parserCode.value=s.parserCode;if(s.parserOutput)parserOutput.value=s.parserOutput}catch{}}checkBotBtn.addEventListener('click',checkBot);checkParserBtn.addEventListener('click',checkParser);['botCode','botOutput','parserCode','parserOutput'].forEach(id=>document.getElementById(id).addEventListener('input',ps));rs();CourseTools.initModulePage(13);</script></body></html>

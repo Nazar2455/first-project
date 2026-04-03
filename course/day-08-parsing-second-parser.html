@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>День 8 · ПАРСИНГ — Второй парсер</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+    body{font-family:'Montserrat',sans-serif;background:linear-gradient(135deg,#0f0f1e,#1a0a2e,#16213e);color:#eaf2ff;min-height:100vh;padding:20px}
+    .wrap{max-width:1100px;margin:0 auto}.card{background:rgba(19,28,46,.86);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px;margin-bottom:12px}
+    h1{color:#ffed4e;margin-bottom:8px}h2{color:#56e8ff;font-size:1.12em;margin-bottom:8px}h3{color:#96b7ff;margin:10px 0 6px}
+    p,li{line-height:1.6;color:#d6e4ff}.actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{display:inline-block;text-decoration:none;border:1px solid rgba(255,215,0,.45);border-radius:10px;background:rgba(255,215,0,.12);color:#ffed4e;font-weight:700;padding:9px 12px}
+    .btn.alt{border-color:rgba(86,232,255,.55);color:#56e8ff;background:rgba(86,232,255,.12)}
+    .code{margin-top:8px;border-radius:10px;overflow:hidden;border:1px solid rgba(102,126,234,.35);background:#0b1220}.code-title{background:rgba(102,126,234,.12);color:#9ec0ff;font-size:.78em;font-weight:700;padding:8px 10px;border-bottom:1px solid rgba(102,126,234,.25)}
+    pre{margin:0;padding:12px;overflow-x:auto;font-size:.84em;line-height:1.45}code{font-family:Consolas,'Courier New',monospace;color:#e7f1ff}
+    .note{border-left:3px solid #ffd700;background:rgba(255,215,0,.08);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.9em}
+  </style>
+  <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+<div class="wrap">
+  <section class="card">
+    <h1>День 8 · 🕷️ ПАРСИНГ</h1>
+    <p>Тема: запускаем второй парсер на новом сайте, но без хаоса — через переиспользование структуры и функций.</p>
+    <div class="actions">
+      <a class="btn" href="day-08-index.html">← День 8 (выбор трека)</a>
+      <a class="btn alt" href="day-08-bots-faq-manager.html">Переключиться на БОТЫ</a>
+      <a class="btn" href="day-09-index.html">День 9 →</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>1) Что переносим из parser-project-1</h2>
+    <ul>
+      <li>Функции загрузки HTML и записи CSV/JSON.</li>
+      <li>Общий формат данных (title, price, url).</li>
+      <li>Валидацию и фильтры.</li>
+      <li>Логирование ошибок.</li>
+    </ul>
+    <div class="note">Переиспользуй модули, а не копируй весь файл main.py как есть.</div>
+  </section>
+
+  <section class="card">
+    <h2>2) Адаптер селекторов под новый сайт</h2>
+    <div class="code"><div class="code-title">parsers/site2_adapter.py</div><pre><code>from bs4 import BeautifulSoup
+
+
+def parse_site2(html: str) -> list[dict]:
+    soup = BeautifulSoup(html, "html.parser")
+    cards = soup.select(".listing-item")
+    rows = []
+
+    for card in cards:
+        title_el = card.select_one(".listing-item__title")
+        price_el = card.select_one(".listing-item__price")
+        url_el = card.select_one("a.listing-item__link")
+
+        if not title_el or not price_el or not url_el:
+            continue
+
+        rows.append({
+            "title": title_el.get_text(strip=True),
+            "price": price_el.get_text(strip=True),
+            "url": url_el.get("href", ""),
+        })
+
+    return rows</code></pre></div>
+  </section>
+
+  <section class="card">
+    <h2>3) Главный сценарий запуска</h2>
+    <div class="code"><div class="code-title">main.py (идея)</div><pre><code>from services.http_client import fetch_html
+from parsers.site2_adapter import parse_site2
+from services.export import save_csv, save_json
+
+URL = "https://example-site-2.com/catalog"
+
+
+def main() -> None:
+    html = fetch_html(URL)
+    rows = parse_site2(html)
+
+    save_csv(rows, "result_site2.csv")
+    save_json(rows, "result_site2.json")
+
+    print(f"Готово: {len(rows)} строк")
+
+
+if __name__ == "__main__":
+    main()</code></pre></div>
+  </section>
+
+  <section class="card">
+    <h2>4) Практика и критерий закрытия дня</h2>
+    <ol>
+      <li>Получить минимум 100 строк со второго сайта.</li>
+      <li>Сделать экспорт в CSV и JSON.</li>
+      <li>Добавить 1 фильтр по цене/категории.</li>
+      <li>Оформить README и добавить второй кейс в портфолио.</li>
+    </ol>
+    <div class="note">Если можешь быстро адаптировать парсер под новый сайт, ты уже работаешь как коммерческий специалист.</div>
+  </section>
+</div>
+</body>
+</html>

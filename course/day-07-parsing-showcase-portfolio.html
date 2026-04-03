@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>День 7 · ПАРСИНГ — Упаковка кейса</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+    body{font-family:'Montserrat',sans-serif;background:linear-gradient(135deg,#0f0f1e,#1a0a2e,#16213e);color:#eaf2ff;min-height:100vh;padding:20px}
+    .wrap{max-width:1100px;margin:0 auto}.card{background:rgba(19,28,46,.86);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px;margin-bottom:12px}
+    h1{color:#ffed4e;margin-bottom:8px}h2{color:#56e8ff;font-size:1.12em;margin-bottom:8px}h3{color:#96b7ff;margin:10px 0 6px}
+    p,li{line-height:1.6;color:#d6e4ff}.actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{display:inline-block;text-decoration:none;border:1px solid rgba(255,215,0,.45);border-radius:10px;background:rgba(255,215,0,.12);color:#ffed4e;font-weight:700;padding:9px 12px}
+    .btn.alt{border-color:rgba(86,232,255,.55);color:#56e8ff;background:rgba(86,232,255,.12)}
+    .code{margin-top:8px;border-radius:10px;overflow:hidden;border:1px solid rgba(102,126,234,.35);background:#0b1220}.code-title{background:rgba(102,126,234,.12);color:#9ec0ff;font-size:.78em;font-weight:700;padding:8px 10px;border-bottom:1px solid rgba(102,126,234,.25)}
+    pre{margin:0;padding:12px;overflow-x:auto;font-size:.84em;line-height:1.45}code{font-family:Consolas,'Courier New',monospace;color:#e7f1ff}
+    .note{border-left:3px solid #ffd700;background:rgba(255,215,0,.08);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.9em}
+  </style>
+  <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+<div class="wrap">
+  <section class="card">
+    <h1>День 7 · 🕷️ ПАРСИНГ</h1>
+    <p>Тема: упаковать парсер так, чтобы заказчик понял ценность, риски и итоговый формат данных.</p>
+    <div class="actions">
+      <a class="btn" href="day-07-index.html">← День 7 (выбор трека)</a>
+      <a class="btn alt" href="day-07-bots-showcase-portfolio.html">Переключиться на БОТЫ</a>
+      <a class="btn" href="day-08-index.html">День 8 →</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>1) Каркас README для парсера</h2>
+    <div class="code"><div class="code-title">README.md</div><pre><code># Parser Project
+
+## Что делает
+Собирает карточки товаров/объявлений с сайта и сохраняет в CSV/JSON.
+
+## Поля
+- title
+- price
+- url
+- updated_at
+
+## Фильтры
+- min_price
+- max_price
+
+## Быстрый запуск
+1. pip install -r requirements.txt
+2. python main.py
+
+## Результат
+Файлы result.csv и result.json для анализа и отчётов.</code></pre></div>
+  </section>
+
+  <section class="card">
+    <h2>2) Как показать результат клиенту</h2>
+    <ol>
+      <li>Скриншот исходного сайта (что собираем).</li>
+      <li>Скриншот CSV/Google Sheets результата.</li>
+      <li>Короткое видео «запуск → итог».</li>
+      <li>Таблица «до/после» по времени ручной работы.</li>
+    </ol>
+    <div class="note">Показывай не код, а бизнес-результат: «автоматически обновляем 300+ позиций за 2 минуты».</div>
+  </section>
+
+  <section class="card">
+    <h2>3) Релиз и описание ограничений</h2>
+    <div class="code"><div class="code-title">Release notes</div><pre><code>v1.0.0 — Parser MVP
+
+Добавлено:
+- сбор карточек и цен
+- фильтр по диапазону цен
+- экспорт CSV/JSON
+
+Ограничения:
+- без прокси и антибот-обхода
+- селекторы зависят от вёрстки сайта</code></pre></div>
+    <p>Когда честно пишешь ограничения — это повышает доверие, а не снижает его.</p>
+  </section>
+
+  <section class="card">
+    <h2>4) Практика + шаблон отклика</h2>
+    <h3>Практика</h3>
+    <ol>
+      <li>Сделай README по каркасу.</li>
+      <li>Сними 45–60 сек демо запуска.</li>
+      <li>Оформи release v1.0.0.</li>
+      <li>Собери карточку кейса с 2 скриншотами.</li>
+    </ol>
+
+    <h3>Отклик клиенту</h3>
+    <div class="code"><div class="code-title">Шаблон</div><pre><code>Здравствуйте! Есть готовый парсер под похожую задачу:
+- собирает данные в CSV/JSON
+- поддерживает фильтры по цене
+- можно добавить расписание и уведомления
+
+Примеры:
+[ссылка на GitHub]
+[ссылка на демо]
+
+Смогу адаптировать под ваш сайт и нужные поля.</code></pre></div>
+  </section>
+</div>
+</body>
+</html>

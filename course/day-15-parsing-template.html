@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>День 15 · ПАРСИНГ — Шаблон проекта</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+    body{font-family:'Montserrat',sans-serif;background:linear-gradient(135deg,#0f0f1e,#1a0a2e,#16213e);color:#eaf2ff;min-height:100vh;padding:20px}
+    .wrap{max-width:1100px;margin:0 auto}.card{background:rgba(19,28,46,.86);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px;margin-bottom:12px}
+    h1{color:#ffed4e;margin-bottom:8px}h2{color:#56e8ff;font-size:1.12em;margin-bottom:8px}h3{color:#96b7ff;margin:10px 0 6px}
+    p,li{line-height:1.6;color:#d6e4ff}.actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{display:inline-block;text-decoration:none;border:1px solid rgba(255,215,0,.45);border-radius:10px;background:rgba(255,215,0,.12);color:#ffed4e;font-weight:700;padding:9px 12px}
+    .btn.alt{border-color:rgba(86,232,255,.55);color:#56e8ff;background:rgba(86,232,255,.12)}
+    .code{margin-top:8px;border-radius:10px;overflow:hidden;border:1px solid rgba(102,126,234,.35);background:#0b1220}.code-title{background:rgba(102,126,234,.12);color:#9ec0ff;font-size:.78em;font-weight:700;padding:8px 10px;border-bottom:1px solid rgba(102,126,234,.25)}
+    pre{margin:0;padding:12px;overflow-x:auto;font-size:.84em;line-height:1.45}code{font-family:Consolas,'Courier New',monospace;color:#e7f1ff}
+    .note{border-left:3px solid #ffd700;background:rgba(255,215,0,.08);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.9em}
+  </style>
+  <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+<div class="wrap">
+  <section class="card">
+    <h1>День 15 · 🕷️ ПАРСИНГ</h1>
+    <p>Тема: parser-template v2 — новый сайт подключается через конфиг и адаптер, а не через переписывание ядра.</p>
+    <div class="actions">
+      <a class="btn" href="day-15-index.html">← День 15 (выбор трека)</a>
+      <a class="btn alt" href="day-15-bots-template.html">Переключиться на БОТЫ</a>
+      <a class="btn" href="day-16-index.html">День 16 →</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>1) Базовый pipeline</h2>
+    <ul>
+      <li>fetch_html()</li>
+      <li>parse_rows()</li>
+      <li>validate_rows()</li>
+      <li>export_rows()</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>2) Конфиг селекторов</h2>
+    <div class="code"><div class="code-title">config/selectors.json</div><pre><code>{
+  "site_a": {"card": ".card", "title": ".title", "price": ".price", "url": "a.link"},
+  "site_b": {"card": ".item", "title": ".name", "price": ".cost", "url": "a.item-link"}
+}</code></pre></div>
+  </section>
+
+  <section class="card">
+    <h2>3) Логика reuse</h2>
+    <p>Одна и та же экспорт-логика, валидация и retry работают для всех сайтов. Меняются только селекторы и иногда маленький adapter.</p>
+    <div class="note">Главная цель: уменьшить время от ТЗ до первого результата.</div>
+  </section>
+
+  <section class="card">
+    <h2>4) Практика</h2>
+    <ol>
+      <li>Подключи 2 сайта через конфиг.</li>
+      <li>Сделай общий экспортный модуль.</li>
+      <li>Добавь базовые тестовые проверки на пустые поля.</li>
+      <li>Оцени, насколько быстрее стал старт нового парсера.</li>
+    </ol>
+  </section>
+</div>
+</body>
+</html>

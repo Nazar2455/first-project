@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 Курс 30 дней: Боты + Парсинг</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0f0f1e, #1a0a2e, #16213e);
+            color: #eaf2ff;
+            min-height: 100vh;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 0;
+            align-self: start;
+            height: 100vh;
+            overflow-y: auto;
+            background: rgba(10, 16, 30, 0.96);
+            border-right: 2px solid rgba(255, 215, 0, 0.3);
+            padding: 20px 16px;
+        }
+
+        .brand {
+            font-weight: 800;
+            font-size: 1.05em;
+            color: #ffed4e;
+            margin-bottom: 14px;
+        }
+
+        .sidebar p {
+            color: #b8c9e8;
+            font-size: 0.84em;
+            line-height: 1.4;
+            margin-bottom: 16px;
+        }
+
+        .search {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            margin-bottom: 14px;
+        }
+
+        .nav-list {
+            display: grid;
+            gap: 8px;
+            list-style: none;
+            margin-bottom: 18px;
+        }
+
+        .nav-list a {
+            display: block;
+            padding: 9px 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #d8e6ff;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.86em;
+            transition: all 0.2s ease;
+        }
+
+        .nav-list a:hover {
+            border-color: rgba(255, 215, 0, 0.65);
+            color: #ffed4e;
+            transform: translateX(3px);
+        }
+
+        .mini-actions {
+            display: grid;
+            gap: 8px;
+        }
+
+        .mini-btn {
+            border: 1px solid rgba(255, 215, 0, 0.45);
+            border-radius: 8px;
+            padding: 9px 10px;
+            color: #ffed4e;
+            background: rgba(255, 215, 0, 0.1);
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .content {
+            padding: 26px;
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(102, 126, 234, 0.14));
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 22px;
+        }
+
+        .hero h1 {
+            font-size: 2em;
+            color: #ffed4e;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            color: #d7e6ff;
+            line-height: 1.55;
+            margin-bottom: 8px;
+        }
+
+        .quick-grid {
+            margin-top: 14px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 10px;
+        }
+
+        .quick-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 0.9em;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            background: rgba(19, 28, 46, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .section h2 {
+            font-size: 1.35em;
+            color: #ffed4e;
+            margin-bottom: 10px;
+        }
+
+        .section h3 {
+            font-size: 1.03em;
+            color: #96b7ff;
+            margin: 12px 0 8px;
+        }
+
+        .section p, .section li {
+            color: #d6e4ff;
+            line-height: 1.55;
+            font-size: 0.95em;
+        }
+
+        .section ul, .section ol {
+            margin-left: 22px;
+            margin-top: 8px;
+        }
+
+        .day-map {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .map-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 0.86em;
+        }
+
+        .example {
+            margin: 10px 0;
+            background: #0b1220;
+            border: 1px solid rgba(102, 126, 234, 0.4);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .example-title {
+            padding: 8px 10px;
+            font-size: 0.78em;
+            font-weight: 700;
+            color: #96b7ff;
+            background: rgba(102, 126, 234, 0.12);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.25);
+        }
+
+        pre {
+            margin: 0;
+            padding: 12px;
+            overflow-x: auto;
+            font-size: 0.84em;
+            line-height: 1.45;
+            color: #e7f1ff;
+        }
+
+        code {
+            font-family: Consolas, 'Courier New', monospace;
+        }
+
+        .explain {
+            border-left: 3px solid #ffd700;
+            background: rgba(255, 215, 0, 0.08);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-top: 8px;
+            font-size: 0.9em;
+        }
+
+        .check {
+            margin-top: 10px;
+            display: grid;
+            gap: 7px;
+        }
+
+        .check label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            color: #d7e6ff;
+        }
+
+        .check input { accent-color: #ffd700; }
+
+        .footer-note {
+            margin-top: 22px;
+            text-align: center;
+            color: #9bb2d7;
+            font-size: 0.85em;
+        }
+
+        .top-link {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid #ffd700;
+            background: rgba(255, 215, 0, 0.18);
+            color: #ffd700;
+            font-size: 1.1em;
+            cursor: pointer;
+        }
+
+        @media (max-width: 1000px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { position: static; height: auto; border-right: none; border-bottom: 2px solid rgba(255, 215, 0, 0.3); }
+            .content { padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="brand">📚 Курс-навигация</div>
+            <p>Полный гайд по 30-дневному плану с практикой, кодом и проверками. Можно идти шаг за шагом как по учебнику.</p>
+            <input class="search" id="navSearch" type="text" placeholder="Найти тему..." oninput="filterNav()">
+            <ul class="nav-list" id="navList">
+                <li><a href="course/index.html">🎓 Модули (День 1–2)</a></li>
+                <li><a href="#start">🚀 Старт и правила</a></li>
+                <li><a href="#architecture">🏗️ Архитектура проектов</a></li>
+                <li><a href="#day-by-day">🧭 Маршрут день 1–30</a></li>
+                <li><a href="#week1">📅 Неделя 1 — База</a></li>
+                <li><a href="#week2">📅 Неделя 2 — Продакшен</a></li>
+                <li><a href="#week3">📅 Неделя 3 — Продажи</a></li>
+                <li><a href="#week4">📅 Неделя 4 — Масштаб</a></li>
+                <li><a href="#bots-deep">🤖 Глубоко: Telegram Bot</a></li>
+                <li><a href="#parsing-deep">🕷️ Глубоко: Парсинг</a></li>
+                <li><a href="#deploy">☁️ Деплой и cron</a></li>
+                <li><a href="#sales">💰 Отклики и продажи</a></li>
+                <li><a href="#quality">✅ Качество и чеклисты</a></li>
+                <li><a href="#final">🏁 Выпускной план</a></li>
+            </ul>
+            <div class="mini-actions">
+                <button class="mini-btn" onclick="window.location.href='30d-main-tasks.html'">← Назад к плану</button>
+                <button class="mini-btn" onclick="expandAllChecks()">✔️ Отметить всё на странице</button>
+            </div>
+        </aside>
+
+        <main class="content" id="top">
+            <section class="hero" id="start">
+                <h1>Курс: от нуля до первых денег за 30 дней</h1>
+                <p>Это не просто памятка. Это полноценный учебный маршрут по твоему плану: каждый блок включает цель, практику, код и критерии готовности.</p>
+                <p><strong>Режим работы:</strong> 3–4 часа разработки + 1 час откликов каждый день. Минимум 1 коммит в день.</p>
+                <p><a href="course/index.html" style="color:#56e8ff; font-weight:700;">Открыть новый формат: большие отдельные модули по дням (День 1 и День 2) →</a></p>
+                <div class="quick-grid">
+                    <div class="quick-card">🎯 Цель: 3 бота + 3 парсера + 6 кейсов</div>
+                    <div class="quick-card">🧠 Формула: шаблоны + рефакторинг + продажи</div>
+                    <div class="quick-card">💵 KPI: 600–800 откликов за месяц</div>
+                    <div class="quick-card">🏁 Итог: 4–7 закрытых заказов</div>
+                </div>
+            </section>
+
+            <section class="section" id="architecture">
+                <h2>🏗️ Базовая архитектура (единая для обоих направлений)</h2>
+                <p>Одна и та же структура ускоряет работу и снижает хаос. Это главный буст скорости в месяце.</p>
+                <div class="example">
+                    <div class="example-title">Структура проекта для бота</div>
+                    <pre><code>lead-bot-v1/
+├── .env
+├── requirements.txt
+├── main.py
+├── handlers/
+├── keyboards/
+├── services/
+├── db/
+├── states/
+└── utils/</code></pre>
+                </div>
+                <div class="example">
+                    <div class="example-title">Структура проекта для парсера</div>
+                    <pre><code>parser-project-1/
+├── .env
+├── requirements.txt
+├── main.py
+├── config/
+├── parsers/
+├── services/
+├── db/
+└── utils/</code></pre>
+                </div>
+                <div class="explain">Почему это важно: ты не ищешь файлы по 10 минут, а сразу знаешь, где что лежит. Это напрямую влияет на скорость сдачи заказов.</div>
+            </section>
+
+            <section class="section" id="week1">
+                <h2>📅 Неделя 1 — Основа и первые рабочие результаты (Дни 1–7)</h2>
+                <div class="day-map">
+                    <div class="map-item"><strong>День 1:</strong> каркас проектов + зависимости</div>
+                    <div class="map-item"><strong>День 2:</strong> кнопки бота + первый экспорт парсинга</div>
+                    <div class="map-item"><strong>День 3:</strong> FSM + фильтры/топ-10</div>
+                    <div class="map-item"><strong>День 4:</strong> SQLite + Google Sheets</div>
+                    <div class="map-item"><strong>День 5:</strong> админка и права доступа</div>
+                    <div class="map-item"><strong>День 6:</strong> CSV + автоматизация</div>
+                    <div class="map-item"><strong>День 7:</strong> README + демо + кейс</div>
+                </div>
+
+                <h3>Практика: минимальный бот на aiogram 3</h3>
+                <div class="example">
+                    <div class="example-title">main.py — стартовая версия</div>
+                    <pre><code>import asyncio
+import os
+from aiogram import Bot, Dispatcher
+from aiogram.filters import Command
+from aiogram.types import Message
+from dotenv import load_dotenv
+
+load_dotenv()
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+
+dp = Dispatcher()
+
+@dp.message(Command("start"))
+async def cmd_start(message: Message):
+    await message.answer("Привет! Я lead-бот. Нажми /help")
+
+@dp.message(Command("help"))
+async def cmd_help(message: Message):
+    await message.answer("Команды: /start /help")
+
+async def main():
+    bot = Bot(TOKEN)
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+                </div>
+                <div class="explain">Разбор: <code>load_dotenv()</code> грузит токен из <code>.env</code>, <code>Dispatcher</code> регистрирует хендлеры, <code>start_polling</code> запускает цикл получения сообщений.</div>
+
+                <h3>Практика: базовый парсер + CSV</h3>
+                <div class="example">
+                    <div class="example-title">main.py — пример парсинга карточек</div>
+                    <pre><code>import csv
+import requests
+from bs4 import BeautifulSoup
+
+URL = "https://example.com/catalog"
+response = requests.get(URL, timeout=20)
+response.raise_for_status()
+
+soup = BeautifulSoup(response.text, "html.parser")
+cards = soup.select(".product-card")
+
+rows = []
+for card in cards[:100]:
+    title = card.select_one(".title").get_text(strip=True)
+    price = card.select_one(".price").get_text(strip=True)
+    rows.append({"title": title, "price": price})
+
+with open("result.csv", "w", newline="", encoding="utf-8") as f:
+    writer = csv.DictWriter(f, fieldnames=["title", "price"])
+    writer.writeheader()
+    writer.writerows(rows)
+
+print(f"Сохранено: {len(rows)}")</code></pre>
+                </div>
+                <div class="explain">Разбор: <code>raise_for_status()</code> сразу ловит HTTP-ошибки, <code>select/select_one</code> — CSS-селекторы, CSV нужен для быстрого показа результата клиенту.</div>
+
+                <div class="check">
+                    <label><input type="checkbox" data-check> У меня есть 2 репозитория с понятной структурой</label>
+                    <label><input type="checkbox" data-check> Бот отвечает на /start и /help</label>
+                    <label><input type="checkbox" data-check> Парсер сохраняет минимум 100 строк в CSV</label>
+                    <label><input type="checkbox" data-check> Есть README и короткое демо-видео</label>
+                </div>
+            </section>
+
+            <section class="section" id="day-by-day">
+                <h2>🧭 Пошаговый маршрут: день 1–30</h2>
+                <p>Этот блок нужен, чтобы ты в любой день понял: что делать сегодня и какой артефакт должен быть на выходе.</p>
+                <div class="day-map">
+                    <div class="map-item"><strong>Д1:</strong> каркас + зависимости → <em>проекты запускаются</em></div>
+                    <div class="map-item"><strong>Д2:</strong> кнопки + 100 объектов → <em>демо и CSV</em></div>
+                    <div class="map-item"><strong>Д3:</strong> FSM + фильтры → <em>логика диалога</em></div>
+                    <div class="map-item"><strong>Д4:</strong> SQLite + Sheets → <em>данные сохраняются</em></div>
+                    <div class="map-item"><strong>Д5:</strong> админка + доступы → <em>роль админа</em></div>
+                    <div class="map-item"><strong>Д6:</strong> экспорт + авто-скрипт → <em>первый автопроцесс</em></div>
+                    <div class="map-item"><strong>Д7:</strong> README + видео + кейс → <em>портфолио v1</em></div>
+
+                    <div class="map-item"><strong>Д8:</strong> 2-й бот/парсер → <em>масштаб шаблона</em></div>
+                    <div class="map-item"><strong>Д9:</strong> деплой обоих → <em>24/7 работа</em></div>
+                    <div class="map-item"><strong>Д10:</strong> 40 откликов → <em>первые диалоги</em></div>
+                    <div class="map-item"><strong>Д11:</strong> Sheets интеграция → <em>прозрачность для клиента</em></div>
+                    <div class="map-item"><strong>Д12:</strong> 3-й бот/парсер → <em>линейка услуг</em></div>
+                    <div class="map-item"><strong>Д13:</strong> рефакторинг структуры → <em>база под коммерцию</em></div>
+                    <div class="map-item"><strong>Д14:</strong> контент/кейсы → <em>упаковка услуг</em></div>
+
+                    <div class="map-item"><strong>Д15:</strong> template bot/parser → <em>быстрый старт</em></div>
+                    <div class="map-item"><strong>Д16:</strong> loguru + error handler → <em>наблюдаемость</em></div>
+                    <div class="map-item"><strong>Д17:</strong> платеж/уведомления → <em>коммерческий сценарий</em></div>
+                    <div class="map-item"><strong>Д18:</strong> CRM + dashboard → <em>контроль статусов</em></div>
+                    <div class="map-item"><strong>Д19:</strong> playbook продаж → <em>готовые скрипты</em></div>
+                    <div class="map-item"><strong>Д20:</strong> 60 откликов → <em>разгон воронки</em></div>
+                    <div class="map-item"><strong>Д21:</strong> первые 2 заказа → <em>отзывы и оплата</em></div>
+
+                    <div class="map-item"><strong>Д22:</strong> +15% к цене → <em>рост чека</em></div>
+                    <div class="map-item"><strong>Д23:</strong> второй раунд заказов → <em>повторяемость</em></div>
+                    <div class="map-item"><strong>Д24:</strong> новые услуги → <em>апсейл</em></div>
+                    <div class="map-item"><strong>Д25:</strong> кейсы с метриками → <em>доказательства</em></div>
+                    <div class="map-item"><strong>Д26:</strong> поддержка/SLA → <em>ретейнер</em></div>
+                    <div class="map-item"><strong>Д27:</strong> дорогие отклики → <em>фильтр клиентов</em></div>
+                    <div class="map-item"><strong>Д28:</strong> шаблон на 90% → <em>экономия времени</em></div>
+                    <div class="map-item"><strong>Д29:</strong> анализ метрик → <em>где растёт доход</em></div>
+                    <div class="map-item"><strong>Д30:</strong> план Месяц-2 → <em>масштаб</em></div>
+                </div>
+            </section>
+
+            <section class="section" id="week2">
+                <h2>📅 Неделя 2 — Продакшен и поток заявок (Дни 8–14)</h2>
+                <p>На этой неделе цель — не “идеально”, а “работает у реального клиента и видно в портфолио”.</p>
+
+                <h3>FSM-форма лидов (имя → телефон → комментарий)</h3>
+                <div class="example">
+                    <div class="example-title">states/lead_state.py</div>
+                    <pre><code>from aiogram.fsm.state import StatesGroup, State
+
+class LeadForm(StatesGroup):
+    name = State()
+    phone = State()
+    comment = State()</code></pre>
+                </div>
+                <div class="example">
+                    <div class="example-title">handlers/lead.py — фрагмент</div>
+                    <pre><code>@router.message(Command("lead"))
+async def lead_start(message: Message, state: FSMContext):
+    await state.set_state(LeadForm.name)
+    await message.answer("Как вас зовут?")
+
+@router.message(LeadForm.name)
+async def lead_name(message: Message, state: FSMContext):
+    await state.update_data(name=message.text)
+    await state.set_state(LeadForm.phone)
+    await message.answer("Введите телефон")</code></pre>
+                </div>
+                <div class="explain">Смысл FSM: ты чётко управляешь диалогом. Это фундамент всех коммерческих ботов, где нужна форма заявки.</div>
+
+                <h3>SQLite для сохранения лидов</h3>
+                <div class="example">
+                    <div class="example-title">db/database.py</div>
+                    <pre><code>import aiosqlite
+
+CREATE_SQL = """
+CREATE TABLE IF NOT EXISTS leads (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    name TEXT,
+    phone TEXT,
+    comment TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+"""
+
+async def init_db(path: str = "bot.db"):
+    async with aiosqlite.connect(path) as db:
+        await db.execute(CREATE_SQL)
+        await db.commit()</code></pre>
+                </div>
+
+                <h3>Google Sheets экспорт для парсера</h3>
+                <div class="example">
+                    <div class="example-title">services/sheets.py</div>
+                    <pre><code>import gspread
+from google.oauth2.service_account import Credentials
+
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+
+def get_sheet(creds_path: str, table_name: str):
+    creds = Credentials.from_service_account_file(creds_path, scopes=SCOPES)
+    client = gspread.authorize(creds)
+    return client.open(table_name).sheet1
+
+def append_rows(sheet, rows):
+    if rows:
+        sheet.append_rows(rows, value_input_option="USER_ENTERED")</code></pre>
+                </div>
+                <div class="explain">Почему клиентам это нравится: им не нужно открывать код, всё видно в таблице в реальном времени.</div>
+
+                <div class="check">
+                    <label><input type="checkbox" data-check> FSM полностью проходит без ошибок</label>
+                    <label><input type="checkbox" data-check> Лиды пишутся в SQLite</label>
+                    <label><input type="checkbox" data-check> Парсер отправляет строки в Google Sheets</label>
+                    <label><input type="checkbox" data-check> Я отправил минимум 20 откликов за день</label>
+                </div>
+            </section>
+
+            <section class="section" id="week3">
+                <h2>📅 Неделя 3 — Продажи и первые оплаты (Дни 15–21)</h2>
+                <p>Здесь фокус: шаблоны + скрипт продаж + дисциплина откликов.</p>
+
+                <h3>Шаблон отклика (быстрый, но персональный)</h3>
+                <div class="example">
+                    <div class="example-title">Шаблон сообщения клиенту</div>
+                    <pre><code>Здравствуйте! Я уже делал похожее решение:
+— Telegram-бот с заявками и админ-панелью
+— или парсер с выгрузкой в Google Sheets
+
+Что могу дать вам:
+1) MVP за 24-48 часов
+2) Чистый код + инструкция запуска
+3) Поддержка после сдачи
+
+Могу сразу показать 30-сек видео демо и предложить структуру ТЗ.</code></pre>
+                </div>
+                <div class="explain">Ключ: не «я всё умею», а «вот похожий кейс и конкретные сроки». Это повышает конверсию в диалог.</div>
+
+                <h3>Сценарий оценки задачи клиента</h3>
+                <ol>
+                    <li>Уточни источник данных / количество пользователей.</li>
+                    <li>Уточни формат результата (CSV, Sheets, Telegram).</li>
+                    <li>Уточни периодичность (разово / ежедневно / 24/7).</li>
+                    <li>Скажи 2 тарифа: MVP и расширенный.</li>
+                </ol>
+
+                <div class="check">
+                    <label><input type="checkbox" data-check> У меня есть готовый шаблон отклика</label>
+                    <label><input type="checkbox" data-check> Я провёл минимум 5 диалогов с клиентами</label>
+                    <label><input type="checkbox" data-check> Я закрыл минимум 1 заказ по сниженной цене ради отзыва</label>
+                </div>
+            </section>
+
+            <section class="section" id="week4">
+                <h2>📅 Неделя 4 — Масштаб и рост среднего чека (Дни 22–30)</h2>
+                <p>Теперь задача — не просто закрывать заказы, а строить систему: ретейнеры, SLA, апсейл, метрики.</p>
+
+                <h3>SLA-шаблон поддержки</h3>
+                <div class="example">
+                    <div class="example-title">Короткий SLA</div>
+                    <pre><code>Тариф "Поддержка 30 дней":
+- Ответ на обращение: до 2 часов
+- Фикс критических ошибок: до 24 часов
+- Мелкие доработки: 2-3 дня
+- Канал связи: Telegram + email
+- Отчёт: 1 раз в неделю</code></pre>
+                </div>
+
+                <h3>Метрики, которые считаем каждую неделю</h3>
+                <ul>
+                    <li>Отклики → Диалоги → Брифы → Сделки (воронка)</li>
+                    <li>Средний чек</li>
+                    <li>Среднее время разработки</li>
+                    <li>Сколько часов экономят шаблоны</li>
+                </ul>
+
+                <div class="check">
+                    <label><input type="checkbox" data-check> Я поднял цену минимум на 10-15%</label>
+                    <label><input type="checkbox" data-check> У меня есть минимум 1 услуга поддержки</label>
+                    <label><input type="checkbox" data-check> Я посчитал метрики месяца в таблице</label>
+                </div>
+            </section>
+
+            <section class="section" id="bots-deep">
+                <h2>🤖 Глубокий блок: Telegram-бот как коммерческий продукт</h2>
+                <h3>Рекомендованный стек</h3>
+                <ul>
+                    <li><code>aiogram 3</code> — ядро бота</li>
+                    <li><code>aiosqlite</code> — локальная БД</li>
+                    <li><code>python-dotenv</code> — секреты и конфиг</li>
+                    <li><code>loguru</code> — логирование</li>
+                </ul>
+
+                <h3>Антипаттерны (чего избегать)</h3>
+                <ul>
+                    <li>Хранить токен прямо в коде</li>
+                    <li>Писать всю бизнес-логику в хендлерах</li>
+                    <li>Не обрабатывать ошибки внешних API</li>
+                    <li>Сдавать проект без README и видео-демо</li>
+                </ul>
+            </section>
+
+            <section class="section" id="parsing-deep">
+                <h2>🕷️ Глубокий блок: Парсер, который не стыдно продать</h2>
+                <h3>Устойчивость к ошибкам сайта</h3>
+                <div class="example">
+                    <div class="example-title">Retry-обёртка запросов</div>
+                    <pre><code>import time
+import requests
+
+def safe_get(url: str, retries: int = 3, timeout: int = 20):
+    for attempt in range(1, retries + 1):
+        try:
+            response = requests.get(url, timeout=timeout)
+            response.raise_for_status()
+            return response
+        except Exception as e:
+            if attempt == retries:
+                raise
+            time.sleep(1.5 * attempt)</code></pre>
+                </div>
+                <div class="explain">Это спасает от временных падений сайта и уменьшает «ложные» ошибки у клиента.</div>
+            </section>
+
+            <section class="section" id="deploy">
+                <h2>☁️ Деплой и фоновый запуск</h2>
+                <h3>Что проверять после выката</h3>
+                <ul>
+                    <li>Приложение стартует без ручного вмешательства</li>
+                    <li>Переменные окружения выставлены в хостинге</li>
+                    <li>Логи пишутся и читаемы</li>
+                    <li>Есть алерт, если процесс падает</li>
+                </ul>
+                <h3>Cron-проверка для парсера</h3>
+                <p>Минимум: 2 запуска в сутки + уведомление об ошибке в Telegram/email.</p>
+            </section>
+
+            <section class="section" id="sales">
+                <h2>💰 Продажи: как конвертировать навык в оплату</h2>
+                <h3>Мини-скрипт созвона/чата</h3>
+                <ol>
+                    <li>Зафиксируй бизнес-цель клиента (что должно улучшиться).</li>
+                    <li>Скажи, что именно автоматизируешь.</li>
+                    <li>Покажи похожий кейс + цифру результата.</li>
+                    <li>Дай дедлайн и 2 варианта стоимости.</li>
+                    <li>Согласуй ближайший следующий шаг (ТЗ/прототип).</li>
+                </ol>
+
+                <h3>Почему ты можешь брать дороже</h3>
+                <p>Потому что продаёшь не “скрипт”, а результат: автоматизацию, экономию времени, прозрачность данных, поддержку.</p>
+            </section>
+
+            <section class="section" id="quality">
+                <h2>✅ Универсальный чеклист качества перед сдачей</h2>
+                <ul>
+                    <li>Код запускается с чистой установки зависимостей</li>
+                    <li>Есть файл <code>.env.example</code></li>
+                    <li>README содержит запуск шаг за шагом</li>
+                    <li>Логи ошибок не молчат, а объясняют проблему</li>
+                    <li>Видео-демо: 30–90 секунд реального сценария</li>
+                    <li>Нет токенов и ключей в репозитории</li>
+                </ul>
+                <div class="explain">Если этот блок соблюдён, вероятность возвратов и правок от клиента падает в разы.</div>
+            </section>
+
+            <section class="section" id="final">
+                <h2>🏁 Финальный маршрут на 30 дней (как проходить по этому курсу)</h2>
+                <ol>
+                    <li>Каждый день открываешь основной план + эту страницу.</li>
+                    <li>Берёшь задачи дня, затем в этом курсе читаешь соответствующий модуль.</li>
+                    <li>Копируешь код-шаблон, адаптируешь под свой проект.</li>
+                    <li>Делаешь коммит, демо, отправляешь отклики.</li>
+                    <li>Отмечаешь чекбоксы прогресса (они сохраняются локально).</li>
+                </ol>
+                <p><strong>Главный принцип:</strong> Лучше 80% готового и опубликованного, чем 100% идеального, но не проданного.</p>
+            </section>
+
+            <div class="footer-note">Сделано как рабочий курс: возвращайся к нему ежедневно и отмечай прогресс. 💪</div>
+        </main>
+    </div>
+
+    <button class="top-link" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</button>
+
+    <script>
+        const CHECK_KEY = 'courseGuideChecks';
+
+        function restoreChecks() {
+            const saved = JSON.parse(localStorage.getItem(CHECK_KEY) || '[]');
+            document.querySelectorAll('input[data-check]').forEach((el, idx) => {
+                el.checked = Boolean(saved[idx]);
+                el.addEventListener('change', persistChecks);
+            });
+        }
+
+        function persistChecks() {
+            const values = Array.from(document.querySelectorAll('input[data-check]')).map(el => el.checked);
+            localStorage.setItem(CHECK_KEY, JSON.stringify(values));
+        }
+
+        function expandAllChecks() {
+            document.querySelectorAll('input[data-check]').forEach(el => el.checked = true);
+            persistChecks();
+        }
+
+        function filterNav() {
+            const q = document.getElementById('navSearch').value.toLowerCase();
+            document.querySelectorAll('#navList li').forEach(li => {
+                const text = li.textContent.toLowerCase();
+                li.style.display = text.includes(q) ? '' : 'none';
+            });
+        }
+
+        restoreChecks();
+    </script>
+</body>
+</html>

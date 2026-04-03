@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>День 13 · БОТЫ — Рефакторинг в шаблон</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+    body{font-family:'Montserrat',sans-serif;background:linear-gradient(135deg,#0f0f1e,#1a0a2e,#16213e);color:#eaf2ff;min-height:100vh;padding:20px}
+    .wrap{max-width:1100px;margin:0 auto}.card{background:rgba(19,28,46,.86);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px;margin-bottom:12px}
+    h1{color:#ffed4e;margin-bottom:8px}h2{color:#56e8ff;font-size:1.12em;margin-bottom:8px}h3{color:#96b7ff;margin:10px 0 6px}
+    p,li{line-height:1.6;color:#d6e4ff}.actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{display:inline-block;text-decoration:none;border:1px solid rgba(255,215,0,.45);border-radius:10px;background:rgba(255,215,0,.12);color:#ffed4e;font-weight:700;padding:9px 12px}
+    .btn.alt{border-color:rgba(86,232,255,.55);color:#56e8ff;background:rgba(86,232,255,.12)}
+    .code{margin-top:8px;border-radius:10px;overflow:hidden;border:1px solid rgba(102,126,234,.35);background:#0b1220}.code-title{background:rgba(102,126,234,.12);color:#9ec0ff;font-size:.78em;font-weight:700;padding:8px 10px;border-bottom:1px solid rgba(102,126,234,.25)}
+    pre{margin:0;padding:12px;overflow-x:auto;font-size:.84em;line-height:1.45}code{font-family:Consolas,'Courier New',monospace;color:#e7f1ff}
+    .note{border-left:3px solid #ffd700;background:rgba(255,215,0,.08);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.9em}
+  </style>
+  <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+<div class="wrap">
+  <section class="card">
+    <h1>День 13 · 🤖 БОТЫ</h1>
+    <p>Тема: из «работает как-нибудь» в «коммерческий шаблон», который можно запускать почти без боли в каждом новом проекте.</p>
+    <div class="actions">
+      <a class="btn" href="day-13-index.html">← День 13 (выбор трека)</a>
+      <a class="btn alt" href="day-13-parsing-refactor-template.html">Переключиться на ПАРСИНГ</a>
+      <a class="btn" href="day-14-index.html">День 14 →</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>1) Целевая структура шаблона</h2>
+    <div class="code"><div class="code-title">bot-template</div><pre><code>bot-template/
+├── handlers/
+├── services/
+├── db/
+├── states/
+├── utils/
+├── main.py
+├── requirements.txt
+├── .env.example
+└── README.md</code></pre></div>
+  </section>
+
+  <section class="card">
+    <h2>2) Принцип распределения кода</h2>
+    <ul>
+      <li><strong>handlers:</strong> только входящие команды/сообщения.</li>
+      <li><strong>services:</strong> бизнес-логика.</li>
+      <li><strong>db:</strong> только операции с БД.</li>
+      <li><strong>utils:</strong> вспомогательные функции (security, logging).</li>
+    </ul>
+    <div class="note">Если в handler 200+ строк — это не handler, это сигнал к рефакторингу.</div>
+  </section>
+
+  <section class="card">
+    <h2>3) Мини-шаблон инициализации</h2>
+    <div class="code"><div class="code-title">main.py (идея)</div><pre><code>from aiogram import Bot, Dispatcher
+from handlers import common, admin
+
+
+def build_dispatcher() -> Dispatcher:
+    dp = Dispatcher()
+    dp.include_router(common.router)
+    dp.include_router(admin.router)
+    return dp</code></pre></div>
+  </section>
+
+  <section class="card">
+    <h2>4) Практика</h2>
+    <ol>
+      <li>Перенеси текущий бот в структуру шаблона.</li>
+      <li>Проверь, что /start, FSM и /admin всё ещё работают.</li>
+      <li>Создай branch <code>refactor-commercial</code>.</li>
+      <li>Подготовь readme «как стартовать новый бот из шаблона».</li>
+    </ol>
+  </section>
+</div>
+</body>
+</html>

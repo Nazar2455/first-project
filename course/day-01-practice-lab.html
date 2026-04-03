@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Модуль 1 · Практикум (БОТЫ + ПАРСИНГ)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(135deg, #0f0f1e, #1a0a2e, #16213e);
+      color: #eaf2ff;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; }
+    .card {
+      background: rgba(19, 28, 46, 0.86);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    h1 { color: #ffed4e; margin-bottom: 8px; }
+    h2 { color: #56e8ff; font-size: 1.14em; margin-bottom: 8px; }
+    h3 { color: #9ec0ff; font-size: 1em; margin: 10px 0 7px; }
+    p, li { color: #d7e6ff; line-height: 1.6; }
+    ul, ol { margin-left: 20px; margin-top: 8px; }
+
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      border: 1px solid rgba(255,215,0,.45);
+      border-radius: 10px;
+      background: rgba(255,215,0,.12);
+      color: #ffed4e;
+      font-weight: 700;
+      padding: 9px 12px;
+    }
+    .btn.alt {
+      border-color: rgba(86,232,255,.55);
+      color: #56e8ff;
+      background: rgba(86,232,255,.12);
+    }
+
+    .hint {
+      border-left: 3px solid #ffd700;
+      background: rgba(255,215,0,0.08);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-top: 8px;
+      font-size: 0.92em;
+    }
+
+    details {
+      margin-top: 8px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.03);
+    }
+    summary {
+      cursor: pointer;
+      color: #ffd700;
+      font-weight: 700;
+    }
+
+    .codebox {
+      margin-top: 10px;
+      border: 1px solid rgba(102,126,234,0.35);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #0b1220;
+    }
+    .codebox-title {
+      background: rgba(102,126,234,0.12);
+      color: #9ec0ff;
+      font-size: 0.8em;
+      font-weight: 700;
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(102,126,234,0.25);
+    }
+    textarea {
+      width: 100%;
+      min-height: 190px;
+      border: none;
+      resize: vertical;
+      padding: 12px;
+      font-family: Consolas, 'Courier New', monospace;
+      font-size: 0.88em;
+      line-height: 1.45;
+      color: #e7f1ff;
+      background: #0b1220;
+      outline: none;
+    }
+
+    .checks {
+      margin-top: 10px;
+      display: grid;
+      gap: 6px;
+      font-size: 0.92em;
+    }
+    .ok { color: #6ff3a3; }
+    .bad { color: #ff8f8f; }
+    .warn { color: #ffd78a; }
+
+    .result {
+      margin-top: 10px;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.92em;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .status-pill {
+      display: inline-block;
+      margin-top: 8px;
+      border: 1px solid rgba(255,215,0,.45);
+      border-radius: 999px;
+      padding: 4px 10px;
+      color: #ffed4e;
+      font-size: 0.8em;
+      font-weight: 700;
+      background: rgba(255,215,0,.1);
+    }
+
+    @media (max-width: 760px) {
+      body { padding: 12px; }
+      textarea { min-height: 160px; }
+    }
+  </style>
+  <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+  <div class="wrap">
+    <section class="card">
+      <h1>🧪 Модуль 1 · Практикум</h1>
+      <p>Здесь ты не просто читаешь теорию, а делаешь <strong>2 боевые мини-задачи</strong>: отдельно по ботам и по парсингу. У каждой есть пошаговый план, подсказки и встроенная проверка ключевых элементов кода.</p>
+      <div class="actions">
+        <a class="btn" href="day-01-foundation.html">← Теория Модуля 1</a>
+        <a class="btn alt" href="index.html">Ко всем модулям</a>
+        <a class="btn" href="day-02-interface-data.html">День 2 →</a>
+      </div>
+      <div class="course-top-tools">
+        <button id="readToggleBtn" class="read-toggle-btn" type="button">📘 Отметить день как прочитанный</button>
+        <span class="status-pill">Практика дня 1</span>
+      </div>
+    </section>
+
+    <section class="card" id="bot-practice">
+      <h2>🤖 Практическое задание #1 (БОТЫ)</h2>
+      <p><strong>Цель:</strong> собрать <strong>рабочий каркас Telegram-бота</strong> (MVP), который безопасно запускается из <code>.env</code> и отвечает на базовые команды <code>/start</code>, <code>/help</code>, <code>/about</code>.</p>
+      <div class="hint">
+        <strong>Связь с теорией дня 1:</strong> здесь ты закрепляешь три опоры из теории —
+        <strong>окружение проекта</strong> (зависимости), <strong>конфиг через .env</strong> (без хардкода токена)
+        и <strong>базовую архитектуру aiogram</strong> (Bot + Dispatcher + handlers).
+      </div>
+      <h3>Что нужно сделать (конкретно)</h3>
+      <ol>
+        <li>Подготовь окружение: установи <code>aiogram</code> и <code>python-dotenv</code>, создай <code>.env</code> с переменной <code>TELEGRAM_BOT_TOKEN</code>.</li>
+        <li>В коде загрузи токен через <code>load_dotenv()</code> + <code>os.getenv()</code> и добавь проверку: если токен пустой — бот не должен молча запускаться.</li>
+        <li>Создай 3 отдельных хендлера:<br>
+          <code>/start</code> — приветствие и что умеет бот;<br>
+          <code>/help</code> — список команд;<br>
+          <code>/about</code> — кратко о назначении бота.</li>
+        <li>Собери <code>async main()</code> и запуск через <code>asyncio.run(main())</code>, чтобы бот стабильно переходил в polling.</li>
+      </ol>
+      <h3>Критерии готовности (Definition of Done)</h3>
+      <ul>
+        <li>Бот реально отвечает в Telegram минимум на 3 команды.</li>
+        <li>Токен не захардкожен в коде, а берётся из <code>.env</code>.</li>
+        <li>При пустом токене есть понятная ошибка (а не «тихое» падение/зависание).</li>
+      </ul>
+
+      <details>
+        <summary>Подсказка 1: какие импорты должны быть</summary>
+        <p>Минимум: <code>asyncio</code>, <code>os</code>, <code>Bot</code>, <code>Dispatcher</code>, <code>Command</code>, <code>Message</code>, <code>load_dotenv</code>.</p>
+      </details>
+      <details>
+        <summary>Подсказка 2: как проверить запуск</summary>
+        <p>В Telegram отправь боту <code>/start</code> и <code>/about</code>. Если отвечает — каркас рабочий.</p>
+      </details>
+
+      <div class="codebox">
+        <div class="codebox-title">Вставь сюда свой Python-код бота</div>
+        <textarea id="botCode" placeholder="Вставь main.py для бота..."></textarea>
+      </div>
+      <div class="codebox">
+        <div class="codebox-title">Вставь вывод/логи запуска (необязательно, но полезно)</div>
+        <textarea id="botOutput" placeholder="Например: Bot started... / или скопируй stdout"></textarea>
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="button" id="checkBotBtn">Проверить задание БОТЫ</button>
+      </div>
+      <div class="result" id="botResult">Пока не проверяли.</div>
+      <div class="checks" id="botChecks"></div>
+    </section>
+
+    <section class="card" id="parsing-practice">
+      <h2>🕷️ Практическое задание #2 (ПАРСИНГ)</h2>
+      <p><strong>Цель:</strong> собрать <strong>первый предсказуемый pipeline парсинга</strong>: получить HTML, безопасно распарсить карточки, отфильтровать мусор и сохранить результат в CSV.</p>
+      <div class="hint">
+        <strong>Связь с теорией дня 1:</strong> это практика по цепочке
+        <strong>«входные данные → обработка → выходной артефакт»</strong>.
+        Ты тренируешь базовую инженерную дисциплину: сетевой запрос, парсинг, валидация, экспорт.
+      </div>
+      <h3>Что нужно сделать (конкретно)</h3>
+      <ol>
+        <li>Раздели код на 4 функции: <code>fetch_html()</code>, <code>parse_cards()</code>, <code>save_csv()</code>, <code>main()</code> (каждая отвечает за свой шаг).</li>
+        <li>В <code>fetch_html()</code> используй <code>requests.get(..., timeout=...)</code> и <code>raise_for_status()</code>, чтобы не игнорировать HTTP-ошибки.</li>
+        <li>В <code>parse_cards()</code> через <code>BeautifulSoup</code> и <code>select/select_one</code> вытащи минимум поля <code>title</code> и <code>price</code> (лучше + <code>url</code>).</li>
+        <li>Добавь базовую валидацию: если карточка пустая/битая — пропускай её.</li>
+        <li>Сохрани результат в CSV (UTF-8, <code>newline=""</code>), ограничь выгрузку первыми 100 строками и выведи в консоль итог: сколько строк сохранено.</li>
+      </ol>
+      <h3>Критерии готовности (Definition of Done)</h3>
+      <ul>
+        <li>Скрипт запускается через <code>main()</code> без ручных правок «на лету».</li>
+        <li>На выходе появляется CSV-файл с заголовками и данными.</li>
+        <li>В консоли есть итоговая метрика (например, <code>Сохранено строк: 100</code>).</li>
+      </ul>
+
+      <details>
+        <summary>Подсказка 1: минимальная защита от падений</summary>
+        <p>Перед чтением текста из элемента проверяй, что элемент не <code>None</code>.</p>
+      </details>
+      <details>
+        <summary>Подсказка 2: корректная запись CSV на Windows</summary>
+        <p>Открывай файл так: <code>open(path, "w", encoding="utf-8", newline="")</code>.</p>
+      </details>
+
+      <div class="codebox">
+        <div class="codebox-title">Вставь сюда свой Python-код парсера</div>
+        <textarea id="parserCode" placeholder="Вставь main.py для парсера..."></textarea>
+      </div>
+      <div class="codebox">
+        <div class="codebox-title">Вставь вывод консоли (например: Сохранено строк: 100)</div>
+        <textarea id="parserOutput" placeholder="Скопируй вывод запуска"></textarea>
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="button" id="checkParserBtn">Проверить задание ПАРСИНГ</button>
+      </div>
+      <div class="result" id="parserResult">Пока не проверяли.</div>
+      <div class="checks" id="parserChecks"></div>
+    </section>
+  </div>
+
+  <script src="course-tools.js"></script>
+  <script>
+    const LAB_KEY = 'course_day1_practice_lab_v1';
+
+    function has(text, pattern) {
+      return pattern.test(text);
+    }
+
+    function normalizeCode(text) {
+      return String(text || '').replace(/\r\n/g, '\n').toLowerCase();
+    }
+
+    function nonEmptyLines(text) {
+      return String(text || '')
+        .split('\n')
+        .map(line => line.trim())
+        .filter(Boolean)
+        .length;
+    }
+
+    function renderChecks(containerId, items) {
+      const el = document.getElementById(containerId);
+      el.innerHTML = items
+        .map(i => {
+          const cls = i.level === 'warn' ? 'warn' : (i.ok ? 'ok' : 'bad');
+          const icon = i.level === 'warn' ? '⚠️' : (i.ok ? '✅' : '❌');
+          return `<div class="${cls}">${icon} ${i.label}${i.note ? ` — ${i.note}` : ''}</div>`;
+        })
+        .join('');
+    }
+
+    function summarize(resultId, checks, mandatoryKeys) {
+      const mandatoryFails = checks.filter(c => c.required && !c.ok);
+      const points = checks.reduce((acc, c) => acc + (c.ok ? (c.weight || 1) : 0), 0);
+      const maxPoints = checks.reduce((acc, c) => acc + (c.weight || 1), 0);
+      const pct = maxPoints > 0 ? Math.round((points / maxPoints) * 100) : 0;
+
+      const hardPass = mandatoryFails.length === 0 && pct >= 75;
+      const mandatoryText = mandatoryFails.length > 0
+        ? `<br><span class="bad">Обязательные недочёты: ${mandatoryFails.map(x => x.short || x.label).join(', ')}</span>`
+        : '';
+
+      const status = hardPass
+        ? '✅ Зачёт. Решение похоже на рабочее MVP.'
+        : '❌ Пока не зачёт. Закрой обязательные пункты и дотяни качество.';
+
+      document.getElementById(resultId).innerHTML = `<strong>${points}/${maxPoints}</strong> баллов (${pct}%). ${status}${mandatoryText}`;
+    }
+
+    function checkBotTask() {
+      const code = normalizeCode(document.getElementById('botCode').value || '');
+      const out = normalizeCode(document.getElementById('botOutput').value || '');
+      const lines = nonEmptyLines(code);
+
+      const checks = [
+        {
+          label: 'Достаточный объём кода (не шаблон-заглушка)',
+          short: 'мало кода',
+          ok: lines >= 18,
+          required: true,
+          weight: 2,
+          note: lines >= 18 ? `${lines} строк` : `${lines} строк (нужно ≥ 18)`
+        },
+        {
+          label: 'Есть загрузка env и токена',
+          short: 'нет env/token',
+          ok: has(code, /load_dotenv\(/) && has(code, /os\.getenv\(/) && has(code, /telegram_bot_token/),
+          required: true,
+          weight: 2
+        },
+        {
+          label: 'Есть защита от пустого токена (if not token / raise)',
+          short: 'нет проверки token',
+          ok: has(code, /if\s+not\s+token/) || has(code, /raise\s+valueerror\(/),
+          required: true,
+          weight: 2
+        },
+        {
+          label: 'Инициализированы Dispatcher и Bot',
+          short: 'нет bot/dp init',
+          ok: has(code, /dp\s*=\s*dispatcher\s*\(/) && has(code, /bot\s*=\s*bot\s*\(/),
+          required: true,
+          weight: 2
+        },
+        {
+          label: 'Команды /start, /help, /about реализованы отдельными хендлерами',
+          short: 'нет 3 команд',
+          ok: has(code, /command\(["']start["']\)/) && has(code, /command\(["']help["']\)/) && has(code, /command\(["']about["']\)/),
+          required: true,
+          weight: 3
+        },
+        {
+          label: 'Есть async main() + polling + asyncio.run(main())',
+          short: 'нет main/polling/run',
+          ok: has(code, /async\s+def\s+main\s*\(/) && has(code, /start_polling\(/) && has(code, /asyncio\.run\(\s*main\s*\(/),
+          required: true,
+          weight: 3
+        },
+        {
+          label: 'Логи запуска/вывода добавлены (желательно)',
+          ok: /start|help|about|bot|polling|запуск|started/.test(out),
+          required: false,
+          level: 'warn',
+          weight: 1,
+          note: out.trim().length === 0 ? 'лог не добавлен' : 'лог добавлен'
+        }
+      ];
+
+      renderChecks('botChecks', checks);
+      summarize('botResult', checks, ['env', 'token', 'commands', 'main']);
+      persistLab();
+    }
+
+    function checkParserTask() {
+      const code = normalizeCode(document.getElementById('parserCode').value || '');
+      const out = normalizeCode(document.getElementById('parserOutput').value || '');
+      const lines = nonEmptyLines(code);
+
+      const checks = [
+        {
+          label: 'Достаточный объём кода (не пустой шаблон)',
+          short: 'мало кода',
+          ok: lines >= 22,
+          required: true,
+          weight: 2,
+          note: lines >= 22 ? `${lines} строк` : `${lines} строк (нужно ≥ 22)`
+        },
+        {
+          label: 'Есть fetch_html + requests.get + timeout + raise_for_status',
+          short: 'нет fetch/http-защиты',
+          ok: has(code, /def\s+fetch_html\s*\(/) && has(code, /requests\.get\(/) && has(code, /timeout\s*=/) && has(code, /raise_for_status\(/),
+          required: true,
+          weight: 3
+        },
+        {
+          label: 'Есть parse_cards + BeautifulSoup + CSS selectors',
+          short: 'нет parse/selectors',
+          ok: has(code, /def\s+parse_cards\s*\(/) && (has(code, /beautifulsoup\(/) || has(code, /from\s+bs4\s+import\s+beautifulsoup/)) && (has(code, /select\(/) || has(code, /select_one\(/)),
+          required: true,
+          weight: 3
+        },
+        {
+          label: 'Есть проверка на отсутствующие элементы (None-check)',
+          short: 'нет none-check',
+          ok: has(code, /if\s+not\s+\w+\s+or\s+not\s+\w+/) || has(code, /if\s+\w+\s+is\s+none/) || has(code, /if\s+not\s+\w+:/),
+          required: true,
+          weight: 2
+        },
+        {
+          label: 'Есть save_csv + utf-8 + newline + DictWriter/Writer',
+          short: 'нет корректного csv save',
+          ok: has(code, /def\s+save_csv\s*\(/) && has(code, /encoding\s*=\s*["']utf-8["']/) && has(code, /newline\s*=\s*["']["']/) && (has(code, /dictwriter\(/) || has(code, /writer\(/)),
+          required: true,
+          weight: 3
+        },
+        {
+          label: 'Есть ограничение выборки (например cards[:100])',
+          short: 'нет лимита 100',
+          ok: has(code, /\[:\s*100\]/) || has(code, /min\(\s*100\s*,/) || has(code, /limit\s*=\s*100/),
+          required: true,
+          weight: 2
+        },
+        {
+          label: 'Есть main() + вывод количества сохранённых строк',
+          short: 'нет main/print rows',
+          ok: has(code, /def\s+main\s*\(/) && (has(code, /print\s*\(.*(строк|rows|saved)/) || has(code, /print\s*\(.*len\s*\(/)),
+          required: true,
+          weight: 2
+        },
+        {
+          label: 'В выводе видно факт сохранения/кол-во строк (желательно)',
+          ok: /сохранено|saved|rows|строк|100|50/.test(out),
+          required: false,
+          level: 'warn',
+          weight: 1,
+          note: out.trim().length === 0 ? 'лог не добавлен' : 'лог добавлен'
+        }
+      ];
+
+      renderChecks('parserChecks', checks);
+      summarize('parserResult', checks, ['fetch', 'parse', 'none', 'save', 'limit', 'main']);
+      persistLab();
+    }
+
+    function persistLab() {
+      const state = {
+        botCode: document.getElementById('botCode').value,
+        botOutput: document.getElementById('botOutput').value,
+        parserCode: document.getElementById('parserCode').value,
+        parserOutput: document.getElementById('parserOutput').value
+      };
+      localStorage.setItem(LAB_KEY, JSON.stringify(state));
+    }
+
+    function restoreLab() {
+      try {
+        const state = JSON.parse(localStorage.getItem(LAB_KEY) || '{}');
+        if (state.botCode) document.getElementById('botCode').value = state.botCode;
+        if (state.botOutput) document.getElementById('botOutput').value = state.botOutput;
+        if (state.parserCode) document.getElementById('parserCode').value = state.parserCode;
+        if (state.parserOutput) document.getElementById('parserOutput').value = state.parserOutput;
+      } catch {}
+    }
+
+    document.getElementById('checkBotBtn').addEventListener('click', checkBotTask);
+    document.getElementById('checkParserBtn').addEventListener('click', checkParserTask);
+
+    ['botCode', 'botOutput', 'parserCode', 'parserOutput'].forEach((id) => {
+      document.getElementById(id).addEventListener('input', persistLab);
+    });
+
+    restoreLab();
+    CourseTools.initModulePage(1);
+  </script>
+</body>
+</html>

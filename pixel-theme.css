@@ -1,0 +1,464 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+    /* Очень темный фон */
+    --bg-dark: #0f0f0f;
+    --bg-darker: #0a0a0a;
+    --bg-card: #1a1a1a;
+    --bg-card-hover: #242424;
+    
+    /* Мягкий неон с градиентом */
+    --accent-primary: #6366f1;
+    --accent-secondary: #a78bfa;
+    --accent-cyan: #06b6d4;
+    --accent-emerald: #10b981;
+    
+    /* Текст */
+    --text-primary: #f5f5f5;
+    --text-secondary: #a3a3a3;
+    --text-muted: #737373;
+}
+
+body {
+    font-family: 'Inter', sans-serif !important;
+    color: var(--text-primary) !important;
+    font-size: 15px;
+    line-height: 1.6;
+    letter-spacing: 0.3px;
+    background: var(--bg-dark) !important;
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: 
+        radial-gradient(circle at 15% 25%, rgba(99, 102, 241, 0.08), transparent 35%),
+        radial-gradient(circle at 85% 75%, rgba(167, 139, 250, 0.06), transparent 40%);
+}
+
+body::after {
+    content: none !important;
+}
+
+h1, h2, h3,
+.navbar-title,
+.section-title,
+.character-name,
+.day-header,
+.level-title,
+.level-number {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+    text-shadow: 0 0 10px rgba(99, 102, 241, 0.3) !important;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+}
+
+/* HARD override против inline стилей в HTML */
+.navbar-title,
+.header h1,
+.section-title,
+.character-name,
+.day-header,
+.level-title,
+.level-number {
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    background-clip: initial !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+h1 { font-size: clamp(26px, 2.3vw, 36px) !important; }
+h2 { font-size: clamp(20px, 1.9vw, 28px) !important; }
+h3 { font-size: clamp(17px, 1.6vw, 24px) !important; }
+
+.navbar-title,
+.section-title,
+.character-name {
+    font-size: clamp(18px, 1.8vw, 26px) !important;
+}
+
+.day-header,
+.level-title {
+    font-size: clamp(15px, 1.4vw, 20px) !important;
+}
+
+.level-number {
+    font-size: clamp(30px, 2.6vw, 44px) !important;
+}
+
+.navbar,
+.profile-container,
+.level-section,
+.item-card,
+.day-card,
+.progress-wrapper,
+.quest-card,
+.quest-block,
+.stat-box,
+.stat-card,
+.lore-progress-section,
+.secrets-panel,
+.secret-strip,
+.modal-content,
+.lore-card,
+.week-separator,
+.header,
+.controls,
+.upgrades-section {
+    position: relative;
+    z-index: 1;
+    border-radius: 10px !important;
+    border: 1px solid rgba(99, 102, 241, 0.3) !important;
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.8), rgba(36, 36, 36, 0.5)) !important;
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px) !important;
+}
+
+.header,
+.controls,
+.week-separator,
+.secret-strip {
+    padding: 16px 18px;
+}
+
+.day-card,
+.item-card,
+.upgrade-card,
+.stat-box,
+.stat-card,
+.quest-block,
+.lore-item,
+.task-item {
+    transition: all 0.35s ease;
+}
+
+.day-card:hover,
+.item-card:hover,
+.upgrade-card:hover,
+.stat-box:hover,
+.stat-card:hover,
+.task-item:hover {
+    transform: translateY(-2px);
+    border-color: rgba(99, 102, 241, 0.5) !important;
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(36, 36, 36, 0.7)) !important;
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(99, 102, 241, 0.15);
+}
+
+.btn,
+.shop-item-button,
+.task-mini-btn,
+.nav-link,
+.expand-toggle,
+.quest-close,
+.lore-card .close-btn {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500;
+    font-size: 14px !important;
+    line-height: 1.4;
+    border-radius: 8px !important;
+    border: 1px solid rgba(99, 102, 241, 0.4) !important;
+    color: var(--text-primary) !important;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(99, 102, 241, 0.04)) !important;
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    padding: 10px 16px !important;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.35s ease;
+}
+
+.task-mini-btn,
+.expand-toggle,
+.quest-close {
+    font-size: 13px !important;
+    padding: 8px 12px !important;
+}
+
+.btn:hover,
+.shop-item-button:hover,
+.task-mini-btn:hover,
+.nav-link:hover,
+.expand-toggle:hover,
+.quest-close:hover,
+.lore-card .close-btn:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.08)) !important;
+    border-color: rgba(99, 102, 241, 0.6) !important;
+    transform: translateY(-1px);
+    box-shadow:
+        0 4px 12px rgba(99, 102, 241, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.btn:active,
+.shop-item-button:active,
+.task-mini-btn:active,
+.nav-link:active,
+.expand-toggle:active,
+.quest-close:active,
+.lore-card .close-btn:active {
+    transform: translateY(0);
+    box-shadow:
+        0 1px 4px rgba(99, 102, 241, 0.1),
+        inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.task-item,
+.upgrade-card,
+.lore-item,
+.resource-link,
+.quest-tips,
+.synergy-box,
+.stat-badge,
+.badge,
+.item-requirement,
+.secret-badge,
+.task-item::after {
+    border-radius: 8px !important;
+    border: 1px solid rgba(99, 102, 241, 0.2) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+}
+
+.task-item {
+    background:
+        linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(99, 102, 241, 0.02)) !important;
+    border-left: 3px solid var(--accent-primary) !important;
+    padding: 12px 14px !important;
+    margin-bottom: 10px !important;
+}
+
+.task-item.completed {
+    opacity: 0.85;
+    border-left-color: var(--accent-emerald) !important;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(16, 185, 129, 0.02)) !important;
+}
+
+.stat-badge,
+.badge,
+.secret-badge,
+.item-requirement {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(99, 102, 241, 0.04)) !important;
+    color: var(--accent-secondary) !important;
+    border-color: rgba(99, 102, 241, 0.3) !important;
+}
+
+.task-text,
+.item-desc,
+.quest-story,
+.lore-item,
+.stat-label,
+.stat-card-label,
+.upgrade-desc,
+.xp-text,
+.secret-strip,
+.nav-link,
+.navbar p,
+.header p {
+    font-family: 'Inter', sans-serif !important;
+    color: var(--text-primary) !important;
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+    font-weight: 400;
+}
+
+.stat-label,
+.stat-card-label,
+.xp-text,
+.upgrade-desc,
+.item-desc,
+.secret-strip {
+    color: var(--text-secondary) !important;
+    font-weight: 400;
+}
+
+.progress-bar,
+.xp-bar,
+.progress-bar-small {
+    border-radius: 8px !important;
+    border: 1px solid rgba(99, 102, 241, 0.2) !important;
+    background: var(--bg-card) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.progress-fill,
+.xp-fill,
+.progress-bar-small > div {
+    border-radius: 6px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 600;
+    color: var(--bg-dark) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)) !important;
+    box-shadow: 0 0 8px rgba(99, 102, 241, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.progress-fill.bots,
+.xp-fill {
+    color: var(--bg-dark) !important;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-emerald)) !important;
+    box-shadow: 0 0 8px rgba(6, 182, 212, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.progress-fill.parsing {
+    color: var(--bg-dark) !important;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)) !important;
+}
+
+.task-item::after {
+    color: var(--text-primary) !important;
+    background: rgba(99, 102, 241, 0.08) !important;
+    border-color: rgba(99, 102, 241, 0.2) !important;
+}
+
+label,
+span,
+small,
+p,
+li,
+td,
+th,
+div {
+    font-stretch: normal;
+}
+
+.checkbox {
+    width: 20px !important;
+    height: 20px !important;
+    border-radius: 6px !important;
+    accent-color: var(--accent-primary);
+    cursor: pointer;
+    transition: all 0.35s ease;
+}
+
+.checkbox:hover {
+    box-shadow: 0 0 6px rgba(99, 102, 241, 0.2);
+}
+
+a,
+.resource-link {
+    color: var(--accent-primary) !important;
+    transition: all 0.35s ease;
+    text-decoration: none;
+}
+
+a:hover,
+.resource-link:hover {
+    color: var(--accent-secondary) !important;
+    text-shadow: 0 0 6px rgba(99, 102, 241, 0.2);
+}
+
+/* Theme blocks - subtle gradient variations */
+.fantasy-zone {
+    position: relative;
+    overflow: hidden;
+}
+
+.fantasy-zone::before,
+.fantasy-zone::after {
+    content: none !important;
+}
+
+.theme-transition-soft {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.theme-castle,
+.theme-knight-order {
+    border-color: rgba(99, 102, 241, 0.4) !important;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.02)) !important;
+}
+
+.theme-dragon-field,
+.theme-elven-forest,
+.theme-goblin-cave {
+    border-color: rgba(16, 185, 129, 0.4) !important;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(16, 185, 129, 0.02)) !important;
+}
+
+.theme-night-witch,
+.theme-arcane-ruins {
+    border-color: rgba(167, 139, 250, 0.4) !important;
+    background: linear-gradient(135deg, rgba(167, 139, 250, 0.08), rgba(167, 139, 250, 0.02)) !important;
+}
+
+.theme-medieval-city,
+.theme-desert-caravan,
+.theme-sun-temple {
+    border-color: rgba(6, 182, 212, 0.4) !important;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(6, 182, 212, 0.02)) !important;
+}
+
+.theme-dwarf-mountain,
+.theme-frost-north {
+    border-color: rgba(167, 139, 250, 0.4) !important;
+    background: linear-gradient(135deg, rgba(167, 139, 250, 0.08), rgba(167, 139, 250, 0.02)) !important;
+}
+
+@media (max-width: 1024px) {
+    body { font-size: 15px; }
+
+    .btn,
+    .shop-item-button,
+    .task-mini-btn,
+    .nav-link {
+        font-size: 13px !important;
+    }
+
+    .task-text,
+    .item-desc,
+    .quest-story,
+    .lore-item,
+    .stat-label,
+    .stat-card-label,
+    .upgrade-desc,
+    .xp-text,
+    .secret-strip,
+    .nav-link,
+    .navbar p,
+    .header p {
+        font-size: 13px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    body { font-size: 15px; }
+
+    .btn,
+    .shop-item-button,
+    .task-mini-btn,
+    .nav-link {
+        font-size: 13px !important;
+        padding: 9px 13px !important;
+    }
+
+    .task-text,
+    .item-desc,
+    .quest-story,
+    .lore-item,
+    .stat-label,
+    .stat-card-label,
+    .upgrade-desc,
+    .xp-text,
+    .secret-strip,
+    .nav-link,
+    .navbar p,
+    .header p {
+        font-size: 13px !important;
+    }
+}

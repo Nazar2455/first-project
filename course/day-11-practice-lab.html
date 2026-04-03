@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Модуль 11 · Практикум (Sheets интеграции)</title>
+	<style>
+		* { box-sizing: border-box; margin: 0; padding: 0; }
+		@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+		body { font-family:'Montserrat',sans-serif; background:linear-gradient(135deg,#0f0f1e,#1a0a2e,#16213e); color:#eaf2ff; min-height:100vh; padding:20px; }
+		.wrap { max-width:1100px; margin:0 auto; }
+		.card { background:rgba(19,28,46,.86); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:18px; margin-bottom:14px; }
+		h1 { color:#ffed4e; margin-bottom:8px; }
+		h2 { color:#56e8ff; font-size:1.14em; margin-bottom:8px; }
+		h3 { color:#9ec0ff; font-size:1em; margin:10px 0 7px; }
+		p, li { color:#d7e6ff; line-height:1.6; }
+		ul, ol { margin-left:20px; margin-top:8px; }
+		.hint { border-left:3px solid #ffd700; background:rgba(255,215,0,.08); border-radius:8px; padding:10px 12px; margin-top:8px; font-size:.92em; }
+		.actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+		.btn { display:inline-block; text-decoration:none; border:1px solid rgba(255,215,0,.45); border-radius:10px; background:rgba(255,215,0,.12); color:#ffed4e; font-weight:700; padding:9px 12px; cursor:pointer; }
+		.btn.alt { border-color:rgba(86,232,255,.55); color:#56e8ff; background:rgba(86,232,255,.12); }
+		.codebox { margin-top:10px; border:1px solid rgba(102,126,234,.35); border-radius:10px; overflow:hidden; background:#0b1220; }
+		.codebox-title { background:rgba(102,126,234,.12); color:#9ec0ff; font-size:.8em; font-weight:700; padding:8px 10px; border-bottom:1px solid rgba(102,126,234,.25); }
+		textarea { width:100%; min-height:190px; border:none; resize:vertical; padding:12px; font-family:Consolas,'Courier New',monospace; font-size:.88em; line-height:1.45; color:#e7f1ff; background:#0b1220; outline:none; }
+		.checks { margin-top:10px; display:grid; gap:6px; font-size:.92em; }
+		.ok { color:#6ff3a3; } .bad { color:#ff8f8f; } .warn { color:#ffd78a; }
+		.result { margin-top:10px; border-radius:10px; padding:10px 12px; font-size:.92em; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.03); }
+		.status-pill { display:inline-block; margin-top:8px; border:1px solid rgba(255,215,0,.45); border-radius:999px; padding:4px 10px; color:#ffed4e; font-size:.8em; font-weight:700; background:rgba(255,215,0,.1); }
+	</style>
+	<link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+	<div class="wrap">
+		<section class="card">
+			<h1>🧪 Модуль 11 · Практикум</h1>
+			<p>Интеграции с Google Sheets для бота и парсера: надёжность, fallback и anti-dup.</p>
+			<div class="actions">
+				<a class="btn" href="day-11-index.html">← Теория Модуля 11</a>
+				<a class="btn alt" href="index.html">Ко всем модулям</a>
+				<a class="btn" href="day-12-index.html">День 12 →</a>
+			</div>
+			<div class="course-top-tools">
+				<button id="readToggleBtn" class="read-toggle-btn" type="button">📘 Отметить день как прочитанный</button>
+				<span class="status-pill">Практика дня 11</span>
+			</div>
+		</section>
+
+		<section class="card">
+			<h2>🤖 БОТЫ: запись лидов в Sheets + fallback</h2>
+			<p><strong>Цель:</strong> сделать запись лидов в Google Sheets как основной канал, но без потери данных при сбоях API.</p>
+			<p><strong>Связь с теорией дня 11:</strong> закрепляешь интеграцию через service account, структуру строк (source/timestamp) и аварийный fallback.</p>
+			<div class="hint"><strong>Фокус на смысл:</strong> если внешняя интеграция упала, данные всё равно должны сохраниться (backup), иначе бизнес теряет лиды.</div>
+			<h3>Что нужно сделать (конкретно)</h3>
+			<ol>
+				<li>Service account + <code>append_row</code>.</li>
+				<li><code>source</code>/<code>timestamp</code> в строке.</li>
+				<li><code>try/except</code> + local backup.</li>
+				<li>Лог успеха/ошибки.</li>
+			</ol>
+			<h3>Критерии готовности (Definition of Done)</h3>
+			<ul>
+				<li>Лиды пишутся в таблицу и читаются в нужном порядке колонок.</li>
+				<li>При ошибке Sheets лид не теряется, а уходит в backup.</li>
+				<li>В логах видно, куда ушла запись (Sheets или backup).</li>
+			</ul>
+			<h3>Что сдать на проверку</h3>
+			<ul>
+				<li>Код интеграции и fallback-функции.</li>
+				<li>Логи одного успешного и одного аварийного сценария.</li>
+			</ul>
+			<div class="codebox"><div class="codebox-title">Код интеграции бота</div><textarea id="botCode"></textarea></div>
+			<div class="codebox"><div class="codebox-title">Логи</div><textarea id="botOutput"></textarea></div>
+			<div class="actions"><button class="btn" id="checkBotBtn" type="button">Проверить БОТЫ</button></div>
+			<div class="result" id="botResult">Пока не проверяли.</div>
+			<div class="checks" id="botChecks"></div>
+		</section>
+
+		<section class="card">
+			<h2>🕷️ ПАРСИНГ: anti-dup выгрузка в Sheets</h2>
+			<p><strong>Цель:</strong> выгружать в таблицу только новые данные и контролировать качество выгрузки через статистику.</p>
+			<p><strong>Связь с теорией дня 11:</strong> закрепляешь ключ уникальности, чтение существующих ключей, <code>append_rows</code> только для новинок и метрики <code>appended/skipped</code>.</p>
+			<div class="hint"><strong>Фокус на смысл:</strong> без anti-dup таблица быстро превращается в шум и теряет ценность для анализа.</div>
+			<h3>Что нужно сделать (конкретно)</h3>
+			<ol>
+				<li>Ключ уникальности (url/id).</li>
+				<li>Проверка existing keys.</li>
+				<li><code>append_rows</code> только новых строк.</li>
+				<li><code>updated_at</code> + stats appended/skipped.</li>
+			</ol>
+			<h3>Критерии готовности (Definition of Done)</h3>
+			<ul>
+				<li>Повторный запуск не дублирует старые строки.</li>
+				<li>Каждая новая строка имеет метку обновления.</li>
+				<li>В конце есть summary с <code>appended/skipped/total</code>.</li>
+			</ul>
+			<h3>Что сдать на проверку</h3>
+			<ul>
+				<li>Код key-builder и anti-dup выгрузки.</li>
+				<li>Лог минимум двух запусков (первый и повторный) с разницей в stats.</li>
+			</ul>
+			<div class="codebox"><div class="codebox-title">Код интеграции парсера</div><textarea id="parserCode"></textarea></div>
+			<div class="codebox"><div class="codebox-title">Логи</div><textarea id="parserOutput"></textarea></div>
+			<div class="actions"><button class="btn" id="checkParserBtn" type="button">Проверить ПАРСИНГ</button></div>
+			<div class="result" id="parserResult">Пока не проверяли.</div>
+			<div class="checks" id="parserChecks"></div>
+		</section>
+	</div>
+
+	<script src="course-tools.js"></script>
+	<script>
+		const LAB_KEY='course_day11_practice_lab_v1';
+		const has=(t,p)=>p.test(t);
+		const norm=t=>String(t||'').replace(/\r\n/g,'\n').toLowerCase();
+		const lines=t=>String(t||'').split('\n').map(x=>x.trim()).filter(Boolean).length;
+
+		function rc(id,it){
+			document.getElementById(id).innerHTML=it.map(i=>`<div class="${i.level==='warn'?'warn':(i.ok?'ok':'bad')}">${i.level==='warn'?'⚠️':(i.ok?'✅':'❌')} ${i.label}${i.note?` — ${i.note}`:''}</div>`).join('')
+		}
+		function sm(id,c){
+			const f=c.filter(x=>x.required&&!x.ok);
+			const s=c.reduce((a,x)=>a+(x.ok?(x.weight||1):0),0);
+			const m=c.reduce((a,x)=>a+(x.weight||1),0);
+			const p=m?Math.round(s*100/m):0;
+			document.getElementById(id).innerHTML=`<strong>${s}/${m}</strong> баллов (${p}%). ${f.length===0&&p>=75?'✅ Зачёт.':'❌ Пока не зачёт.'}${f.length?`<br><span class="bad">Недочёты: ${f.map(x=>x.short||x.label).join(', ')}</span>`:''}`
+		}
+
+		function checkBot(){
+			const c=norm(botCode.value),o=norm(botOutput.value);
+			const k=[
+				{label:'Достаточный объём',short:'мало кода',ok:lines(c)>=16,required:true,weight:2,note:`${lines(c)} строк`},
+				{label:'Service account и append_row',short:'нет базовой записи в Sheets',ok:has(c,/service_account|credentials/)&&has(c,/append_row\(/),required:true,weight:4},
+				{label:'Есть source + timestamp',short:'нет source/timestamp',ok:has(c,/source|telegram_bot/)&&has(c,/datetime|timestamp/),required:true,weight:3},
+				{label:'Есть fallback backup',short:'нет fallback',ok:has(c,/except/)&&has(c,/backup|jsonl|local/),required:true,weight:3},
+				{label:'Есть логи save/error',short:'нет логирования',ok:has(c,/saved|error|print|logger/),required:true,weight:2},
+				{label:'Логи запуска добавлены',ok:o.trim().length>0,required:false,level:'warn',weight:1,note:o.trim()?'добавлены':'не добавлены'}
+			];
+			rc('botChecks',k); sm('botResult',k); ps();
+		}
+
+		function checkParser(){
+			const c=norm(parserCode.value),o=norm(parserOutput.value);
+			const k=[
+				{label:'Достаточный объём',short:'мало кода',ok:lines(c)>=16,required:true,weight:2,note:`${lines(c)} строк`},
+				{label:'Есть key url/id',short:'нет ключа уникальности',ok:has(c,/url|id/)&&has(c,/build_key|key\s*=/),required:true,weight:3},
+				{label:'Читаются existing keys',short:'нет existing keys',ok:has(c,/col_values|existing/),required:true,weight:3},
+				{label:'append_rows только новых',short:'нет anti-dup потока',ok:has(c,/append_rows\(/)&&has(c,/if\s+key\s+in\s+existing/),required:true,weight:4},
+				{label:'Есть updated_at',short:'нет updated_at',ok:has(c,/updated_at|datetime/),required:true,weight:2},
+				{label:'Есть stats appended/skipped',short:'нет stats',ok:has(c,/appended|skipped|total/),required:true,weight:2},
+				{label:'Логи запуска добавлены',ok:o.trim().length>0,required:false,level:'warn',weight:1,note:o.trim()?'добавлены':'не добавлены'}
+			];
+			rc('parserChecks',k); sm('parserResult',k); ps();
+		}
+
+		function ps(){
+			localStorage.setItem(LAB_KEY,JSON.stringify({
+				botCode:botCode.value,
+				botOutput:botOutput.value,
+				parserCode:parserCode.value,
+				parserOutput:parserOutput.value
+			}))
+		}
+		function rs(){
+			try{
+				const s=JSON.parse(localStorage.getItem(LAB_KEY)||'{}');
+				if(s.botCode) botCode.value=s.botCode;
+				if(s.botOutput) botOutput.value=s.botOutput;
+				if(s.parserCode) parserCode.value=s.parserCode;
+				if(s.parserOutput) parserOutput.value=s.parserOutput;
+			}catch{}
+		}
+
+		checkBotBtn.addEventListener('click',checkBot);
+		checkParserBtn.addEventListener('click',checkParser);
+		['botCode','botOutput','parserCode','parserOutput'].forEach(id=>document.getElementById(id).addEventListener('input',ps));
+		rs();
+		CourseTools.initModulePage(11);
+	</script>
+</body>
+</html>
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Модуль 11 · Практикум (Sheets интеграции)</title><style>*{box-sizing:border-box;margin:0;padding:0}@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');body{font-family:'Montserrat',sans-serif;background:linear-gradient(135deg,#0f0f1e,#1a0a2e,#16213e);color:#eaf2ff;min-height:100vh;padding:20px}.wrap{max-width:1100px;margin:0 auto}.card{background:rgba(19,28,46,.86);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:18px;margin-bottom:14px}h1{color:#ffed4e;margin-bottom:8px}h2{color:#56e8ff;font-size:1.14em;margin-bottom:8px}p,li{color:#d7e6ff;line-height:1.6}ul,ol{margin-left:20px;margin-top:8px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.btn{display:inline-block;text-decoration:none;border:1px solid rgba(255,215,0,.45);border-radius:10px;background:rgba(255,215,0,.12);color:#ffed4e;font-weight:700;padding:9px 12px;cursor:pointer}.btn.alt{border-color:rgba(86,232,255,.55);color:#56e8ff;background:rgba(86,232,255,.12)}.codebox{margin-top:10px;border:1px solid rgba(102,126,234,.35);border-radius:10px;overflow:hidden;background:#0b1220}.codebox-title{background:rgba(102,126,234,.12);color:#9ec0ff;font-size:.8em;font-weight:700;padding:8px 10px;border-bottom:1px solid rgba(102,126,234,.25)}textarea{width:100%;min-height:190px;border:none;resize:vertical;padding:12px;font-family:Consolas,'Courier New',monospace;font-size:.88em;line-height:1.45;color:#e7f1ff;background:#0b1220;outline:none}.checks{margin-top:10px;display:grid;gap:6px;font-size:.92em}.ok{color:#6ff3a3}.bad{color:#ff8f8f}.warn{color:#ffd78a}.result{margin-top:10px;border-radius:10px;padding:10px 12px;font-size:.92em;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03)}.status-pill{display:inline-block;margin-top:8px;border:1px solid rgba(255,215,0,.45);border-radius:999px;padding:4px 10px;color:#ffed4e;font-size:.8em;font-weight:700;background:rgba(255,215,0,.1)}</style><link rel="stylesheet" href="course-tools.css"/></head><body><div class="wrap"><section class="card"><h1>🧪 Модуль 11 · Практикум</h1><p>Интеграции с Google Sheets для бота и парсера: надёжность, fallback и anti-dup.</p><div class="actions"><a class="btn" href="day-11-index.html">← Теория Модуля 11</a><a class="btn alt" href="index.html">Ко всем модулям</a><a class="btn" href="day-12-index.html">День 12 →</a></div><div class="course-top-tools"><button id="readToggleBtn" class="read-toggle-btn" type="button">📘 Отметить день как прочитанный</button><span class="status-pill">Практика дня 11</span></div></section><section class="card"><h2>🤖 БОТЫ: запись лидов в Sheets + fallback</h2><ol><li>Service account + append_row.</li><li>source/timestamp в строке.</li><li>try/except + local backup.</li><li>Лог успеха/ошибки.</li></ol><div class="codebox"><div class="codebox-title">Код интеграции бота</div><textarea id="botCode"></textarea></div><div class="codebox"><div class="codebox-title">Логи</div><textarea id="botOutput"></textarea></div><div class="actions"><button class="btn" id="checkBotBtn" type="button">Проверить БОТЫ</button></div><div class="result" id="botResult">Пока не проверяли.</div><div class="checks" id="botChecks"></div></section><section class="card"><h2>🕷️ ПАРСИНГ: anti-dup выгрузка в Sheets</h2><ol><li>Ключ уникальности (url/id).</li><li>Проверка existing keys.</li><li>append_rows только новых строк.</li><li>updated_at + stats appended/skipped.</li></ol><div class="codebox"><div class="codebox-title">Код интеграции парсера</div><textarea id="parserCode"></textarea></div><div class="codebox"><div class="codebox-title">Логи</div><textarea id="parserOutput"></textarea></div><div class="actions"><button class="btn" id="checkParserBtn" type="button">Проверить ПАРСИНГ</button></div><div class="result" id="parserResult">Пока не проверяли.</div><div class="checks" id="parserChecks"></div></section></div><script src="course-tools.js"></script><script>const LAB_KEY='course_day11_practice_lab_v1';const has=(t,p)=>p.test(t);const norm=t=>String(t||'').replace(/\r\n/g,'\n').toLowerCase();const lines=t=>String(t||'').split('\n').map(x=>x.trim()).filter(Boolean).length;function rc(id,it){document.getElementById(id).innerHTML=it.map(i=>`<div class="${i.level==='warn'?'warn':(i.ok?'ok':'bad')}">${i.level==='warn'?'⚠️':(i.ok?'✅':'❌')} ${i.label}${i.note?` — ${i.note}`:''}</div>`).join('')}function sm(id,c){const f=c.filter(x=>x.required&&!x.ok);const s=c.reduce((a,x)=>a+(x.ok?(x.weight||1):0),0);const m=c.reduce((a,x)=>a+(x.weight||1),0);const p=m?Math.round(s*100/m):0;document.getElementById(id).innerHTML=`<strong>${s}/${m}</strong> баллов (${p}%). ${f.length===0&&p>=75?'✅ Зачёт.':'❌ Пока не зачёт.'}${f.length?`<br><span class="bad">Недочёты: ${f.map(x=>x.short||x.label).join(', ')}</span>`:''}`}function checkBot(){const c=norm(botCode.value),o=norm(botOutput.value);const k=[{label:'Достаточный объём',short:'мало кода',ok:lines(c)>=16,required:true,weight:2,note:`${lines(c)} строк`},{label:'Service account и append_row',short:'нет базовой записи в Sheets',ok:has(c,/service_account|credentials/)&&has(c,/append_row\(/),required:true,weight:4},{label:'Есть source + timestamp',short:'нет source/timestamp',ok:has(c,/source|telegram_bot/)&&has(c,/datetime|timestamp/),required:true,weight:3},{label:'Есть fallback backup',short:'нет fallback',ok:has(c,/except/)&&has(c,/backup|jsonl|local/),required:true,weight:3},{label:'Есть логи save/error',short:'нет логирования',ok:has(c,/saved|error|print|logger/),required:true,weight:2},{label:'Логи запуска добавлены',ok:o.trim().length>0,required:false,level:'warn',weight:1,note:o.trim()?'добавлены':'не добавлены'}];rc('botChecks',k);sm('botResult',k);ps()}function checkParser(){const c=norm(parserCode.value),o=norm(parserOutput.value);const k=[{label:'Достаточный объём',short:'мало кода',ok:lines(c)>=16,required:true,weight:2,note:`${lines(c)} строк`},{label:'Есть key url/id',short:'нет ключа уникальности',ok:has(c,/url|id/)&&has(c,/build_key|key\s*=/),required:true,weight:3},{label:'Читаются existing keys',short:'нет existing keys',ok:has(c,/col_values|existing/),required:true,weight:3},{label:'append_rows только новых',short:'нет anti-dup потока',ok:has(c,/append_rows\(/)&&has(c,/if\s+key\s+in\s+existing/),required:true,weight:4},{label:'Есть updated_at',short:'нет updated_at',ok:has(c,/updated_at|datetime/),required:true,weight:2},{label:'Есть stats appended/skipped',short:'нет stats',ok:has(c,/appended|skipped|total/),required:true,weight:2},{label:'Логи запуска добавлены',ok:o.trim().length>0,required:false,level:'warn',weight:1,note:o.trim()?'добавлены':'не добавлены'}];rc('parserChecks',k);sm('parserResult',k);ps()}function ps(){localStorage.setItem(LAB_KEY,JSON.stringify({botCode:botCode.value,botOutput:botOutput.value,parserCode:parserCode.value,parserOutput:parserOutput.value}))}function rs(){try{const s=JSON.parse(localStorage.getItem(LAB_KEY)||'{}');if(s.botCode)botCode.value=s.botCode;if(s.botOutput)botOutput.value=s.botOutput;if(s.parserCode)parserCode.value=s.parserCode;if(s.parserOutput)parserOutput.value=s.parserOutput}catch{}}checkBotBtn.addEventListener('click',checkBot);checkParserBtn.addEventListener('click',checkParser);['botCode','botOutput','parserCode','parserOutput'].forEach(id=>document.getElementById(id).addEventListener('input',ps));rs();CourseTools.initModulePage(11);</script></body></html>

@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧌 Гоблин-хаб: магазин и ачивки</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0f0f1e, #1a0a2e, #16213e);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(255,215,0,0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(102,126,234,0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(20, 30, 50, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-link {
+            color: #b0c4de;
+            cursor: pointer;
+            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav-link.active {
+            color: #ffd700;
+            border-bottom-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+        
+        .nav-link:hover {
+            color: #ffd700;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-title {
+            font-size: 2.5em;
+            font-weight: 800;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .item-card {
+            background: linear-gradient(135deg, rgba(20, 30, 50, 0.9), rgba(30, 40, 70, 0.8));
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .item-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        
+        .item-card.achieved::before {
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+        }
+        
+        .item-card:hover {
+            transform: translateY(-8px);
+            border-color: #ffd700;
+            box-shadow: 0 20px 50px rgba(255, 215, 0, 0.2);
+        }
+        
+        .item-icon {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            display: block;
+            text-align: center;
+        }
+        
+        .item-title {
+            font-size: 1.2em;
+            font-weight: 800;
+            color: #ffed4e;
+            margin-bottom: 10px;
+        }
+        
+        .item-desc {
+            font-size: 0.9em;
+            color: #b0c4de;
+            margin-bottom: 15px;
+            min-height: 40px;
+        }
+        
+        .item-requirement {
+            font-size: 0.85em;
+            color: #ffa500;
+            margin-bottom: 10px;
+            background: rgba(255, 165, 0, 0.1);
+            padding: 8px;
+            border-radius: 8px;
+            border-left: 3px solid #ffa500;
+        }
+        
+        .item-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .progress-bar-small {
+            flex: 1;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            margin-right: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-small > div {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+        
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            background: rgba(255, 215, 0, 0.1);
+            color: #ffd700;
+            text-align: right;
+            min-width: 60px;
+        }
+        
+        .badge.achieved {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .shop-item-button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border: 2px solid #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+            color: #ffd700;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .shop-item-button:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+        
+        .shop-item-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .empty-state-emoji {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state-text {
+            font-size: 1.2em;
+            color: #b0c4de;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 28px;
+            border: 2px solid #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(102, 126, 234, 0.05));
+            color: #667eea;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(102, 126, 234, 0.15));
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .stat-header {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .secret-strip {
+            margin: 0 0 20px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            background: rgba(255, 215, 0, 0.08);
+            color: #ffeeb5;
+            font-size: 0.92em;
+            font-weight: 600;
+        }
+        
+        .stat-card {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #ffd700;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-card-label {
+            font-size: 0.9em;
+            color: #b0c4de;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card-value {
+            font-size: 2em;
+            font-weight: 800;
+            color: #ffed4e;
+        }
+        
+        @media (max-width: 768px) {
+            .section-title { font-size: 1.8em; }
+            .items-grid { grid-template-columns: 1fr; }
+            .nav-links { flex-direction: column; width: 100%; }
+        }
+    </style>
+    <link rel="stylesheet" href="pixel-theme.css">
+</head>
+<body>
+    <div class="container">
+        <!-- NAVBAR -->
+        <div class="navbar">
+            <div style="font-size: 1.5em; font-weight: 800;">🧌 ГОБЛИН-ХАБ: МАГАЗИН & АЧИВКИ</div>
+            <div class="nav-links">
+                <div class="nav-link active" data-tab="shop" onclick="switchTab('shop', this)">🏪 Магазин</div>
+                <div class="nav-link" data-tab="achievements" onclick="switchTab('achievements', this)">🏆 Достижения</div>
+                <div class="nav-link" onclick="goBack()">← Назад</div>
+            </div>
+        </div>
+        
+        <!-- SHOP TAB -->
+        <div id="shop" class="tab-content active">
+            <h1 class="section-title">🏪 Магазин Косметики</h1>
+            <div class="secret-strip" id="secretStrip">🗝️ Секреты: 0/8 — ищи их в заданиях</div>
+            
+            <div class="stat-header">
+                <div class="stat-card">
+                    <div class="stat-card-label">💰 Твои Монеты</div>
+                    <div class="stat-card-value" id="userCoins">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">🛒 Куплено</div>
+                    <div class="stat-card-value" id="purchasedCount">0</div>
+                </div>
+            </div>
+            
+            <div class="items-grid" id="shopGrid">
+                <!-- Динамически из JS -->
+            </div>
+        </div>
+        
+        <!-- ACHIEVEMENTS TAB -->
+        <div id="achievements" class="tab-content">
+            <h1 class="section-title">🏆 ДОСТИЖЕНИЯ</h1>
+            
+            <div class="stat-header">
+                <div class="stat-card">
+                    <div class="stat-card-label">🎖️ Получено</div>
+                    <div class="stat-card-value" id="achievedCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">📊 Прогресс</div>
+                    <div class="stat-card-value" id="achievementPercent">0%</div>
+                </div>
+            </div>
+            
+            <div class="items-grid" id="achievementsGrid">
+                <!-- Динамически из JS -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="api-client.js"></script>
+    <script>
+        const SHOP_ITEMS = [
+            { id: 'helm_gold', icon: '👑', title: 'Корона Золота', desc: 'Легендарная корона для программиста', cost: 1000, type: 'cosmetic' },
+            { id: 'cape_red', icon: '🧛', title: 'Красный Плащ', desc: 'Стильный плащ +20% сила воли', cost: 500, type: 'cosmetic' },
+            { id: 'sword_light', icon: '⚔️', title: 'Светящий Меч', desc: 'Меч который светит в темноте', cost: 750, type: 'cosmetic' },
+            { id: 'ring_power', icon: '💍', title: 'Кольцо Силы', desc: '+50 HP к здоровью кодера', cost: 600, type: 'upgrade' },
+            { id: 'boost_2x', icon: '🚀', title: 'Ускоритель x2', desc: '+100% XP на 1 день', cost: 200, type: 'boost' },
+            { id: 'theme_dark', icon: '🌙', title: 'Темная Тема+', desc: 'Еще более черная студия', cost: 300, type: 'cosmetic' },
+            { id: 'potion_heal', icon: '🧪', title: 'Зелье Восстановления', desc: 'Восстановить энергию', cost: 150, type: 'consumable' },
+            { id: 'wings_gold', icon: '💛', title: 'Золотые Крылья', desc: 'Летай над заданиями', cost: 1200, type: 'cosmetic' }
+        ];
+        
+        const ACHIEVEMENTS = [
+            { 
+                id: 'first_task', 
+                icon: '✅', 
+                title: 'Первый Шаг', 
+                desc: 'Выполни первое задание', 
+                requirement: 'Выполнить 1 задание', 
+                check: () => Object.keys(GAME_STATE.completed).length >= 1,
+                reward: 50
+            },
+            { 
+                id: 'ten_tasks', 
+                icon: '🔟', 
+                title: 'Десяток', 
+                desc: 'Выполни 10 заданий', 
+                requirement: 'Выполнить 10 заданий', 
+                check: () => Object.keys(GAME_STATE.completed).length >= 10,
+                reward: 200
+            },
+            { 
+                id: 'half_done', 
+                icon: '🏗️', 
+                title: 'На Полпути', 
+                desc: 'Завершено 60 заданий', 
+                requirement: 'Выполнить 60 заданий', 
+                check: () => Object.keys(GAME_STATE.completed).length >= 60,
+                reward: 500
+            },
+            { 
+                id: 'all_done', 
+                icon: '🎉', 
+                title: 'ЛЕГЕНДА', 
+                desc: 'ВСЕ 120 заданий выполнены!', 
+                requirement: 'Выполнить все 120 заданий', 
+                check: () => Object.keys(GAME_STATE.completed).length >= 120,
+                reward: 2000
+            },
+            { 
+                id: 'level_5', 
+                icon: '⭐', 
+                title: 'Пятый уровень', 
+                desc: 'Достигни 5-го уровня', 
+                requirement: 'Уровень 5+', 
+                check: () => GAME_STATE.level >= 5,
+                reward: 300
+            },
+            { 
+                id: 'level_10', 
+                icon: '⭐⭐', 
+                title: 'Десятый уровень', 
+                desc: 'Достигни 10-го уровня', 
+                requirement: 'Уровень 10+', 
+                check: () => GAME_STATE.level >= 10,
+                reward: 800
+            },
+            { 
+                id: 'rich', 
+                icon: '💰', 
+                title: 'Богач', 
+                desc: 'Собрал 1000 монет', 
+                requirement: 'Собрать 1000 монет', 
+                check: () => (GAME_STATE.points / 10) >= 1000,
+                reward: 500
+            },
+            { 
+                id: 'collector', 
+                icon: '🎁', 
+                title: 'Коллекционер', 
+                desc: 'Куплено 5 предметов', 
+                requirement: 'Купить 5 предметов', 
+                check: () => Object.keys(GAME_STATE.cosmetics).filter(k => GAME_STATE.cosmetics[k]).length >= 5,
+                reward: 600
+            }
+        ];
+        
+        const GAME_STATE = {
+            points: parseInt(localStorage.getItem('points')) || 0,
+            level: parseInt(localStorage.getItem('level')) || 1,
+            completed: JSON.parse(localStorage.getItem('completed')) || {},
+            cosmetics: JSON.parse(localStorage.getItem('cosmetics')) || {},
+            equippedCosmetics: JSON.parse(localStorage.getItem('equippedCosmetics') || '{}'),
+            achievements: JSON.parse(localStorage.getItem('achievements')) || {}
+        };
+
+        const API_BASE = localStorage.getItem('planApiBase') || 'http://127.0.0.1:8000/api';
+
+        async function apiRequest(path, options = {}) {
+            if (window.PlanApiClient?.request) {
+                return window.PlanApiClient.request(path, options, API_BASE);
+            }
+
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 3000);
+
+            try {
+                const response = await fetch(`${API_BASE}${path}`, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(options.headers || {})
+                    },
+                    signal: controller.signal
+                });
+
+                if (!response.ok) return null;
+                return await response.json();
+            } catch (_) {
+                return null;
+            } finally {
+                clearTimeout(timeout);
+            }
+        }
+
+        async function hydrateShopFromServer() {
+            const data = await apiRequest('/state/main_tracker');
+            if (!data?.value || typeof data.value !== 'object') return;
+
+            const incoming = data.value;
+            if (typeof incoming.points === 'number') localStorage.setItem('points', String(incoming.points));
+            if (typeof incoming.level === 'number') localStorage.setItem('level', String(incoming.level));
+            if (incoming.completed && typeof incoming.completed === 'object') localStorage.setItem('completed', JSON.stringify(incoming.completed));
+            if (incoming.cosmetics && typeof incoming.cosmetics === 'object') localStorage.setItem('cosmetics', JSON.stringify(incoming.cosmetics));
+            if (incoming.equippedCosmetics && typeof incoming.equippedCosmetics === 'object') localStorage.setItem('equippedCosmetics', JSON.stringify(incoming.equippedCosmetics));
+
+            GAME_STATE.points = parseInt(localStorage.getItem('points')) || GAME_STATE.points;
+            GAME_STATE.level = parseInt(localStorage.getItem('level')) || GAME_STATE.level;
+            GAME_STATE.completed = JSON.parse(localStorage.getItem('completed') || '{}');
+            GAME_STATE.cosmetics = JSON.parse(localStorage.getItem('cosmetics') || '{}');
+            GAME_STATE.equippedCosmetics = JSON.parse(localStorage.getItem('equippedCosmetics') || '{}');
+        }
+
+        async function syncShopToServer() {
+            await apiRequest('/state/main_tracker', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    value: {
+                        points: GAME_STATE.points,
+                        level: GAME_STATE.level,
+                        completed: GAME_STATE.completed,
+                        cosmetics: GAME_STATE.cosmetics,
+                        equippedCosmetics: GAME_STATE.equippedCosmetics,
+                        achievements: GAME_STATE.achievements
+                    }
+                })
+            });
+        }
+        
+        function switchTab(tabName, element) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-link[data-tab]').forEach(link => link.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            if (element) {
+                element.classList.add('active');
+            } else {
+                const auto = document.querySelector(`.nav-link[data-tab="${tabName}"]`);
+                if (auto) auto.classList.add('active');
+            }
+            
+            if (tabName === 'shop') renderShop();
+            else renderAchievements();
+        }
+        
+        function renderShop() {
+            const grid = document.getElementById('shopGrid');
+            grid.innerHTML = '';
+            
+            const coins = Math.floor(GAME_STATE.points / 10);
+            const secretCount = Object.keys(JSON.parse(localStorage.getItem('secretFlags')) || {}).length;
+            document.getElementById('userCoins').textContent = coins;
+            document.getElementById('purchasedCount').textContent = 
+                Object.keys(GAME_STATE.cosmetics).filter(k => GAME_STATE.cosmetics[k]).length;
+            document.getElementById('secretStrip').textContent = `🗝️ Секреты: ${secretCount}/8 — гоблин уже одобряет твой прогресс`;
+            
+            SHOP_ITEMS.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                
+                const owned = GAME_STATE.cosmetics[item.id];
+                const canAfford = coins >= item.cost;
+                
+                if (owned) {
+                    card.style.borderColor = '#ffd700';
+                    card.style.background = 'linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.05))';
+                }
+                
+                card.innerHTML = `
+                    <span class="item-icon">${item.icon}</span>
+                    <div class="item-title">${item.title}</div>
+                    <div class="item-desc">${item.desc}</div>
+                    <div class="item-status">
+                        <span class="badge ${owned ? 'achieved' : ''}">${owned ? '✅ ИМЕЕШЬ' : '💰 ' + item.cost}</span>
+                    </div>
+                    ${owned && item.type === 'cosmetic' ? `<button class="shop-item-button" onclick="toggleEquipItem('${item.id}')">${GAME_STATE.equippedCosmetics[item.id] === false ? 'Надеть' : 'Снять'}</button>` : ''}
+                    ${!owned ? `<button class="shop-item-button" onclick="purchaseItem('${item.id}')" ${!canAfford ? 'disabled' : ''}>
+                        ${canAfford ? 'Купить' : 'Недостаточно монет'}
+                    </button>` : ''}
+                `;
+                
+                grid.appendChild(card);
+            });
+
+            applyFantasyThemesShop();
+        }
+        
+        function renderAchievements() {
+            const grid = document.getElementById('achievementsGrid');
+            grid.innerHTML = '';
+            
+            let completed = 0;
+            ACHIEVEMENTS.forEach(ach => {
+                if (ach.check()) completed++;
+                
+                const card = document.createElement('div');
+                card.className = 'item-card ' + (ach.check() ? 'achieved' : '');
+                
+                const progress = ach.check() ? 100 : calculateProgress(ach);
+                
+                card.innerHTML = `
+                    <span class="item-icon">${ach.icon}</span>
+                    <div class="item-title">${ach.title}</div>
+                    <div class="item-desc">${ach.desc}</div>
+                    <div class="item-requirement">📋 ${ach.requirement}</div>
+                    <div class="item-status">
+                        <div class="progress-bar-small"><div style="width: ${progress}%"></div></div>
+                        <span class="badge ${ach.check() ? 'achieved' : ''}">${ach.check() ? '✅' : progress + '%'}</span>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+            
+            document.getElementById('achievedCount').textContent = completed;
+            document.getElementById('achievementPercent').textContent = Math.round((completed / ACHIEVEMENTS.length) * 100) + '%';
+
+            applyFantasyThemesShop();
+        }
+        
+        function calculateProgress(achievement) {
+            if (achievement.id === 'first_task' || achievement.id === 'ten_tasks' || achievement.id === 'half_done' || achievement.id === 'all_done') {
+                const tasks = Object.keys(GAME_STATE.completed).length;
+                if (achievement.id === 'first_task') return Math.min(tasks, 1) * 100;
+                if (achievement.id === 'ten_tasks') return Math.min(tasks / 10, 1) * 100;
+                if (achievement.id === 'half_done') return Math.min(tasks / 60, 1) * 100;
+                if (achievement.id === 'all_done') return Math.min(tasks / 120, 1) * 100;
+            }
+            return 0;
+        }
+        
+        function purchaseItem(itemId) {
+            const item = SHOP_ITEMS.find(i => i.id === itemId);
+            const coins = Math.floor(GAME_STATE.points / 10);
+            
+            if (coins >= item.cost) {
+                GAME_STATE.cosmetics[itemId] = true;
+                if (item.type === 'cosmetic') {
+                    GAME_STATE.equippedCosmetics[itemId] = true;
+                }
+                GAME_STATE.points -= item.cost * 10;
+                localStorage.setItem('cosmetics', JSON.stringify(GAME_STATE.cosmetics));
+                localStorage.setItem('equippedCosmetics', JSON.stringify(GAME_STATE.equippedCosmetics));
+                localStorage.setItem('points', GAME_STATE.points);
+                void syncShopToServer();
+                renderShop();
+            }
+        }
+
+        function toggleEquipItem(itemId) {
+            if (!GAME_STATE.cosmetics[itemId]) return;
+            const current = GAME_STATE.equippedCosmetics[itemId] !== false;
+            GAME_STATE.equippedCosmetics[itemId] = !current;
+            localStorage.setItem('equippedCosmetics', JSON.stringify(GAME_STATE.equippedCosmetics));
+            void syncShopToServer();
+            renderShop();
+        }
+        
+        function goBack() {
+            window.location.href = 'profile-cosmetics.html';
+        }
+
+        function applyFantasyThemesShop() {
+            const paint = (selector, cls, icon) => {
+                const el = document.querySelector(selector);
+                if (!el) return;
+                el.classList.add('fantasy-zone', 'theme-transition-soft', cls);
+                if (icon) el.setAttribute('data-biome-icon', icon);
+            };
+
+            paint('.navbar', 'theme-medieval-city', '🏘️');
+            paint('#shop', 'theme-dragon-field', '🐉');
+            paint('#achievements', 'theme-knight-order', '🛡️');
+            paint('.secret-strip', 'theme-night-witch', '🧪');
+
+            document.querySelectorAll('.stat-card').forEach((card, idx) => {
+                const map = [
+                    ['theme-sun-temple', '☀️'],
+                    ['theme-castle', '🏰'],
+                    ['theme-arcane-ruins', '🔮']
+                ];
+                const [cls, icon] = map[idx % map.length];
+                card.classList.add('fantasy-zone', 'theme-transition-soft', cls);
+                card.setAttribute('data-biome-icon', icon);
+            });
+
+            document.querySelectorAll('#shopGrid .item-card').forEach((card, idx) => {
+                const map = [
+                    ['theme-medieval-city', '🏘️'],
+                    ['theme-dwarf-mountain', '⛰️'],
+                    ['theme-elven-forest', '🧝'],
+                    ['theme-goblin-cave', '🕳️'],
+                    ['theme-desert-caravan', '🏜️']
+                ];
+                const [cls, icon] = map[idx % map.length];
+                card.classList.add('fantasy-zone', 'theme-transition-soft', cls);
+                card.setAttribute('data-biome-icon', icon);
+            });
+
+            document.querySelectorAll('#achievementsGrid .item-card').forEach((card, idx) => {
+                const map = [
+                    ['theme-knight-order', '⚔️'],
+                    ['theme-castle', '🏰'],
+                    ['theme-frost-north', '❄️'],
+                    ['theme-arcane-ruins', '🔮']
+                ];
+                const [cls, icon] = map[idx % map.length];
+                card.classList.add('fantasy-zone', 'theme-transition-soft', cls);
+                card.setAttribute('data-biome-icon', icon);
+            });
+        }
+
+        function initPageFromHash() {
+            if (window.location.hash === '#achievements') {
+                switchTab('achievements');
+            } else {
+                switchTab('shop');
+            }
+        }
+        
+        // INIT
+        async function initPage() {
+            await hydrateShopFromServer();
+            initPageFromHash();
+            applyFantasyThemesShop();
+        }
+
+        initPage();
+    </script>
+</body>
+</html>

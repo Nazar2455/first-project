@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Модуль 7 · Практикум (Упаковка кейсов и отклики)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+    body { font-family:'Montserrat',sans-serif; background:linear-gradient(135deg,#0f0f1e,#1a0a2e,#16213e); color:#eaf2ff; min-height:100vh; padding:20px; }
+    .wrap{max-width:1100px;margin:0 auto}.card{background:rgba(19,28,46,.86);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:18px;margin-bottom:14px}
+    h1{color:#ffed4e;margin-bottom:8px}h2{color:#56e8ff;font-size:1.14em;margin-bottom:8px}h3{color:#9ec0ff;font-size:1em;margin:10px 0 7px}p,li{color:#d7e6ff;line-height:1.6}ul,ol{margin-left:20px;margin-top:8px}
+    .hint{border-left:3px solid #ffd700;background:rgba(255,215,0,.08);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.92em}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.btn{display:inline-block;text-decoration:none;border:1px solid rgba(255,215,0,.45);border-radius:10px;background:rgba(255,215,0,.12);color:#ffed4e;font-weight:700;padding:9px 12px;cursor:pointer}.btn.alt{border-color:rgba(86,232,255,.55);color:#56e8ff;background:rgba(86,232,255,.12)}
+    .codebox{margin-top:10px;border:1px solid rgba(102,126,234,.35);border-radius:10px;overflow:hidden;background:#0b1220}.codebox-title{background:rgba(102,126,234,.12);color:#9ec0ff;font-size:.8em;font-weight:700;padding:8px 10px;border-bottom:1px solid rgba(102,126,234,.25)}
+    textarea{width:100%;min-height:190px;border:none;resize:vertical;padding:12px;font-family:Consolas,'Courier New',monospace;font-size:.88em;line-height:1.45;color:#e7f1ff;background:#0b1220;outline:none}
+    .checks{margin-top:10px;display:grid;gap:6px;font-size:.92em}.ok{color:#6ff3a3}.bad{color:#ff8f8f}.warn{color:#ffd78a}
+    .result{margin-top:10px;border-radius:10px;padding:10px 12px;font-size:.92em;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03)}
+    .status-pill{display:inline-block;margin-top:8px;border:1px solid rgba(255,215,0,.45);border-radius:999px;padding:4px 10px;color:#ffed4e;font-size:.8em;font-weight:700;background:rgba(255,215,0,.1)}
+  </style>
+  <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+  <div class="wrap">
+    <section class="card">
+      <h1>🧪 Модуль 7 · Практикум</h1>
+      <p>Задача дня — не код ради кода, а упакованный результат: README, кейс-карта, демо-сценарий и готовые отклики.</p>
+      <div class="actions">
+        <a class="btn" href="day-07-index.html">← Теория Модуля 7</a>
+        <a class="btn alt" href="index.html">Ко всем модулям</a>
+        <a class="btn" href="day-08-index.html">День 8 →</a>
+      </div>
+      <div class="course-top-tools">
+        <button id="readToggleBtn" class="read-toggle-btn" type="button">📘 Отметить день как прочитанный</button>
+        <span class="status-pill">Практика дня 7</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>🤖 Задание #1 (БОТ-КЕЙС: README + DEMO + ОТКЛИК)</h2>
+      <p><strong>Цель:</strong> превратить технический результат в кейс, который продаёт: чтобы клиент за 1–2 минуты понял пользу и следующий шаг.</p>
+      <p><strong>Связь с теорией дня 7:</strong> закрепляешь упаковку кейса (pain → solution → result), демо-подачу и структуру отклика.</p>
+      <div class="hint"><strong>Фокус на смысл:</strong> сильный кейс = доказательство, что ты решаешь бизнес-задачу, а не просто «умеешь писать код».</div>
+      <h3>Что нужно сделать (конкретно)</h3>
+      <ol>
+        <li>README с блоками: проблема → решение → функции → запуск → результат.</li>
+        <li>Короткая кейс-карточка (5–8 пунктов).</li>
+        <li>Сценарий демо 60–90 секунд.</li>
+        <li>Шаблон отклика с CTA и ссылкой на кейс.</li>
+      </ol>
+      <h3>Критерии готовности (Definition of Done)</h3>
+      <ul>
+        <li>README читается клиентом и даёт понятный эффект от решения.</li>
+        <li>Есть короткая версия кейса для чата и полная для портфолио.</li>
+        <li>Отклик заканчивается явным next step (демо/созвон).</li>
+      </ul>
+      <h3>Что сдать на проверку</h3>
+      <ul>
+        <li>Готовый текст README и кейс-карточки.</li>
+        <li>Сценарий демо + шаблон отклика.</li>
+      </ul>
+      <div class="codebox"><div class="codebox-title">Текст/структура бота-кейса</div><textarea id="botCode"></textarea></div>
+      <div class="codebox"><div class="codebox-title">Доп. заметки/лог</div><textarea id="botOutput"></textarea></div>
+      <div class="actions"><button class="btn" type="button" id="checkBotBtn">Проверить БОТЫ</button></div>
+      <div class="result" id="botResult">Пока не проверяли.</div>
+      <div class="checks" id="botChecks"></div>
+    </section>
+
+    <section class="card">
+      <h2>🕷️ Задание #2 (PARSING-КЕЙС: МЕТРИКИ + ОГРАНИЧЕНИЯ + КП)</h2>
+      <p><strong>Цель:</strong> упаковать parsing-проект как услугу с понятной ценностью, рисками и коммерческим предложением.</p>
+      <p><strong>Связь с теорией дня 7:</strong> закрепляешь метрики кейса, блок ограничений и две формы КП (короткая/развёрнутая).</p>
+      <div class="hint"><strong>Фокус на смысл:</strong> клиент покупает предсказуемый результат и прозрачные условия, а не «абстрактный скрипт».</div>
+      <h3>Что нужно сделать (конкретно)</h3>
+      <ol>
+        <li>Шаблон кейса с метриками (обработано/валидно/новых/время).</li>
+        <li>Блок ограничений и рисков + меры контроля.</li>
+        <li>Короткое КП для чата и развёрнутое КП.</li>
+      </ol>
+      <h3>Критерии готовности (Definition of Done)</h3>
+      <ul>
+        <li>Есть измеримые метрики последнего прогона.</li>
+        <li>Ограничения и риски сформулированы заранее и честно.</li>
+        <li>Обе версии КП содержат формат результата, сроки и next step.</li>
+      </ul>
+      <h3>Что сдать на проверку</h3>
+      <ul>
+        <li>Текст parsing-кейса с метриками и ограничениями.</li>
+        <li>Короткая и развернутая версия КП.</li>
+      </ul>
+      <div class="codebox"><div class="codebox-title">Текст/структура parsing-кейса</div><textarea id="parserCode"></textarea></div>
+      <div class="codebox"><div class="codebox-title">Доп. заметки/лог</div><textarea id="parserOutput"></textarea></div>
+      <div class="actions"><button class="btn" type="button" id="checkParserBtn">Проверить ПАРСИНГ</button></div>
+      <div class="result" id="parserResult">Пока не проверяли.</div>
+      <div class="checks" id="parserChecks"></div>
+    </section>
+  </div>
+
+  <script src="course-tools.js"></script>
+  <script>
+    const LAB_KEY = 'course_day7_practice_lab_v1';
+    const has = (t,p) => p.test(t);
+    const norm = (t) => String(t || '').replace(/\r\n/g,'\n').toLowerCase();
+    const lineCount = (t) => String(t || '').split('\n').map(x=>x.trim()).filter(Boolean).length;
+
+    function renderChecks(id, items){
+      document.getElementById(id).innerHTML = items.map(i => {
+        const cls = i.level === 'warn' ? 'warn' : (i.ok ? 'ok' : 'bad');
+        const icon = i.level === 'warn' ? '⚠️' : (i.ok ? '✅' : '❌');
+        return `<div class="${cls}">${icon} ${i.label}${i.note ? ` — ${i.note}` : ''}</div>`;
+      }).join('');
+    }
+    function summarize(id, checks){
+      const fails = checks.filter(c => c.required && !c.ok);
+      const score = checks.reduce((a,c)=>a + (c.ok ? (c.weight||1):0),0);
+      const max = checks.reduce((a,c)=>a + (c.weight||1),0);
+      const pct = max ? Math.round(score*100/max) : 0;
+      const pass = fails.length === 0 && pct >= 75;
+      const failText = fails.length ? `<br><span class="bad">Обязательные недочёты: ${fails.map(f => f.short || f.label).join(', ')}</span>` : '';
+      document.getElementById(id).innerHTML = `<strong>${score}/${max}</strong> баллов (${pct}%). ${pass ? '✅ Зачёт.' : '❌ Пока не зачёт.'}${failText}`;
+    }
+
+    function checkBot(){
+      const code = norm(document.getElementById('botCode').value);
+      const out = norm(document.getElementById('botOutput').value);
+      const checks = [
+        { label:'Достаточный объём материала', short:'слишком коротко', ok: lineCount(code) >= 16, required:true, weight:2, note:`${lineCount(code)} строк` },
+        { label:'README: проблема/решение/функции/запуск/результат', short:'неполный README', ok: has(code,/проблем|problem/) && has(code,/решени|solution/) && has(code,/функц|features/) && has(code,/запуск|run/) && has(code,/результ|result/), required:true, weight:5 },
+        { label:'Есть кейс-карточка', short:'нет карточки кейса', ok: has(code,/кейс|case/) && (has(code,/ниша|pain|боль/) || has(code,/срок|result/)), required:true, weight:2 },
+        { label:'Есть демо-сценарий 60-90 сек', short:'нет demo script', ok: has(code,/демо|demo/) && has(code,/60|90/), required:true, weight:2 },
+        { label:'Есть шаблон отклика + CTA', short:'нет отклика', ok: has(code,/отклик|proposal|hello|здравствуйте/) && has(code,/созвон|call|next step|покажу/), required:true, weight:3 },
+        { label:'Есть ссылка/указание на proof (желательно)', ok: has(code,/http|github|readme|демо/), required:false, level:'warn', weight:1, note: has(code,/http|github|readme|демо/) ? 'proof есть' : 'добавь ссылку на proof' },
+        { label:'Доп. лог добавлен (желательно)', ok: out.trim().length > 0, required:false, level:'warn', weight:1, note: out.trim() ? 'лог добавлен' : 'лог не добавлен' }
+      ];
+      renderChecks('botChecks', checks); summarize('botResult', checks); persist();
+    }
+
+    function checkParser(){
+      const code = norm(document.getElementById('parserCode').value);
+      const out = norm(document.getElementById('parserOutput').value);
+      const checks = [
+        { label:'Достаточный объём материала', short:'слишком коротко', ok: lineCount(code) >= 14, required:true, weight:2, note:`${lineCount(code)} строк` },
+        { label:'Есть метрики (обработано/валидно/новых/время)', short:'нет метрик', ok: has(code,/обработ|total/) && has(code,/валид|valid/) && has(code,/нов|new/) && has(code,/время|duration|sec/), required:true, weight:4 },
+        { label:'Есть ограничения и риски', short:'нет ограничений/рисков', ok: has(code,/огранич|limit/) && has(code,/риск|risk/), required:true, weight:3 },
+        { label:'Есть меры контроля (retry/log/alert)', short:'нет мер контроля', ok: has(code,/retry|лог|log|alert|monitor/), required:true, weight:3 },
+        { label:'Есть короткое и длинное КП', short:'нет 2 версий КП', ok: (has(code,/коротк|short/) && has(code,/развернут|long|full/)) || has(code,/кп.*кп/s), required:true, weight:3 },
+        { label:'Доп. лог добавлен (желательно)', ok: out.trim().length > 0, required:false, level:'warn', weight:1, note: out.trim() ? 'лог добавлен' : 'лог не добавлен' }
+      ];
+      renderChecks('parserChecks', checks); summarize('parserResult', checks); persist();
+    }
+
+    function persist(){
+      localStorage.setItem(LAB_KEY, JSON.stringify({
+        botCode: document.getElementById('botCode').value,
+        botOutput: document.getElementById('botOutput').value,
+        parserCode: document.getElementById('parserCode').value,
+        parserOutput: document.getElementById('parserOutput').value
+      }));
+    }
+    function restore(){
+      try {
+        const s = JSON.parse(localStorage.getItem(LAB_KEY) || '{}');
+        if (s.botCode) document.getElementById('botCode').value = s.botCode;
+        if (s.botOutput) document.getElementById('botOutput').value = s.botOutput;
+        if (s.parserCode) document.getElementById('parserCode').value = s.parserCode;
+        if (s.parserOutput) document.getElementById('parserOutput').value = s.parserOutput;
+      } catch {}
+    }
+
+    document.getElementById('checkBotBtn').addEventListener('click', checkBot);
+    document.getElementById('checkParserBtn').addEventListener('click', checkParser);
+    ['botCode','botOutput','parserCode','parserOutput'].forEach(id => document.getElementById(id).addEventListener('input', persist));
+    restore();
+    CourseTools.initModulePage(7);
+  </script>
+</body>
+</html>

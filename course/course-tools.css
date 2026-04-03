@@ -1,0 +1,469 @@
+.course-top-tools {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 10px 0 14px;
+}
+
+.read-toggle-btn {
+  border: 1px solid rgba(0, 200, 83, 0.65);
+  border-radius: 10px;
+  background: rgba(0, 200, 83, 0.18);
+  color: #b9ffd0;
+  font-weight: 700;
+  padding: 9px 12px;
+  cursor: pointer;
+}
+
+.read-toggle-btn.done {
+  background: rgba(255, 215, 0, 0.2);
+  border-color: rgba(255, 215, 0, 0.75);
+  color: #ffed4e;
+}
+
+.practice-toggle-btn {
+  border: 1px solid rgba(86, 232, 255, 0.65);
+  border-radius: 10px;
+  background: rgba(86, 232, 255, 0.16);
+  color: #7beeff;
+  font-weight: 700;
+  padding: 9px 12px;
+  cursor: pointer;
+}
+
+.practice-toggle-btn.done {
+  background: rgba(255, 215, 0, 0.2);
+  border-color: rgba(255, 215, 0, 0.75);
+  color: #ffed4e;
+}
+
+.track-switch {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.track-btn {
+  border: 1px solid rgba(86, 232, 255, 0.55);
+  border-radius: 10px;
+  background: rgba(86, 232, 255, 0.12);
+  color: #56e8ff;
+  font-weight: 700;
+  padding: 9px 12px;
+  cursor: pointer;
+}
+
+.track-btn.active {
+  border-color: rgba(255, 215, 0, 0.75);
+  background: rgba(255, 215, 0, 0.18);
+  color: #ffed4e;
+}
+
+.course-progress-pill {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 215, 0, 0.45);
+  color: #ffed4e;
+  background: rgba(255, 215, 0, 0.1);
+  font-size: 0.82em;
+  font-weight: 700;
+}
+
+.track-block[hidden] {
+  display: none !important;
+}
+
+/* Unified visual language with 30d-main-tasks */
+body {
+  position: relative;
+  overflow-x: hidden;
+  color: #eaf2ff;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(102, 126, 234, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '🏰 🧙‍♂️ 🗡️ 🐉 🧝 ⚔️ 🛡️ 🧛 🐺 💀';
+  position: fixed;
+  inset: 0;
+  font-size: 74px;
+  opacity: 0.02;
+  line-height: 1.2;
+  white-space: pre-wrap;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrap,
+.layout,
+.content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero,
+.card,
+.section,
+.side {
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.24), inset 0 0 10px rgba(255, 215, 0, 0.05);
+}
+
+.hero,
+.card,
+.section {
+  border: 2px solid rgba(102, 126, 234, 0.35) !important;
+  background: linear-gradient(135deg, rgba(20, 30, 50, 0.9), rgba(30, 40, 70, 0.8)) !important;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.hero:hover,
+.card:hover,
+.section:hover {
+  border-color: rgba(255, 215, 0, 0.55) !important;
+  box-shadow: 0 14px 34px rgba(255, 215, 0, 0.16);
+  transform: translateY(-1px);
+}
+
+h1,
+.hero h1,
+.card h1,
+.section h1 {
+  background: linear-gradient(135deg, #ffd700, #ffed4e, #ffa500);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: #ffed4e;
+}
+
+h2,
+.section h2,
+.card h2 {
+  color: #ffed4e !important;
+}
+
+h3,
+.section h3,
+.card h3 {
+  color: #9dc0ff !important;
+}
+
+.btn,
+a.btn {
+  border: 2px solid rgba(255, 215, 0, 0.45) !important;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.05)) !important;
+  color: #ffed4e !important;
+  font-weight: 700;
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.15);
+  transition: all 0.25s ease;
+}
+
+.btn:hover,
+a.btn:hover {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.15)) !important;
+  box-shadow: 0 9px 24px rgba(255, 215, 0, 0.24);
+  transform: translateY(-2px);
+}
+
+.btn.track,
+a.btn.track,
+.btn.alt,
+a.btn.alt {
+  border-color: rgba(86, 232, 255, 0.5) !important;
+  background: linear-gradient(135deg, rgba(86, 232, 255, 0.18), rgba(86, 232, 255, 0.05)) !important;
+  color: #7beeff !important;
+}
+
+.btn.track:hover,
+a.btn.track:hover,
+.btn.alt:hover,
+a.btn.alt:hover {
+  border-color: rgba(255, 215, 0, 0.6) !important;
+  color: #ffed4e !important;
+}
+
+.side {
+  border-right: 2px solid rgba(255, 215, 0, 0.4) !important;
+  background: linear-gradient(135deg, rgba(10, 15, 30, 0.96), rgba(20, 30, 50, 0.94)) !important;
+}
+
+.side a {
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.2s ease;
+}
+
+.side a:hover {
+  border-color: rgba(255, 215, 0, 0.6) !important;
+  color: #ffed4e !important;
+  transform: translateX(3px);
+}
+
+.badge {
+  border-color: rgba(255, 215, 0, 0.55) !important;
+  color: #ffed4e !important;
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.code {
+  border: 1px solid rgba(102, 126, 234, 0.45) !important;
+  background: #0b1220 !important;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.35);
+}
+
+.code-title {
+  background: rgba(102, 126, 234, 0.16) !important;
+  color: #b9d2ff !important;
+}
+
+.note {
+  border-left: 3px solid #ffd700 !important;
+  background: rgba(255, 215, 0, 0.11) !important;
+  color: #fff2bf;
+}
+
+.read-toggle-btn {
+  border: 2px solid rgba(0, 200, 83, 0.6);
+  background: linear-gradient(135deg, rgba(0, 200, 83, 0.2), rgba(0, 200, 83, 0.08));
+  color: #b9ffd0;
+  box-shadow: 0 5px 16px rgba(0, 200, 83, 0.15);
+  transition: all 0.2s ease;
+}
+
+.read-toggle-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(0, 200, 83, 0.2);
+}
+
+.read-toggle-btn.done {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.22), rgba(255, 215, 0, 0.1));
+  border-color: rgba(255, 215, 0, 0.8);
+  color: #ffed4e;
+}
+
+.practice-toggle-btn {
+  border: 2px solid rgba(86, 232, 255, 0.5);
+  background: linear-gradient(135deg, rgba(86, 232, 255, 0.16), rgba(86, 232, 255, 0.06));
+  color: #7beeff;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.practice-toggle-btn:hover {
+  border-color: rgba(255, 215, 0, 0.6);
+  color: #ffed4e;
+}
+
+.practice-toggle-btn.done {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.22), rgba(255, 215, 0, 0.1));
+  border-color: rgba(255, 215, 0, 0.8);
+  color: #ffed4e;
+}
+
+.card.module-complete-gold {
+  border-color: rgba(255, 215, 0, 0.92) !important;
+  box-shadow: 0 14px 34px rgba(255, 215, 0, 0.28), inset 0 0 16px rgba(255, 215, 0, 0.12) !important;
+  background: linear-gradient(135deg, rgba(56, 43, 13, 0.9), rgba(30, 40, 70, 0.9)) !important;
+}
+
+.track-btn {
+  border: 2px solid rgba(86, 232, 255, 0.5);
+  background: linear-gradient(135deg, rgba(86, 232, 255, 0.16), rgba(86, 232, 255, 0.06));
+  color: #7beeff;
+  transition: all 0.2s ease;
+}
+
+.track-btn:hover {
+  border-color: rgba(255, 215, 0, 0.6);
+  color: #ffed4e;
+}
+
+.track-btn.active {
+  border-color: rgba(255, 215, 0, 0.8);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.24), rgba(255, 215, 0, 0.1));
+  color: #ffed4e;
+}
+
+/* hide old static easter blocks (day-01 legacy) */
+.easter-egg {
+  display: none !important;
+}
+
+/* hidden icon hosts */
+.course-egg-host {
+  position: relative;
+}
+
+.course-easter-icon,
+.course-super-icon {
+  position: absolute;
+  z-index: 3;
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0.22;
+  filter: saturate(0.8);
+  transform: translate(-50%, -50%);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.course-super-icon {
+  opacity: 0.28;
+}
+
+.course-super-icon.found {
+  opacity: 0.45;
+}
+
+.course-ultra-secret-icon {
+  position: absolute;
+  z-index: 3;
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0.12;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.course-ultra-secret-icon:hover {
+  opacity: 0.55;
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+.course-ultra-secret-icon.found {
+  opacity: 0.42;
+}
+
+.course-easter-icon:hover,
+.course-super-icon:hover {
+  opacity: 0.74;
+  transform: translate(-50%, -50%) scale(1.12);
+}
+
+.course-fragment-glyph {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.16);
+  font-size: 0.72em;
+  cursor: pointer;
+  padding: 0 2px;
+  vertical-align: baseline;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.course-fragment-glyph:hover {
+  color: rgba(255, 215, 0, 0.58);
+  transform: scale(1.2);
+}
+
+.course-fragment-glyph.found {
+  color: rgba(77, 174, 100, 0.65);
+}
+
+.course-fragment-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%) translateY(12px);
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(20, 30, 50, 0.96);
+  border: 1px solid rgba(255, 215, 0, 0.55);
+  color: #ffed4e;
+  font-weight: 700;
+  font-size: 0.9em;
+  opacity: 0;
+  z-index: 10001;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.course-fragment-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.course-easter-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.66);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+}
+
+.course-easter-modal-backdrop.hidden {
+  display: none;
+}
+
+.course-easter-modal {
+  width: min(680px, 96vw);
+  background: linear-gradient(135deg, rgba(20, 30, 50, 0.98), rgba(30, 40, 70, 0.96));
+  border: 2px solid rgba(255, 215, 0, 0.55);
+  border-radius: 14px;
+  padding: 16px 16px 14px;
+  position: relative;
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.45);
+}
+
+.course-easter-modal-title {
+  color: #ffd700;
+  font-weight: 800;
+  margin-bottom: 8px;
+  font-size: 1.08em;
+}
+
+.course-easter-modal-body {
+  color: #eaf2ff;
+  line-height: 1.55;
+  font-size: 0.95em;
+  white-space: normal;
+}
+
+.course-easter-modal-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+@keyframes courseEggGlow {
+  0%, 100% { box-shadow: 0 0 10px rgba(255, 107, 107, 0.2); }
+  50% { box-shadow: 0 0 18px rgba(255, 215, 0, 0.28); }
+}
+
+@keyframes courseEggShine {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}

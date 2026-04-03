@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 Bot Builder Platform | Код-челленджи</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Montserrat, Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0e27, #1b0f3d);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .topbar {
+            background: rgba(20, 30, 60, 0.95);
+            border-bottom: 2px solid #00ff88;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        .topbar-left {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .title {
+            font-weight: 800;
+            font-size: 1.3em;
+            background: linear-gradient(135deg, #00ff88, #00ffcc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .level-badge {
+            background: rgba(0, 255, 136, 0.2);
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            padding: 5px 12px;
+            font-weight: 700;
+            font-size: 0.9em;
+            color: #00ffcc;
+        }
+        .xp-bar {
+            background: rgba(0, 255, 136, 0.1);
+            width: 200px;
+            height: 8px;
+            border-radius: 4px;
+            border: 1px solid #00ff88;
+            overflow: hidden;
+        }
+        .xp-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00ffcc);
+            transition: width 0.3s ease;
+        }
+        .topbar-right {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-small {
+            border: 1px solid #00ff88;
+            background: rgba(0, 255, 136, 0.15);
+            color: #00ffcc;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-weight: 700;
+            font-size: 0.75em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-small:hover {
+            background: rgba(0, 255, 136, 0.25);
+            transform: scale(1.05);
+        }
+        
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .game-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: linear-gradient(135deg, rgba(10, 14, 39, 0.8), rgba(20, 10, 40, 0.8));
+            border-right: 1px solid rgba(0, 255, 136, 0.2);
+        }
+        
+        canvas {
+            border: 2px solid #00ff88;
+            background: linear-gradient(135deg, #1a1f3f, #2a1f4f);
+            display: block;
+        }
+        
+        .sidebar {
+            width: 320px;
+            background: rgba(20, 30, 60, 0.95);
+            border-left: 2px solid #00ff88;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            gap: 15px;
+        }
+        
+        .panel {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+        }
+        
+        .panel-title {
+            font-weight: 800;
+            color: #00ffcc;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .level-info {
+            display: flex;
+            gap: 10px;
+            font-size: 0.85em;
+            line-height: 1.6;
+        }
+        .level-info-label {
+            color: #00ff88;
+            font-weight: 700;
+            min-width: 70px;
+        }
+        
+        .code-terminal {
+            background: rgba(10, 20, 40, 0.8);
+            border: 1px solid rgba(0, 255, 136, 0.5);
+            border-radius: 6px;
+            padding: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.7em;
+            max-height: 120px;
+            overflow-y: auto;
+            color: #00ff88;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .objective-text {
+            font-size: 0.9em;
+            line-height: 1.5;
+            color: #d8e2ff;
+            margin-bottom: 10px;
+        }
+        
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .input-area textarea {
+            width: 100%;
+            height: 80px;
+            background: rgba(10, 20, 40, 0.9);
+            border: 1px solid rgba(0, 255, 136, 0.4);
+            border-radius: 4px;
+            padding: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75em;
+            color: #00ff88;
+            resize: none;
+        }
+        
+        .input-area textarea::placeholder {
+            color: rgba(0, 255, 136, 0.5);
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #00ff88, #00ffcc);
+            color: #0a0e27;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-weight: 800;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-submit:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+        
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .feedback {
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 0.8em;
+            text-align: center;
+            margin-top: 8px;
+        }
+        
+        .feedback.success {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
+            color: #00ffcc;
+        }
+        
+        .feedback.error {
+            background: rgba(255, 50, 50, 0.2);
+            border: 1px solid #ff3232;
+            color: #ff6666;
+        }
+        
+        .levels-list {
+            font-size: 0.8em;
+        }
+        
+        .level-item {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 4px;
+            padding: 6px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .level-item:hover {
+            background: rgba(0, 255, 136, 0.15);
+            border-color: #00ff88;
+        }
+        
+        .level-item.active {
+            background: rgba(0, 255, 136, 0.25);
+            border-color: #00ffcc;
+            color: #00ffcc;
+            font-weight: 700;
+        }
+        
+        .level-item.completed {
+            color: #00ff88;
+        }
+        
+        .level-item.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+            color: #666;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 255, 136, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 136, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 136, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="title">🤖 Bot Builder Platform</div>
+            <div class="level-badge">Level <span id="playerLevel">1</span></div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <div class="xp-bar">
+                    <div class="xp-progress" id="xpProgress" style="width: 0%"></div>
+                </div>
+                <span style="font-size: 0.85em; color: #00ff88;" id="xpText">0/100 XP</span>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="btn-small" onclick="goToHub()">← Хаб</button>
+            <button class="btn-small" onclick="goToMainPlan()">📋 План</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="game-area">
+            <canvas id="gameCanvas" width="850" height="500"></canvas>
+        </div>
+        
+        <div class="sidebar">
+            <!-- Level Progress -->
+            <div class="panel">
+                <div class="panel-title">📍 Текущий уровень</div>
+                <div class="level-info">
+                    <div>
+                        <div class="level-info-label">Уровень:</div>
+                        <div class="level-info-label">Тема:</div>
+                        <div class="level-info-label">Тип:</div>
+                    </div>
+                    <div>
+                        <div id="levelNum">1</div>
+                        <div id="levelTheme">Основы</div>
+                        <div id="levelType">Платформа</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Objective -->
+            <div class="panel">
+                <div class="panel-title">🎯 Цель</div>
+                <div class="objective-text" id="objective">Собери все коины и дойди до конца уровня.</div>
+            </div>
+            
+            <!-- Level Code -->
+            <div class="panel">
+                <div class="panel-title">💻 Код челленджа</div>
+                <div class="code-terminal" id="codeChallenge">// Ожидание загрузки...</div>
+            </div>
+            
+            <!-- Code Input & Validation -->
+            <div class="panel">
+                <div class="panel-title">✍️ Ввод решения</div>
+                <div class="input-area">
+                    <textarea id="solutionInput" placeholder="// Напиши решение..."></textarea>
+                    <button class="btn-submit" id="submitBtn" onclick="submitSolution()">ПРОВЕРИТЬ</button>
+                    <div id="feedback" style="display:none;"></div>
+                </div>
+            </div>
+            
+            <!-- Level Selector -->
+            <div class="panel">
+                <div class="panel-title">🗂️ Уровни</div>
+                <div class="levels-list" id="levelsList"></div>
+            </div>
+            
+            <!-- Tips -->
+            <div class="panel">
+                <div class="panel-title">💡 Совет</div>
+                <div style="font-size: 0.8em; line-height: 1.5; color: #d8e2ff;" id="tip">Нажми на уровень ниже.</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script src="game-session-tracker.js"></script>
+    <script>
+        // Game Configuration
+        const GAME_WIDTH = 850;
+        const GAME_HEIGHT = 500;
+        const TILE_SIZE = 50;
+        
+        const LEVELS = [
+            {
+                id: 1,
+                theme: 'Основы MVP',
+                description: 'Собери простой бот из кусочков кода',
+                objective: 'Пройди уровень, собрав все código-коины. Каждый коин даёт фраз.',
+                challenge: `// Задача: основа функции бота
+function handleMessage(message) {
+  // TODO: вернуть ответ "OK"
+  return // ???
+}`,
+                expectedPattern: /return\s+["']OK["']/,
+                hint: 'Функция должна вернуть строку "OK". Используй return.',
+                xpReward: 50,
+                requiredCoins: 3,
+                platformLayout: [
+                    '.........',
+                    '...P.....',
+                    '.C...C...',
+                    '...#.....',
+                    '.#...#.F.'
+                ]
+            },
+            {
+                id: 2,
+                theme: 'Error Handling',
+                description: 'Добавь обработку ошибок',
+                objective: 'Собери коины, избегая ловушек; напиши try-catch.',
+                challenge: `// Задача: защита от ошибок
+function parseData(json) {
+  // TODO: добавь try-catch,
+  // вернуть объект или пустой {}
+}`,
+                expectedPattern: /try\s*{[\s\S]*?}\s*catch/,
+                hint: 'Используй try-catch блок для перехвата ошибок.',
+                xpReward: 75,
+                requiredCoins: 4,
+                platformLayout: [
+                    '.........',
+                    '.......P.',
+                    '.C..#C.C',
+                    '..#....#.',
+                    'C#....#F.'
+                ]
+            },
+            {
+                id: 3,
+                theme: 'Асинхронный код',
+                description: 'Работай с обещаниями',
+                objective: 'Контрол волн врагов; напиши async-await.',
+                challenge: `// Задача: асинхронный запрос
+async function fetchBotData(url) {
+  // TODO: логика try-catch,
+  // используй await fetch
+}`,
+                expectedPattern: /async|await|fetch/,
+                hint: 'Для асинхронности используй async-await с fetch.',
+                xpReward: 100,
+                requiredCoins: 5,
+                platformLayout: [
+                    '.....P...',
+                    '.C.E.C.E',
+                    '####.....',
+                    '.C...C.C.',
+                    '#####..F.'
+                ]
+            },
+            {
+                id: 4,
+                theme: 'Регулярные выражения',
+                description: 'Парсинг данных с благодарностью',
+                objective: 'Быстрая платформа с каменьями; regex для парсинга.',
+                challenge: `// Задача: парсинг email
+function extractEmails(text) {
+  // TODO: используй regex,
+  // вернись массив email адресов
+}`,
+                expectedPattern: /regex|RegExp|\/.*\/@/,
+                hint: 'Используй регулярные выражения для поиска примеров.',
+                xpReward: 125,
+                requiredCoins: 6,
+                platformLayout: [
+                    '...P.....',
+                    '....C....',
+                    '.##.##.##',
+                    '.C.E.C.E.',
+                    '########F'
+                ]
+            },
+            {
+                id: 5,
+                theme: 'MVPComplete',
+                description: 'Полный бот с веб-сервером',
+                objective: 'Суперсложная платформа! Комплексный код.',
+                challenge: `// Задача: интеграция
+class TelegramBot {
+  constructor(token) {
+    // TODO: инициализира API,
+    // запусти сервер, обработка сообщений
+  }
+}`,
+                expectedPattern: /class|constructor|this\./,
+                hint: 'Используй классы и конструкторы для структуры.',
+                xpReward: 200,
+                requiredCoins: 8,
+                platformLayout: [
+                    '.P.......',
+                    '.C.E.C.E.',
+                    '###..###.',
+                    '.C.E.C.E.',
+                    '###..##F.'
+                ]
+            }
+        ];
+
+        let currentLevel = 1;
+        let playerCoins = 0;
+        let playerXP = 0;
+        let playerLevel = 1;
+        let levelCoinsCollected = 0;
+        let coins = [];
+        let platforms = [];
+        let enemies = [];
+        let gameWon = false;
+
+        const API_BASE = localStorage.getItem('planApiBase') || 'http://127.0.0.1:8000/api';
+
+        async function apiRequest(path, options = {}) {
+            if (window.PlanApiClient?.request) {
+                return window.PlanApiClient.request(path, options, API_BASE);
+            }
+
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 3000);
+
+            try {
+                const response = await fetch(`${API_BASE}${path}`, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(options.headers || {})
+                    },
+                    signal: controller.signal
+                });
+
+                if (!response.ok) return null;
+                return await response.json();
+            } catch (_) {
+                return null;
+            } finally {
+                clearTimeout(timeout);
+            }
+        }
+
+        async function hydrateBotBuilderFromServer() {
+            const [mainState, botState] = await Promise.all([
+                apiRequest('/state/main_tracker'),
+                apiRequest('/state/bot_builder')
+            ]);
+
+            if (mainState?.value && typeof mainState.value === 'object') {
+                const incoming = mainState.value;
+                if (typeof incoming.points === 'number') localStorage.setItem('points', String(incoming.points));
+                if (typeof incoming.level === 'number') localStorage.setItem('level', String(incoming.level));
+            }
+
+            if (botState?.value && typeof botState.value === 'object') {
+                const incoming = botState.value;
+                if (typeof incoming.xp === 'number') localStorage.setItem('botBuilderXP', String(incoming.xp));
+                if (typeof incoming.level === 'number') localStorage.setItem('botBuilderLevel', String(incoming.level));
+            }
+
+            const savedXP = localStorage.getItem('botBuilderXP');
+            const savedLevel = localStorage.getItem('botBuilderLevel');
+            if (savedXP) playerXP = parseInt(savedXP);
+            if (savedLevel) playerLevel = parseInt(savedLevel);
+            updateXPDisplay();
+        }
+
+        async function syncBotBuilderToServer() {
+            await apiRequest('/state/bot_builder', {
+                method: 'PUT',
+                body: JSON.stringify({ value: { xp: playerXP, level: playerLevel, currentLevel } })
+            });
+        }
+
+        // Player object
+        const player = {
+            x: 50,
+            y: 300,
+            width: 30,
+            height: 30,
+            velocityY: 0,
+            velocityX: 0,
+            isJumping: false,
+            isGrounded: false,
+            speed: 5,
+            jumpPower: 12,
+            color: '#00ff88'
+        };
+
+        // Input handling
+        const keys = {};
+        window.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+        });
+        window.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+
+        function initLevel() {
+            const level = LEVELS[currentLevel - 1];
+            levelCoinsCollected = 0;
+            coins = [];
+            platforms = [];
+            enemies = [];
+            gameWon = false;
+
+            // Parse platform layout
+            const layout = level.platformLayout;
+            platforms = [];
+            coins = [];
+            let goalX = GAME_WIDTH - 60;
+            let goalY = 100;
+
+            for (let row = 0; row < layout.length; row++) {
+                for (let col = 0; col < layout[row].length; col++) {
+                    const cell = layout[row][col];
+                    const x = col * TILE_SIZE;
+                    const y = row * TILE_SIZE;
+
+                    if (cell === '#') {
+                        platforms.push({ x, y, width: TILE_SIZE, height: TILE_SIZE, type: 'platform' });
+                    } else if (cell === 'C') {
+                        coins.push({ x: x + TILE_SIZE / 2, y: y + TILE_SIZE / 2, collected: false });
+                    } else if (cell === 'E') {
+                        enemies.push({
+                            x: x + TILE_SIZE / 2,
+                            y: y + TILE_SIZE / 2,
+                            width: 20,
+                            height: 20,
+                            velocityX: 2,
+                            color: '#ff3333'
+                        });
+                    } else if (cell === 'F') {
+                        goalX = x;
+                        goalY = y;
+                    } else if (cell === 'P') {
+                        player.x = x;
+                        player.y = y - player.height;
+                    }
+                }
+            }
+
+            // Add bottom platform
+            platforms.push({ x: 0, y: GAME_HEIGHT - 50, width: GAME_WIDTH, height: 50, type: 'ground' });
+
+            // Update sidebar
+            document.getElementById('levelNum').textContent = level.id;
+            document.getElementById('levelTheme').textContent = level.theme;
+            document.getElementById('levelType').textContent = 'Платформер';
+            document.getElementById('objective').textContent = level.objective;
+            document.getElementById('codeChallenge').textContent = level.challenge;
+            document.getElementById('tip').textContent = level.hint;
+            document.getElementById('solutionInput').value = '';
+            document.getElementById('feedback').style.display = 'none';
+
+            updateLevelsList();
+        }
+
+        function updateLevelsList() {
+            const list = document.getElementById('levelsList');
+            list.innerHTML = LEVELS.map((level, idx) => {
+                const isActive = currentLevel === level.id;
+                const isCompleted = playerLevel > 1 || (currentLevel === 1 && playerXP > 0);
+                const isLocked = level.id > currentLevel + 1;
+                
+                let className = 'level-item';
+                if (isActive) className += ' active';
+                if (isCompleted && !isActive) className += ' completed';
+                if (isLocked) className += ' locked';
+                
+                return `<div class="${className}" onclick="selectLevel(${level.id})">
+                    Уровень ${level.id}: ${level.theme}
+                </div>`;
+            }).join('');
+        }
+
+        function selectLevel(id) {
+            if (id > currentLevel + 1) return; // Prevent skipping
+            currentLevel = id;
+            initLevel();
+            gameWon = false;
+        }
+
+        function updateXPDisplay() {
+            const xpPerLevel = 100;
+            const levelXP = playerXP % xpPerLevel;
+            const progress = (levelXP / xpPerLevel) * 100;
+            
+            document.getElementById('playerLevel').textContent = playerLevel;
+            document.getElementById('xpText').textContent = `${levelXP}/${xpPerLevel} XP`;
+            document.getElementById('xpProgress').style.width = `${progress}%`;
+
+            // Save to localStorage for main plan
+            localStorage.setItem('botBuilderXP', playerXP);
+            localStorage.setItem('botBuilderLevel', playerLevel);
+            void syncBotBuilderToServer();
+        }
+
+        function submitSolution() {
+            const level = LEVELS[currentLevel - 1];
+            const solution = document.getElementById('solutionInput').value;
+            const feedback = document.getElementById('feedback');
+
+            if (!solution.trim()) {
+                feedback.textContent = '⚠️ Напиши код!';
+                feedback.className = 'feedback error';
+                feedback.style.display = 'block';
+                return;
+            }
+
+            const isCorrect = level.expectedPattern.test(solution);
+            
+            if (isCorrect) {
+                const xpGain = level.xpReward;
+                playerXP += xpGain;
+                const newLevel = Math.floor(playerXP / 100) + 1;
+                if (newLevel > playerLevel) {
+                    playerLevel = newLevel;
+                }
+                
+                feedback.textContent = `✅ Верно! +${xpGain} XP`;
+                feedback.className = 'feedback success';
+                feedback.style.display = 'block';
+
+                updateXPDisplay();
+                document.getElementById('submitBtn').disabled = true;
+
+                setTimeout(() => {
+                    if (currentLevel < LEVELS.length) {
+                        currentLevel++;
+                        initLevel();
+                    } else {
+                        feedback.textContent = '🏆 Ты завершил все уровни!';
+                    }
+                }, 2000);
+            } else {
+                feedback.textContent = `❌ Неверно. ${level.hint}`;
+                feedback.className = 'feedback error';
+                feedback.style.display = 'block';
+                document.getElementById('submitBtn').disabled = false;
+            }
+        }
+
+        // Game loop
+        function update() {
+            const gravity = 0.6;
+            player.velocityY += gravity;
+
+            // Input
+            if ((keys['ArrowLeft'] || keys['a'] || keys['ф']) && player.x > 0) {
+                player.velocityX = -player.speed;
+            } else if ((keys['ArrowRight'] || keys['d'] || keys['в']) && player.x < GAME_WIDTH - player.width) {
+                player.velocityX = player.speed;
+            } else {
+                player.velocityX = 0;
+            }
+
+            player.x += player.velocityX;
+            player.y += player.velocityY;
+
+            // Ground detection
+            player.isGrounded = false;
+            for (const platform of platforms) {
+                if (
+                    player.velocityY >= 0 &&
+                    player.y + player.height >= platform.y &&
+                    player.y + player.height <= platform.y + platform.height &&
+                    player.x + player.width > platform.x &&
+                    player.x < platform.x + platform.width
+                ) {
+                    player.y = platform.y - player.height;
+                    player.velocityY = 0;
+                    player.isGrounded = true;
+                }
+            }
+
+            // Jump
+            if ((keys['ArrowUp'] || keys['w'] || keys['ц']) && player.isGrounded) {
+                player.velocityY = -player.jumpPower;
+                player.isGrounded = false;
+            }
+
+            // Coin collection
+            coins.forEach((coin, idx) => {
+                const dx = player.x - coin.x;
+                const dy = player.y - coin.y;
+                if (Math.sqrt(dx * dx + dy * dy) < 30 && !coin.collected) {
+                    coin.collected = true;
+                    levelCoinsCollected++;
+                    playerCoins++;
+                    playerXP += 10;
+                    updateXPDisplay();
+                }
+            });
+
+            // Enemy movement & collision
+            enemies.forEach(enemy => {
+                enemy.x += enemy.velocityX;
+                if (enemy.x < 30 || enemy.x > GAME_WIDTH - 30) {
+                    enemy.velocityX *= -1;
+                }
+
+                const dx = player.x - enemy.x;
+                const dy = player.y - enemy.y;
+                if (Math.sqrt(dx * dx + dy * dy) < 40) {
+                    if (player.velocityY > 0) {
+                        enemies.splice(enemies.indexOf(enemy), 1);
+                        playerXP += 25;
+                        updateXPDisplay();
+                    } else {
+                        // Hit - damage
+                        player.y = 100;
+                        player.velocityY = 0;
+                    }
+                }
+            });
+
+            // Fall off
+            if (player.y > GAME_HEIGHT) {
+                initLevel();
+            }
+
+            // Level complete
+            if (levelCoinsCollected >= LEVELS[currentLevel - 1].requiredCoins && player.x > GAME_WIDTH - 100) {
+                gameWon = true;
+                levelCoinsCollected = LEVELS[currentLevel - 1].requiredCoins; // Prevent over-collection
+                document.getElementById('feedback').textContent = '✅ Уровень пройден! Решай код ниже для продвижения.';
+                document.getElementById('feedback').className = 'feedback success';
+                document.getElementById('feedback').style.display = 'block';
+            }
+        }
+
+        function draw() {
+            const ctx = document.getElementById('gameCanvas').getContext('2d');
+            
+            // Background
+            ctx.fillStyle = '#1a1f3f';
+            ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+            // Platforms
+            platforms.forEach(plat => {
+                ctx.fillStyle = plat.type === 'ground' ? '#00aa55' : '#00ff88';
+                ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
+                ctx.strokeStyle = '#00ffcc';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(plat.x, plat.y, plat.width, plat.height);
+            });
+
+            // Coins
+            coins.forEach(coin => {
+                if (!coin.collected) {
+                    ctx.fillStyle = '#ffff00';
+                    ctx.beginPath();
+                    ctx.arc(coin.x, coin.y, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+
+            // Enemies
+            enemies.forEach(enemy => {
+                ctx.fillStyle = enemy.color;
+                ctx.fillRect(enemy.x - enemy.width / 2, enemy.y - enemy.height / 2, enemy.width, enemy.height);
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(enemy.x - 5, enemy.y - 5, 3, 3);
+                ctx.fillRect(enemy.x + 2, enemy.y - 5, 3, 3);
+            });
+
+            // Goal
+            ctx.fillStyle = '#00ffcc';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('🏁', GAME_WIDTH - 30, GAME_HEIGHT - 60);
+
+            // Player
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(player.x + 8, player.y + 8, 4, 4);
+            ctx.fillRect(player.x + 18, player.y + 8, 4, 4);
+
+            // HUD
+            ctx.fillStyle = '#00ff88';
+            ctx.font = '12px Courier';
+            ctx.textAlign = 'left';
+            ctx.fillText(`🪙 ${levelCoinsCollected}/${LEVELS[currentLevel - 1].requiredCoins}`, 10, 20);
+            ctx.fillText(`Уровень ${currentLevel}`, 10, 40);
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function goToHub() {
+            window.location.href = 'games-hub.html';
+        }
+
+        function goToMainPlan() {
+            window.location.href = '30d-main-tasks.html';
+        }
+
+        async function initPage() {
+            await hydrateBotBuilderFromServer();
+            window.PlanGameTracker?.startGameSession('bot-builder-platformer', 'Bot Builder');
+            initLevel();
+            gameLoop();
+        }
+
+        initPage();
+    </script>
+</body>
+</html>

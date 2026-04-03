@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>День 5 · БОТЫ — Безопасность и админка</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+    body{font-family:'Montserrat',sans-serif;background:linear-gradient(135deg,#0f0f1e,#1a0a2e,#16213e);color:#eaf2ff;min-height:100vh;padding:20px}
+    .wrap{max-width:1100px;margin:0 auto}.card{background:rgba(19,28,46,.86);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px;margin-bottom:12px}
+    h1{color:#ffed4e;margin-bottom:8px}h2{color:#56e8ff;font-size:1.12em;margin-bottom:8px}h3{color:#96b7ff;margin:10px 0 6px}
+    p,li{line-height:1.6;color:#d6e4ff}.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{display:inline-block;text-decoration:none;border:1px solid rgba(255,215,0,.45);border-radius:10px;background:rgba(255,215,0,.12);color:#ffed4e;font-weight:700;padding:9px 12px}
+    .btn.alt{border-color:rgba(86,232,255,.55);color:#56e8ff;background:rgba(86,232,255,.12)}
+    .code{margin-top:8px;border-radius:10px;overflow:hidden;border:1px solid rgba(102,126,234,.35);background:#0b1220}.code-title{background:rgba(102,126,234,.12);color:#9ec0ff;font-size:.78em;font-weight:700;padding:8px 10px;border-bottom:1px solid rgba(102,126,234,.25)}
+    pre{margin:0;padding:12px;overflow-x:auto;font-size:.84em;line-height:1.45}code{font-family:Consolas,'Courier New',monospace;color:#e7f1ff}
+    .note{border-left:3px solid #ffd700;background:rgba(255,215,0,.08);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.9em}
+  </style>
+  <link rel="stylesheet" href="course-tools.css" />
+</head>
+<body>
+<div class="wrap">
+  <section class="card">
+    <h1>День 5 · 🤖 БОТЫ</h1>
+    <p>Тема: безопасность доступа и базовая админка. Код ниже с комментариями, чтобы читать было легко.</p>
+    <div class="actions">
+      <a class="btn" href="day-05-index.html">← День 5 (выбор трека)</a>
+      <a class="btn alt" href="day-05-parsing-filters-monitoring.html">Переключиться на ПАРСИНГ</a>
+      <a class="btn" href="day-06-index.html">День 6 →</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>1) Мини-теория: зачем ограничения по ADMIN_IDS</h2>
+    <ul>
+      <li>Команды админа нельзя открывать всем пользователям.</li>
+      <li>Иначе любой сможет читать чужие лиды.</li>
+      <li>Проверка ID — минимальный уровень безопасности в MVP-боте.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>2) Маленький пример проверки доступа</h2>
+    <div class="code">
+      <div class="code-title">utils/security.py (минимальный вариант)</div>
+      <pre><code>import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+def get_admin_ids() -> set[int]:
+    # Берём строку из .env: "123,456,789"
+    raw = os.getenv("ADMIN_IDS", "")
+    result = set()
+
+    for token in raw.split(","):
+        token = token.strip()
+        if token.isdigit():
+            result.add(int(token))
+
+    return result
+
+
+def is_admin(user_id: int) -> bool:
+    return user_id in get_admin_ids()</code></pre>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>3) Полный блок: /admin + последние заявки</h2>
+    <div class="code">
+      <div class="code-title">handlers/admin.py</div>
+      <pre><code>from aiogram import Router
+from aiogram.filters import Command
+from aiogram.types import Message
+
+from utils.security import is_admin
+from db.repository import get_last_leads
+
+router = Router()
+
+@router.message(Command("admin"))
+async def admin_panel(message: Message):
+    user_id = message.from_user.id
+
+    # 1) Проверяем доступ
+    if not is_admin(user_id):
+        await message.answer("⛔ Доступ запрещён")
+        return
+
+    # 2) Достаём последние заявки из БД
+    leads = await get_last_leads(limit=10)
+
+    if not leads:
+        await message.answer("📭 Пока заявок нет")
+        return
+
+    # 3) Формируем удобный текст
+    lines = ["📊 Последние заявки:"]
+    for lead in leads:
+        lead_id, name, phone, comment, created_at = lead
+        lines.append(
+            f"\n#{lead_id} | {created_at}\n"
+            f"Имя: {name}\n"
+            f"Телефон: {phone}\n"
+            f"Комментарий: {comment}"
+        )
+
+    await message.answer("\n".join(lines))</code></pre>
+    </div>
+    <div class="note">Идея: даже такой простой /admin уже выглядит как полноценный коммерческий функционал.</div>
+  </section>
+
+  <section class="card">
+    <h2>4) Практика Дня 5 (БОТЫ)</h2>
+    <ol>
+      <li>Добавь 2 админа в <code>.env</code> и проверь доступ с обоих аккаунтов.</li>
+      <li>Сделай красивое форматирование вывода заявок (эмодзи, блоки).</li>
+      <li>Добавь команду <code>/admin_count</code> — показать количество заявок.</li>
+    </ol>
+  </section>
+</div>
+</body>
+</html>
