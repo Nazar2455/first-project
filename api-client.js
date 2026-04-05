@@ -7,6 +7,7 @@
         : PROD_API_BASE;
     const USER_KEY = 'planUserId';
     const USER_DRAFT_KEY = 'planUserIdDraft';
+    const AUTH_TOKEN_KEY = 'planAuthToken';
 
     function getPlanApiBase() {
         return localStorage.getItem('planApiBase') || FALLBACK_BASE;
@@ -29,6 +30,24 @@
         localStorage.setItem(USER_DRAFT_KEY, value);
     }
 
+    function getAuthToken() {
+        return localStorage.getItem(AUTH_TOKEN_KEY) || '';
+    }
+
+    function setAuthToken(token) {
+        const value = String(token || '').trim();
+        if (!value) {
+            localStorage.removeItem(AUTH_TOKEN_KEY);
+            return;
+        }
+        localStorage.setItem(AUTH_TOKEN_KEY, value);
+    }
+
+    function clearAuth() {
+        setAuthToken('');
+        setPlanUserId('');
+    }
+
     function buildUrl(path, base = getPlanApiBase()) {
         const url = new URL(`${base}${path}`);
         const userId = getPlanUserId();
@@ -42,6 +61,7 @@
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 3000);
         const userId = getPlanUserId();
+        const authToken = getAuthToken();
 
         try {
             const headers = {
@@ -50,6 +70,9 @@
             };
             if (userId) {
                 headers['X-User-ID'] = userId;
+            }
+            if (authToken) {
+                headers['Authorization'] = `Bearer ${authToken}`;
             }
 
             const response = await fetch(buildUrl(path, base), {
@@ -67,11 +90,47 @@
         }
     }
 
+    async function register({ email, password, display_name }, base = getPlanApiBase()) {
+        const data = await request('/auth/register', {
+            method: 'POST',
+            body: JSON.stringify({ email, password, display_name })
+        }, base);
+
+        if (data?.access_token) {
+            setAuthToken(data.access_token);
+            if (data.user_id) setPlanUserId(data.user_id);
+        }
+        return data;
+    }
+
+    async function login({ email, password }, base = getPlanApiBase()) {
+        const data = await request('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ email, password })
+        }, base);
+
+        if (data?.access_token) {
+            setAuthToken(data.access_token);
+            if (data.user_id) setPlanUserId(data.user_id);
+        }
+        return data;
+    }
+
+    async function me(base = getPlanApiBase()) {
+        return request('/auth/me', { method: 'GET' }, base);
+    }
+
     window.PlanApiClient = {
         getPlanApiBase,
         getPlanUserId,
         setPlanUserId,
+        getAuthToken,
+        setAuthToken,
+        clearAuth,
         buildUrl,
-        request
+        request,
+        register,
+        login,
+        me
     };
 })();
