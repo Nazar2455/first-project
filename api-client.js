@@ -1,7 +1,7 @@
 (function () {
     if (window.PlanApiClient) return;
 
-    const PROD_API_BASE = 'https://first-project-a31a.onrender.com/api';
+    const PROD_API_BASE = 'https://first-project-1-ec9k.onrender.com/api';
     const FALLBACK_BASE = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
         ? 'http://127.0.0.1:8000/api'
         : PROD_API_BASE;
