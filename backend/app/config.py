@@ -45,6 +45,8 @@ if DATABASE_URL and DATABASE_URL.startswith(("postgresql://", "postgres://", "po
 
 DEFAULT_USER_ID = os.getenv("DEFAULT_USER_ID", "local")
 ENVIRONMENT = os.getenv("ENV", "development")
+AUTH_SECRET = os.getenv("AUTH_SECRET", "dev-secret-change-me")
+ACCESS_TOKEN_EXPIRES_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRES_MINUTES", "10080"))
 
 RAW_CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*")
 CORS_ORIGINS = [origin.strip() for origin in RAW_CORS_ORIGINS.split(",") if origin.strip()]

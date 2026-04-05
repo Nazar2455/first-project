@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import uuid
 from typing import Any
 
 from sqlalchemy import create_engine, text
@@ -32,6 +33,33 @@ def get_engine() -> Engine:
 ENGINE = get_engine()
 
 
+def _get_existing_user_columns() -> set[str]:
+    with ENGINE.begin() as conn:
+        if ENGINE.dialect.name == "postgresql":
+            rows = conn.execute(
+                text(
+                    """
+                    SELECT column_name
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public' AND table_name = 'users'
+                    """
+                )
+            ).mappings().all()
+            return {str(row["column_name"]).lower() for row in rows}
+
+        rows = conn.execute(text("PRAGMA table_info(users)")).mappings().all()
+        return {str(row["name"]).lower() for row in rows}
+
+
+def _ensure_users_columns() -> None:
+    existing = _get_existing_user_columns()
+    with ENGINE.begin() as conn:
+        if "email" not in existing:
+            conn.execute(text("ALTER TABLE users ADD COLUMN email TEXT"))
+        if "password_hash" not in existing:
+            conn.execute(text("ALTER TABLE users ADD COLUMN password_hash TEXT"))
+
+
 def init_db() -> None:
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     with ENGINE.begin() as conn:
@@ -49,6 +77,8 @@ def init_db() -> None:
             CREATE TABLE IF NOT EXISTS users (
                 id TEXT PRIMARY KEY,
                 display_name TEXT,
+                email TEXT,
+                password_hash TEXT,
                 auth_provider TEXT,
                 created_at TEXT DEFAULT (datetime('now')),
                 updated_at TEXT DEFAULT (datetime('now'))
@@ -68,6 +98,8 @@ def init_db() -> None:
             CREATE TABLE IF NOT EXISTS users (
                 id TEXT PRIMARY KEY,
                 display_name TEXT,
+                email TEXT,
+                password_hash TEXT,
                 auth_provider TEXT,
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                 updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -77,9 +109,15 @@ def init_db() -> None:
         conn.execute(text(state_store_sql))
         conn.execute(text(users_sql))
 
+    _ensure_users_columns()
+
+    with ENGINE.begin() as conn:
         if ENGINE.dialect.name == "postgresql":
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_state_store_user_key ON state_store (user_id, key)"))
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_users_provider ON users (auth_provider)"))
+            conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS uq_users_email ON users (email) WHERE email IS NOT NULL"))
+        else:
+            conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS uq_users_email ON users (email)"))
 
 
 def load_state(key: str, user_id: str = "local") -> dict[str, Any] | None:
@@ -117,6 +155,93 @@ def save_state(key: str, value: dict[str, Any], user_id: str = "local") -> None:
                 ),
                 {"user_id": user_id, "key": key, "value": payload},
             )
+
+
+def get_user_by_email(email: str) -> dict[str, Any] | None:
+    normalized = email.strip().lower()
+    if not normalized:
+        return None
+
+    with ENGINE.begin() as conn:
+        row = conn.execute(
+            text(
+                """
+                SELECT id, email, display_name, auth_provider, password_hash
+                FROM users
+                WHERE lower(email) = :email
+                LIMIT 1
+                """
+            ),
+            {"email": normalized},
+        ).mappings().first()
+
+    if row is None:
+        return None
+    return dict(row)
+
+
+def get_user_by_id(user_id: str) -> dict[str, Any] | None:
+    with ENGINE.begin() as conn:
+        row = conn.execute(
+            text(
+                """
+                SELECT id, email, display_name, auth_provider
+                FROM users
+                WHERE id = :user_id
+                LIMIT 1
+                """
+            ),
+            {"user_id": user_id},
+        ).mappings().first()
+
+    if row is None:
+        return None
+    return dict(row)
+
+
+def create_local_user(email: str, password_hash: str, display_name: str | None = None) -> dict[str, Any]:
+    user_id = str(uuid.uuid4())
+    normalized_email = email.strip().lower()
+    normalized_name = (display_name or "").strip() or None
+
+    with ENGINE.begin() as conn:
+        if ENGINE.dialect.name == "postgresql":
+            conn.execute(
+                text(
+                    """
+                    INSERT INTO users(id, display_name, email, password_hash, auth_provider, created_at, updated_at)
+                    VALUES (:id, :display_name, :email, :password_hash, 'email', NOW(), NOW())
+                    """
+                ),
+                {
+                    "id": user_id,
+                    "display_name": normalized_name,
+                    "email": normalized_email,
+                    "password_hash": password_hash,
+                },
+            )
+        else:
+            conn.execute(
+                text(
+                    """
+                    INSERT INTO users(id, display_name, email, password_hash, auth_provider, created_at, updated_at)
+                    VALUES (:id, :display_name, :email, :password_hash, 'email', datetime('now'), datetime('now'))
+                    """
+                ),
+                {
+                    "id": user_id,
+                    "display_name": normalized_name,
+                    "email": normalized_email,
+                    "password_hash": password_hash,
+                },
+            )
+
+    return {
+        "id": user_id,
+        "email": normalized_email,
+        "display_name": normalized_name,
+        "auth_provider": "email",
+    }
         else:
             conn.execute(
                 text(
