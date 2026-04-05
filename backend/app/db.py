@@ -155,6 +155,19 @@ def save_state(key: str, value: dict[str, Any], user_id: str = "local") -> None:
                 ),
                 {"user_id": user_id, "key": key, "value": payload},
             )
+        else:
+            conn.execute(
+                text(
+                    """
+                    INSERT INTO state_store(user_id, key, value, updated_at)
+                    VALUES (:user_id, :key, :value, datetime('now'))
+                    ON CONFLICT(user_id, key) DO UPDATE SET
+                        value = excluded.value,
+                        updated_at = datetime('now')
+                    """
+                ),
+                {"user_id": user_id, "key": key, "value": payload},
+            )
 
 
 def get_user_by_email(email: str) -> dict[str, Any] | None:
@@ -242,16 +255,3 @@ def create_local_user(email: str, password_hash: str, display_name: str | None =
         "display_name": normalized_name,
         "auth_provider": "email",
     }
-        else:
-            conn.execute(
-                text(
-                    """
-                    INSERT INTO state_store(user_id, key, value, updated_at)
-                    VALUES (:user_id, :key, :value, datetime('now'))
-                    ON CONFLICT(user_id, key) DO UPDATE SET
-                        value = excluded.value,
-                        updated_at = datetime('now')
-                    """
-                ),
-                {"user_id": user_id, "key": key, "value": payload},
-            )
