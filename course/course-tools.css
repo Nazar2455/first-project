@@ -467,3 +467,96 @@ a.btn.alt:hover {
   0% { left: -100%; }
   100% { left: 100%; }
 }
+
+@media (max-width: 1024px) {
+  body {
+    padding: 14px !important;
+  }
+
+  .layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .side {
+    position: static !important;
+    height: auto !important;
+    max-height: none !important;
+    border-right: none !important;
+    border-bottom: 2px solid rgba(255, 215, 0, 0.25) !important;
+  }
+
+  .content,
+  .wrap {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .hero,
+  .card,
+  .section {
+    padding: 14px !important;
+  }
+
+  .switch,
+  .actions,
+  .course-top-tools,
+  .track-switch {
+    gap: 8px !important;
+  }
+
+  .btn,
+  .track-btn,
+  .read-toggle-btn,
+  .practice-toggle-btn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    font-size: 0.92rem !important;
+  }
+
+  h1,
+  .hero h1 {
+    font-size: clamp(1.35rem, 5vw, 1.9rem) !important;
+    line-height: 1.2;
+  }
+
+  h2,
+  .section h2,
+  .card h2 {
+    font-size: clamp(1.08rem, 4.2vw, 1.35rem) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    padding: 10px !important;
+  }
+
+  .hero,
+  .card,
+  .section,
+  .side {
+    border-radius: 10px !important;
+  }
+
+  pre {
+    font-size: 0.78rem !important;
+    padding: 10px !important;
+  }
+
+  .course-progress-pill,
+  .badge {
+    font-size: 0.74rem !important;
+  }
+
+  .course-fragment-toast {
+    width: calc(100vw - 20px);
+    left: 10px;
+    right: 10px;
+    transform: translateY(12px);
+  }
+
+  .course-fragment-toast.show {
+    transform: translateY(0);
+  }
+}

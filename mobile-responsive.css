@@ -1,0 +1,193 @@
+/* Global mobile-first responsiveness for top-level pages */
+
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.container,
+.wrap,
+.content {
+  max-width: 100%;
+}
+
+.navbar,
+.topbar,
+.controls,
+.actions,
+.nav-buttons,
+.navbar-stats,
+.top-stats {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.badge,
+.stat-badge,
+.btn,
+.tab-btn,
+.filter-btn {
+  max-width: 100%;
+}
+
+#authUserBadge .stat-value {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.days-grid,
+.games-grid,
+.profile-stats,
+.progress-bar-group,
+.current-day-banner,
+.journey-tracker,
+.quest-grid,
+.achievements-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+}
+
+@media (max-width: 1024px) {
+  body {
+    padding: 14px !important;
+  }
+
+  .navbar,
+  .topbar,
+  .header {
+    padding: 12px 14px !important;
+  }
+
+  .navbar,
+  .topbar {
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center;
+  }
+
+  .navbar-stats,
+  .top-stats,
+  .nav-buttons {
+    width: 100%;
+    justify-content: center !important;
+  }
+
+  .stat-badge,
+  .badge,
+  .btn,
+  .tab-btn {
+    padding: 8px 10px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .navbar-title,
+  .title,
+  .topbar-title,
+  .header h1 {
+    font-size: clamp(1.2rem, 3.8vw, 1.8rem) !important;
+    word-break: break-word;
+  }
+
+  .container,
+  .wrap,
+  .content {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .days-grid,
+  .games-grid,
+  .profile-stats,
+  .progress-bar-group,
+  .current-day-banner,
+  .journey-tracker,
+  .quest-grid,
+  .achievements-grid,
+  .layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .day-card,
+  .card,
+  .panel,
+  .module,
+  .quest,
+  .hero,
+  .profile-section {
+    padding: 14px !important;
+  }
+
+  .day-counter,
+  .journey-value,
+  .level-display {
+    font-size: clamp(1.5rem, 7vw, 2.2rem) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    padding: 10px !important;
+  }
+
+  .navbar,
+  .topbar,
+  .header,
+  .hero,
+  .card,
+  .panel,
+  .module,
+  .quest {
+    border-radius: 10px !important;
+  }
+
+  .stat-badge,
+  .badge,
+  .btn,
+  .tab-btn,
+  .filter-btn {
+    font-size: 0.84rem !important;
+    padding: 7px 9px !important;
+    border-width: 1px !important;
+  }
+
+  #authUserBadge .stat-value {
+    max-width: 95px;
+  }
+
+  .chart-bars {
+    gap: 8px !important;
+    height: 170px !important;
+  }
+
+  .day-navigator {
+    padding: 8px !important;
+  }
+
+  .day-nav-btn {
+    font-size: 0.78rem !important;
+    padding: 7px 10px !important;
+  }
+
+  .modal-content,
+  .quest-card {
+    width: 96vw !important;
+    max-width: 96vw !important;
+    max-height: 88vh !important;
+  }
+}
