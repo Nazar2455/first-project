@@ -23,6 +23,11 @@ def on_startup() -> None:
     init_db()
 
 
+@app.get("/")
+def root() -> dict[str, str]:
+    return {"status": "ok", "service": "plan-backend", "health": f"{API_PREFIX}/health"}
+
+
 def resolve_user_id(
     user_id: str | None = Query(default=None),
     x_user_id: str | None = Header(default=None, alias="X-User-ID"),
