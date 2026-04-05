@@ -32,11 +32,16 @@ DATA_DIR = BASE_DIR / "data"
 DB_PATH = DATA_DIR / "plan_site.db"
 
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
-if DATABASE_URL and DATABASE_URL.startswith(("postgresql://", "postgres://")):
+if DATABASE_URL and DATABASE_URL.startswith(("postgresql://", "postgres://", "postgresql+psycopg://")):
     parts = urlsplit(DATABASE_URL)
     query = dict(parse_qsl(parts.query, keep_blank_values=True))
     query.setdefault("sslmode", "require")
-    DATABASE_URL = urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
+
+    normalized_scheme = parts.scheme
+    if parts.scheme in {"postgres", "postgresql"}:
+        normalized_scheme = "postgresql+psycopg"
+
+    DATABASE_URL = urlunsplit((normalized_scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
 
 DEFAULT_USER_ID = os.getenv("DEFAULT_USER_ID", "local")
 ENVIRONMENT = os.getenv("ENV", "development")
