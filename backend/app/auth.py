@@ -6,7 +6,7 @@ import hmac
 import os
 from datetime import UTC, datetime, timedelta
 
-import jwt
+import jwt  # type: ignore[import-not-found]
 
 from .config import ACCESS_TOKEN_EXPIRES_MINUTES, AUTH_SECRET, ENVIRONMENT
 
