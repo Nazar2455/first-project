@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Переход к главному плану</title>
-  <meta http-equiv="refresh" content="0; url=30d-main-tasks.html">
+  <title>Переход в приложение</title>
   <script>
-    window.location.replace('30d-main-tasks.html');
+    (function () {
+      var token = localStorage.getItem('planAuthToken') || '';
+      var target = token ? '30d-main-tasks.html' : 'auth.html';
+      window.location.replace(target);
+    })();
   </script>
   <style>
     body {
@@ -47,8 +50,9 @@
 </head>
 <body>
   <main class="card">
-    <h1>Главная страница проекта</h1>
-    <p>Если редирект не сработал автоматически, откройте основной план вручную.</p>
+    <h1>Вход в приложение</h1>
+    <p>Если редирект не сработал автоматически, откройте авторизацию или основной план вручную.</p>
+    <a class="btn" href="auth.html">Открыть вход</a>
     <a class="btn" href="30d-main-tasks.html">Открыть основной план</a>
   </main>
 </body>

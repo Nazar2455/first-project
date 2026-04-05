@@ -120,6 +120,29 @@
         return request('/auth/me', { method: 'GET' }, base);
     }
 
+    async function ensureAuthOrRedirect({
+        next = (window.location.pathname.split('/').pop() || '30d-main-tasks.html'),
+        redirectTo = 'auth.html',
+        base = getPlanApiBase()
+    } = {}) {
+        const token = getAuthToken();
+        const target = `${redirectTo}?next=${encodeURIComponent(next || '30d-main-tasks.html')}`;
+
+        if (!token) {
+            window.location.href = target;
+            return null;
+        }
+
+        const meData = await me(base);
+        if (!meData || !meData.email) {
+            clearAuth();
+            window.location.href = target;
+            return null;
+        }
+
+        return meData;
+    }
+
     window.PlanApiClient = {
         getPlanApiBase,
         getPlanUserId,
@@ -131,6 +154,7 @@
         request,
         register,
         login,
-        me
+        me,
+        ensureAuthOrRedirect
     };
 })();

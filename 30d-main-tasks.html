@@ -1652,6 +1652,14 @@
                     <span>🧹</span>
                     <span class="stat-value">RESET</span>
                 </div>
+                <div class="stat-badge" id="authUserBadge" title="Текущий пользователь">
+                    <span>📧</span>
+                    <span class="stat-value">Гость</span>
+                </div>
+                <div class="stat-badge" onclick="logoutAndGoToAuth()" title="Выйти из аккаунта" style="cursor: pointer;">
+                    <span>🚪</span>
+                    <span class="stat-value">ВЫЙТИ</span>
+                </div>
                 <div class="stat-badge">
                     <span>💰</span>
                     <span class="stat-value" id="pointsDisplay">0</span>
@@ -3226,6 +3234,41 @@
             window.location.href = 'code-dungeon.html';
         }
 
+        function logoutAndGoToAuth() {
+            if (window.PlanApiClient?.clearAuth) {
+                window.PlanApiClient.clearAuth();
+            }
+            window.location.href = 'auth.html';
+        }
+
+        async function ensureAuthOrRedirect() {
+            const token = window.PlanApiClient?.getAuthToken ? window.PlanApiClient.getAuthToken() : '';
+            if (!token) {
+                window.location.href = `auth.html?next=${encodeURIComponent('30d-main-tasks.html')}`;
+                return null;
+            }
+
+            const me = await window.PlanApiClient.me();
+            if (!me || !me.email) {
+                if (window.PlanApiClient?.clearAuth) {
+                    window.PlanApiClient.clearAuth();
+                }
+                window.location.href = `auth.html?next=${encodeURIComponent('30d-main-tasks.html')}`;
+                return null;
+            }
+
+            const authBadge = document.getElementById('authUserBadge');
+            if (authBadge) {
+                const valueEl = authBadge.querySelector('.stat-value');
+                if (valueEl) {
+                    valueEl.textContent = me.email;
+                }
+                authBadge.title = `Вход выполнен: ${me.email}`;
+            }
+
+            return me;
+        }
+
         function bindEasterEggs() {
             const title = document.querySelector('.navbar-title');
             const hint = document.getElementById('secretHint');
@@ -3612,6 +3655,9 @@
         }
 
         async function initPage() {
+            const me = await ensureAuthOrRedirect();
+            if (!me) return;
+
             // Гидратация всех данных с сервера
             await hydrateMainTrackerFromServer();
             await hydrateProfileFromServer();

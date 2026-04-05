@@ -1765,6 +1765,9 @@
 
         // Инициализация
         async function initPage() {
+            const me = await window.PlanApiClient?.ensureAuthOrRedirect?.({ next: 'profile-cosmetics.html' });
+            if (!me) return;
+
             await hydrateProfileFromServer();
             updateUI();
         }

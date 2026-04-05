@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход в Plan Website</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Montserrat', Arial, sans-serif;
+            color: #ecf2ff;
+            background: radial-gradient(circle at 20% 20%, rgba(255,215,0,0.18), transparent 30%),
+                        radial-gradient(circle at 80% 80%, rgba(102,126,234,0.24), transparent 32%),
+                        linear-gradient(135deg, #0f0f1e, #1a0a2e, #16213e);
+            display: grid;
+            place-items: center;
+            padding: 20px;
+        }
+
+        .shell {
+            width: min(900px, 100%);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .card {
+            background: rgba(17, 24, 43, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 14px 40px rgba(0,0,0,0.35);
+        }
+
+        .hero h1 {
+            margin: 0 0 10px;
+            color: #ffed4e;
+            font-size: 1.6rem;
+        }
+
+        .hero p {
+            margin: 0;
+            color: #c9dbff;
+            line-height: 1.5;
+        }
+
+        .panel-title {
+            margin: 0 0 10px;
+            font-size: 1.1rem;
+            color: #ffed4e;
+        }
+
+        .field {
+            display: grid;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .field label {
+            color: #d5e3ff;
+            font-size: 0.9rem;
+        }
+
+        .field input {
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.06);
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        .btn {
+            border: 1px solid rgba(255, 215, 0, 0.42);
+            background: rgba(255, 215, 0, 0.12);
+            color: #ffed4e;
+            font-weight: 700;
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .btn.secondary {
+            border-color: rgba(102, 126, 234, 0.5);
+            background: rgba(102,126,234,0.16);
+            color: #b8cbff;
+        }
+
+        .status {
+            margin-top: 12px;
+            min-height: 22px;
+            font-size: 0.9rem;
+            color: #a9c6ff;
+        }
+
+        .status.error { color: #ff9f9f; }
+        .status.ok { color: #8bf2a7; }
+
+        .small {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #adc0e8;
+        }
+
+        @media (max-width: 840px) {
+            .shell { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <section class="card hero">
+            <h1>🔐 Вход в систему прогресса</h1>
+            <p>Войди или зарегистрируйся, чтобы прогресс, уровни и достижения сохранялись по аккаунту.
+               После входа ты автоматически попадёшь в основной план.</p>
+            <p class="small">Если уже авторизован — страница сама перенаправит тебя в проект.</p>
+            <div class="actions" style="margin-top:14px;">
+                <button class="btn secondary" id="goMainBtn" type="button">Открыть основной план</button>
+            </div>
+            <div class="status" id="meStatus"></div>
+        </section>
+
+        <section class="card">
+            <h2 class="panel-title">Регистрация и вход</h2>
+
+            <div class="field">
+                <label for="displayName">Имя (опционально)</label>
+                <input id="displayName" type="text" placeholder="Например: Nazar" autocomplete="name">
+            </div>
+            <div class="field">
+                <label for="email">Email</label>
+                <input id="email" type="email" placeholder="you@example.com" autocomplete="email">
+            </div>
+            <div class="field">
+                <label for="password">Пароль</label>
+                <input id="password" type="password" placeholder="Минимум 8 символов" autocomplete="current-password">
+            </div>
+
+            <div class="actions">
+                <button class="btn" id="registerBtn" type="button">Создать аккаунт</button>
+                <button class="btn secondary" id="loginBtn" type="button">Войти</button>
+                <button class="btn secondary" id="logoutBtn" type="button">Выйти</button>
+            </div>
+
+            <div class="status" id="authStatus"></div>
+            <p class="small">Подсказка: сначала регистрация, потом вход теми же email+паролем.</p>
+        </section>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const nextRaw = params.get('next') || '30d-main-tasks.html';
+        const mainUrl = nextRaw.endsWith('.html') ? nextRaw : '30d-main-tasks.html';
+        const authStatus = document.getElementById('authStatus');
+        const meStatus = document.getElementById('meStatus');
+        const displayNameInput = document.getElementById('displayName');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+
+        function setStatus(text, type = '') {
+            authStatus.className = `status ${type}`.trim();
+            authStatus.textContent = text || '';
+        }
+
+        function setMeStatus(text, type = '') {
+            meStatus.className = `status ${type}`.trim();
+            meStatus.textContent = text || '';
+        }
+
+        function readForm() {
+            return {
+                display_name: displayNameInput.value.trim(),
+                email: emailInput.value.trim(),
+                password: passwordInput.value
+            };
+        }
+
+        function validateBasic({ email, password }) {
+            if (!email || !email.includes('@')) {
+                setStatus('Введите корректный email.', 'error');
+                return false;
+            }
+            if (!password || password.length < 8) {
+                setStatus('Пароль должен быть не короче 8 символов.', 'error');
+                return false;
+            }
+            return true;
+        }
+
+        async function checkCurrentSessionAndRedirect() {
+            if (!window.PlanApiClient?.getAuthToken) return;
+            const token = window.PlanApiClient.getAuthToken();
+            if (!token) {
+                setMeStatus('Сессия не найдена. Выполни вход.', '');
+                return;
+            }
+
+            const me = await window.PlanApiClient.me();
+            if (me?.email) {
+                setMeStatus(`Уже вошёл как ${me.email}. Перенаправляю...`, 'ok');
+                setTimeout(() => { window.location.href = mainUrl; }, 700);
+            } else {
+                setMeStatus('Токен есть, но сессия недействительна. Выполни вход заново.', 'error');
+            }
+        }
+
+        async function handleRegister() {
+            const data = readForm();
+            if (!validateBasic(data)) return;
+
+            setStatus('Регистрирую аккаунт...', '');
+            const result = await window.PlanApiClient.register(data);
+            if (!result?.access_token) {
+                setStatus('Регистрация не удалась. Проверь email/пароль или попробуй другой email.', 'error');
+                return;
+            }
+            setStatus('Аккаунт создан! Перехожу в основной план...', 'ok');
+            setTimeout(() => { window.location.href = mainUrl; }, 700);
+        }
+
+        async function handleLogin() {
+            const data = readForm();
+            if (!validateBasic(data)) return;
+
+            setStatus('Выполняю вход...', '');
+            const result = await window.PlanApiClient.login({ email: data.email, password: data.password });
+            if (!result?.access_token) {
+                setStatus('Вход не удался. Проверь email и пароль.', 'error');
+                return;
+            }
+            setStatus('Вход выполнен! Перехожу в основной план...', 'ok');
+            setTimeout(() => { window.location.href = mainUrl; }, 700);
+        }
+
+        function handleLogout() {
+            window.PlanApiClient.clearAuth();
+            setStatus('Сессия очищена.', 'ok');
+            setMeStatus('Ты вышел из аккаунта.', '');
+        }
+
+        document.getElementById('registerBtn').addEventListener('click', handleRegister);
+        document.getElementById('loginBtn').addEventListener('click', handleLogin);
+        document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+        document.getElementById('goMainBtn').addEventListener('click', () => { window.location.href = mainUrl; });
+
+        checkCurrentSessionAndRedirect();
+    </script>
+</body>
+</html>

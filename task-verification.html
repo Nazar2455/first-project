@@ -921,6 +921,9 @@ function goDungeon() { window.location.href = 'code-dungeon.html'; }
 function goProfile() { window.location.href = 'character-profile.html'; }
 
 async function initPage() {
+    const me = await window.PlanApiClient?.ensureAuthOrRedirect?.({ next: 'task-verification.html' });
+    if (!me) return;
+
     await hydrateVerificationFromServer();
     renderHeader();
     renderModules();

@@ -307,6 +307,9 @@
         }
 
         async function initPage() {
+            const me = await window.PlanApiClient?.ensureAuthOrRedirect?.({ next: 'games-hub.html' });
+            if (!me) return;
+
             await hydrateGameStatsFromServer();
 
             document.querySelectorAll('a.game-card').forEach(card => {
