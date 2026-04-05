@@ -1,7 +1,10 @@
 (function () {
     if (window.PlanApiClient) return;
 
-    const FALLBACK_BASE = 'http://127.0.0.1:8000/api';
+    const PROD_API_BASE = 'https://first-project-a31a.onrender.com/api';
+    const FALLBACK_BASE = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
+        ? 'http://127.0.0.1:8000/api'
+        : PROD_API_BASE;
     const USER_KEY = 'planUserId';
     const USER_DRAFT_KEY = 'planUserIdDraft';
 
