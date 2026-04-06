@@ -1718,6 +1718,18 @@
             if (total) {
                 const height = (learning.totalHours / maxValue) * 100;
                 total.style.height = Math.max(height, 10) + '%';
+                const combined = learning.theoryHours + learning.practiceHours + learning.gamingHours;
+                if (combined > 0) {
+                    const theoryShare = (learning.theoryHours / combined) * 100;
+                    const practiceShare = (learning.practiceHours / combined) * 100;
+                    const gamingShare = Math.max(0, 100 - theoryShare - practiceShare);
+                    const p1 = gamingShare;
+                    const p2 = gamingShare + practiceShare;
+                    total.style.background = `linear-gradient(to top,
+                        #56c2ff 0% ${p1}%,
+                        #ffd700 ${p1}% ${p2}%,
+                        #4dae64 ${p2}% 100%)`;
+                }
                 document.getElementById('val-total').textContent = learning.totalHours + 'ч';
             }
         }
