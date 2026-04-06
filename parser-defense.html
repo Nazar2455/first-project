@@ -483,7 +483,8 @@
         ];
 
         let currentWave = 1, gold = 200, health = 20, towers = [], enemies = [], projectiles = [];
-        let waveActive = false, waveEnemiesLeft = 0, enemiesKilled = 0, xpEarned = 0, codesCompleted = 0;
+        let waveActive = false, waveEnemiesToSpawn = 0, waveEnemiesAlive = 0, enemiesKilled = 0, xpEarned = 0, codesCompleted = 0;
+        let waveSpawnTimer = null;
         let showingChallenge = false, selectedTower = null;
 
         function drawTowerTexture(ctx, x, y, type) {
@@ -605,21 +606,43 @@
             if (waveActive) return;
             waveActive = true;
             const wave = WAVES[currentWave - 1];
-            waveEnemiesLeft = wave.enemies.reduce((s, e) => s + e.count, 0);
-            let spawned = 0;
-            
-            const spawnInterval = setInterval(() => {
-                if (spawned >= waveEnemiesLeft) { clearInterval(spawnInterval); return; }
-                const enemyType = WAVES[currentWave - 1].enemies[Math.floor(Math.random() * WAVES[currentWave - 1].enemies.length)];
-                for (let i = 0; i < 2; i++) {
-                    enemies.push({
-                        x: -30, y: GAME_HEIGHT / 2 + (Math.random() - 0.5) * 100,
-                        type: enemyType.type, speed: enemyType.speed, hp: enemyType.hp, maxHp: enemyType.hp, width: 25, height: 25
-                    });
-                    spawned++;
+            const spawnQueue = wave.enemies.flatMap(enemyType => 
+                Array.from({ length: enemyType.count }, () => enemyType)
+            );
+            waveEnemiesToSpawn = spawnQueue.length;
+            waveEnemiesAlive = 0;
+
+            if (waveSpawnTimer) clearInterval(waveSpawnTimer);
+            let spawnIndex = 0;
+            waveSpawnTimer = setInterval(() => {
+                if (spawnIndex >= spawnQueue.length) {
+                    clearInterval(waveSpawnTimer);
+                    waveSpawnTimer = null;
+                    return;
                 }
-            }, 800);
+
+                const enemyType = spawnQueue[spawnIndex++];
+                enemies.push({
+                    x: -30,
+                    y: GAME_HEIGHT / 2 + (Math.random() - 0.5) * 100,
+                    type: enemyType.type,
+                    speed: enemyType.speed,
+                    hp: enemyType.hp,
+                    maxHp: enemyType.hp,
+                    width: 25,
+                    height: 25
+                });
+                waveEnemiesToSpawn--;
+                waveEnemiesAlive++;
+
+                if (spawnIndex >= spawnQueue.length) {
+                    clearInterval(waveSpawnTimer);
+                    waveSpawnTimer = null;
+                }
+            }, 650);
             document.getElementById('startBtn').disabled = true;
+            document.getElementById('startBtn').textContent = `⏳ Волна ${currentWave}`;
+            document.getElementById('tipPanel').textContent = 'Волна запущена. Укладывай врагов и жди перехода к следующей волне.';
         }
 
         function update() {
@@ -649,7 +672,7 @@
                         proj.target.hp -= proj.damage;
                         if (proj.target.hp <= 0) {
                             enemies = enemies.filter(e => e !== proj.target);
-                            waveEnemiesLeft--;
+                            waveEnemiesAlive = Math.max(0, waveEnemiesAlive - 1);
                             enemiesKilled++;
                             xpEarned += 5;
                             gold += 10;
@@ -669,7 +692,7 @@
                 if (enemy.x > GAME_WIDTH) {
                     health--;
                     enemies = enemies.filter(e => e !== enemy);
-                    waveEnemiesLeft--;
+                    waveEnemiesAlive = Math.max(0, waveEnemiesAlive - 1);
                 }
             });
 
@@ -678,14 +701,25 @@
                 location.reload();
             }
 
-            if (waveActive && waveEnemiesLeft === 0 && enemies.length === 0) {
+            if (waveActive && waveEnemiesToSpawn === 0 && waveEnemiesAlive === 0 && enemies.length === 0) {
                 waveActive = false;
                 const reward = WAVES[currentWave - 1].xpReward;
                 xpEarned += reward;
                 gold += reward * 2;
                 currentWave++;
                 document.getElementById('startBtn').disabled = false;
+                document.getElementById('startBtn').textContent = currentWave > 6 ? '🏆 ГОТОВО' : '▶️ НАЧАТЬ';
                 syncParserDefenseToServer().catch(() => {});
+
+                if (currentWave <= WAVES.length) {
+                    setTimeout(() => {
+                        if (!showingChallenge && !waveActive) {
+                            startWave();
+                        }
+                    }, 1000);
+                } else {
+                    document.getElementById('tipPanel').textContent = '🏆 Все волны пройдены! Ты победил Parser Defense.';
+                }
             }
 
             updateUI();
@@ -755,6 +789,8 @@
             document.getElementById('xpEarned').textContent = xpEarned;
             document.getElementById('codesCompleted').textContent = codesCompleted + '/6';
             localStorage.setItem('parserDefenseXP', xpEarned);
+
+            document.getElementById('startBtn').textContent = currentWave > 6 ? '🏆 ГОТОВО' : (waveActive ? `🌊 Волна ${currentWave}` : '▶️ НАЧАТЬ');
         }
 
         function goToHub() { window.location.href = 'games-hub.html'; }
@@ -829,6 +865,7 @@
         async function initPage() {
             await hydrateParserDefenseFromServer();
             window.PlanGameTracker?.startGameSession('parser-defense', 'Parser Defense');
+            document.getElementById('startBtn').textContent = '▶️ НАЧАТЬ';
             updateUI();
             gameLoop();
         }

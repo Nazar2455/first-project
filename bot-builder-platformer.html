@@ -492,6 +492,7 @@ class TelegramBot {
         let platforms = [];
         let enemies = [];
         let gameWon = false;
+        let completedLevels = new Set(JSON.parse(localStorage.getItem('botBuilderCompletedLevels') || '[]'));
 
         const API_BASE = localStorage.getItem('planApiBase') || 'http://127.0.0.1:8000/api';
 
@@ -544,6 +545,11 @@ class TelegramBot {
             const savedLevel = localStorage.getItem('botBuilderLevel');
             if (savedXP) playerXP = parseInt(savedXP);
             if (savedLevel) playerLevel = parseInt(savedLevel);
+            try {
+                completedLevels = new Set(JSON.parse(localStorage.getItem('botBuilderCompletedLevels') || '[]'));
+            } catch {
+                completedLevels = new Set();
+            }
             updateXPDisplay();
         }
 
@@ -585,6 +591,8 @@ class TelegramBot {
             platforms = [];
             enemies = [];
             gameWon = false;
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) submitBtn.disabled = false;
 
             // Parse platform layout
             const layout = level.platformLayout;
@@ -634,6 +642,7 @@ class TelegramBot {
             document.getElementById('tip').textContent = level.hint;
             document.getElementById('solutionInput').value = '';
             document.getElementById('feedback').style.display = 'none';
+            document.getElementById('feedback').textContent = '';
 
             updateLevelsList();
         }
@@ -642,7 +651,7 @@ class TelegramBot {
             const list = document.getElementById('levelsList');
             list.innerHTML = LEVELS.map((level, idx) => {
                 const isActive = currentLevel === level.id;
-                const isCompleted = playerLevel > 1 || (currentLevel === 1 && playerXP > 0);
+                const isCompleted = completedLevels.has(String(level.id));
                 const isLocked = level.id > currentLevel + 1;
                 
                 let className = 'level-item';
@@ -690,7 +699,13 @@ class TelegramBot {
                 return;
             }
 
-            const isCorrect = level.expectedPattern.test(solution);
+            const normalized = solution.replace(/\s+/g, ' ').trim();
+            const isCorrect = level.expectedPattern.test(solution)
+                || (level.id === 1 && /return\s+['"]OK['"]/i.test(normalized))
+                || (level.id === 2 && /try\s*\{[\s\S]*?\}\s*catch/i.test(solution) && /json\.parse/i.test(solution))
+                || (level.id === 3 && /(async|await|fetch)/i.test(solution))
+                || (level.id === 4 && /(RegExp|\/.*\/[gimsuy]*|\.match\(|\.replace\()/i.test(solution))
+                || (level.id === 5 && /(class\s+\w+|constructor\s*\(|this\.)/i.test(solution));
             
             if (isCorrect) {
                 const xpGain = level.xpReward;
@@ -699,6 +714,8 @@ class TelegramBot {
                 if (newLevel > playerLevel) {
                     playerLevel = newLevel;
                 }
+                completedLevels.add(String(level.id));
+                localStorage.setItem('botBuilderCompletedLevels', JSON.stringify([...completedLevels]));
                 
                 feedback.textContent = `✅ Верно! +${xpGain} XP`;
                 feedback.className = 'feedback success';
@@ -713,6 +730,7 @@ class TelegramBot {
                         initLevel();
                     } else {
                         feedback.textContent = '🏆 Ты завершил все уровни!';
+                        document.getElementById('submitBtn').disabled = true;
                     }
                 }, 2000);
             } else {
