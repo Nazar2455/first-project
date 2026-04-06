@@ -19,19 +19,18 @@
         }
 
         function getTheme() {
-            localStorage.setItem(THEME_KEY, 'dark');
-            return 'dark';
+            return (localStorage.getItem(THEME_KEY) || 'dark') === 'light' ? 'light' : 'dark';
         }
 
-        function setTheme(_) {
-            localStorage.setItem(THEME_KEY, 'dark');
-            return 'dark';
+        function setTheme(theme) {
+            const safe = theme === 'light' ? 'light' : 'dark';
+            localStorage.setItem(THEME_KEY, safe);
+            return safe;
         }
 
         function applyThemeClass(target = document.body) {
             if (!target) return;
-            localStorage.setItem(THEME_KEY, 'dark');
-            target.classList.remove('light-theme');
+            target.classList.toggle('light-theme', getTheme() === 'light');
         }
 
         function translate(translations = {}) {

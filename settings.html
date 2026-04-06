@@ -18,8 +18,8 @@
         }
 
         body.light-theme {
-            background: linear-gradient(135deg, #f5f8ff, #eef3ff, #e9f0ff);
-            color: #1f2a44;
+            background: radial-gradient(circle at top left, #f8fbff 0%, #edf4ff 45%, #e7efff 100%);
+            color: #1d2a44;
         }
 
         .container {
@@ -42,9 +42,10 @@
 
         body.light-theme .header,
         body.light-theme .card {
-            background: rgba(255, 255, 255, 0.92);
-            border-color: rgba(71, 96, 170, 0.25);
-            color: #1f2a44;
+            background: rgba(255, 255, 255, 0.96);
+            border-color: rgba(71, 96, 170, 0.28);
+            color: #1d2a44;
+            box-shadow: 0 10px 24px rgba(43, 70, 139, 0.08);
         }
 
         .title {
@@ -59,7 +60,7 @@
         }
 
         body.light-theme .muted {
-            color: #3a4b74;
+            color: #445883;
         }
 
         .btn {
@@ -75,6 +76,16 @@
 
         .btn:hover {
             background: rgba(255, 215, 0, 0.25);
+        }
+
+        body.light-theme .btn {
+            border-color: #4a66b6;
+            color: #4a66b6;
+            background: rgba(74, 102, 182, 0.1);
+        }
+
+        body.light-theme .btn:hover {
+            background: rgba(74, 102, 182, 0.18);
         }
 
         .btn-danger {
@@ -128,23 +139,64 @@
             color: #1a1a2e;
         }
 
-        select {
+        .segmented {
+            display: inline-flex;
             width: 100%;
-            border-radius: 10px;
-            border: 2px solid rgba(255, 215, 0, 0.35);
-            background: rgba(255, 255, 255, 0.08);
-            color: inherit;
-            padding: 10px;
-            font-family: inherit;
-            font-weight: 600;
+            padding: 4px;
+            gap: 6px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.28);
+            background: rgba(255, 215, 0, 0.08);
         }
 
-        .status {
-            margin-top: 12px;
-            min-height: 22px;
+        .seg-btn {
+            flex: 1;
+            border: none;
+            border-radius: 10px;
+            background: transparent;
+            color: inherit;
+            padding: 10px 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+
+        .seg-btn.active {
+            background: #ffd700;
+            color: #1a1a2e;
+        }
+
+        .toast-host {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .toast {
+            min-width: 220px;
+            max-width: 320px;
+            background: rgba(23, 35, 56, 0.96);
+            border: 1px solid rgba(155, 231, 167, 0.45);
             color: #9be7a7;
-            font-weight: 600;
+            border-radius: 10px;
+            padding: 10px 12px;
             font-size: 0.9em;
+            font-weight: 700;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.22s ease, transform 0.22s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         body.light-theme .title {
@@ -160,6 +212,23 @@
         body.light-theme .pill.active {
             color: #fff;
             background: #3f63c8;
+        }
+
+        body.light-theme .segmented {
+            background: rgba(63, 99, 200, 0.08);
+            border-color: rgba(63, 99, 200, 0.28);
+        }
+
+        body.light-theme .seg-btn.active {
+            background: #3f63c8;
+            color: #fff;
+        }
+
+        body.light-theme .toast {
+            background: rgba(255, 255, 255, 0.98);
+            color: #245234;
+            border-color: rgba(36, 82, 52, 0.35);
+            box-shadow: 0 8px 22px rgba(43, 70, 139, 0.2);
         }
     </style>
     <link rel="stylesheet" href="mobile-responsive.css">
@@ -179,7 +248,8 @@
                 <h3 data-i18n="themeTitle">🎨 Тема</h3>
                 <p class="muted" data-i18n="themeDesc">Выбери визуальный режим интерфейса.</p>
                 <div class="row" style="margin-top:10px;">
-                    <span class="pill active" id="themeDark" data-i18n="darkOnly">Тёмная (фиксированная)</span>
+                    <button class="pill" id="themeDark" onclick="setTheme('dark')" data-i18n="dark">Тёмная</button>
+                    <button class="pill" id="themeLight" onclick="setTheme('light')" data-i18n="light">Светлая</button>
                 </div>
             </div>
 
@@ -187,11 +257,11 @@
                 <h3 data-i18n="langTitle">🌍 Язык</h3>
                 <p class="muted" data-i18n="langDesc">Выбери язык интерфейса.</p>
                 <div style="margin-top:10px;">
-                    <select id="langSelect" onchange="setLanguage(this.value)">
-                        <option value="ru">Русский</option>
-                        <option value="uk">Українська</option>
-                        <option value="en">English</option>
-                    </select>
+                    <div class="segmented" role="tablist" aria-label="Language">
+                        <button class="seg-btn" id="langRu" onclick="setLanguage('ru')">Русский</button>
+                        <button class="seg-btn" id="langUk" onclick="setLanguage('uk')">Українська</button>
+                        <button class="seg-btn" id="langEn" onclick="setLanguage('en')">English</button>
+                    </div>
                 </div>
             </div>
 
@@ -212,7 +282,7 @@
             </div>
         </div>
 
-        <div class="status" id="status"></div>
+        <div class="toast-host" id="toastHost" aria-live="polite" aria-atomic="true"></div>
     </div>
 
     <script src="api-client.js"></script>
@@ -251,8 +321,9 @@
                 title: '⚙️ Настройки',
                 backBtn: '← Назад',
                 themeTitle: '🎨 Тема',
-                themeDesc: 'В проекте используется только тёмная тема.',
-                darkOnly: 'Тёмная (фиксированная)',
+                themeDesc: 'Выбери визуальный режим интерфейса.',
+                dark: 'Тёмная',
+                light: 'Светлая',
                 langTitle: '🌍 Язык',
                 langDesc: 'Выбери язык интерфейса.',
                 accountTitle: '🔐 Аккаунт',
@@ -269,8 +340,9 @@
                 title: '⚙️ Налаштування',
                 backBtn: '← Назад',
                 themeTitle: '🎨 Тема',
-                themeDesc: 'У проєкті використовується лише темна тема.',
-                darkOnly: 'Темна (фіксована)',
+                themeDesc: 'Обери візуальний режим інтерфейсу.',
+                dark: 'Темна',
+                light: 'Світла',
                 langTitle: '🌍 Мова',
                 langDesc: 'Обери мову інтерфейсу.',
                 accountTitle: '🔐 Акаунт',
@@ -287,8 +359,9 @@
                 title: '⚙️ Settings',
                 backBtn: '← Back',
                 themeTitle: '🎨 Theme',
-                themeDesc: 'Only dark theme is used in this project.',
-                darkOnly: 'Dark (fixed)',
+                themeDesc: 'Choose interface appearance mode.',
+                dark: 'Dark',
+                light: 'Light',
                 langTitle: '🌍 Language',
                 langDesc: 'Choose interface language.',
                 accountTitle: '🔐 Account',
@@ -314,9 +387,10 @@
         }
 
         function applyTheme() {
-            localStorage.setItem(APP_THEME_KEY, 'dark');
-            document.body.classList.remove('light-theme');
-            document.getElementById('themeDark')?.classList.add('active');
+            const theme = (localStorage.getItem(APP_THEME_KEY) || 'dark') === 'light' ? 'light' : 'dark';
+            document.body.classList.toggle('light-theme', theme === 'light');
+            document.getElementById('themeDark')?.classList.toggle('active', theme === 'dark');
+            document.getElementById('themeLight')?.classList.toggle('active', theme === 'light');
         }
 
         function applyLanguage() {
@@ -327,11 +401,14 @@
                 const value = t(key);
                 if (value) el.textContent = value;
             });
-            document.getElementById('langSelect').value = lang;
+            document.getElementById('langRu')?.classList.toggle('active', lang === 'ru');
+            document.getElementById('langUk')?.classList.toggle('active', lang === 'uk');
+            document.getElementById('langEn')?.classList.toggle('active', lang === 'en');
         }
 
-        function setTheme() {
-            localStorage.setItem(APP_THEME_KEY, 'dark');
+        function setTheme(theme) {
+            const safeTheme = theme === 'light' ? 'light' : 'dark';
+            localStorage.setItem(APP_THEME_KEY, safeTheme);
             applyTheme();
             showStatus(t('statusSaved'));
         }
@@ -347,7 +424,7 @@
 
             const preserveApiBase = localStorage.getItem('planApiBase');
             const preserveLang = localStorage.getItem(APP_LANG_KEY) || 'ru';
-            const preserveTheme = 'dark';
+            const preserveTheme = (localStorage.getItem(APP_THEME_KEY) || 'dark') === 'light' ? 'light' : 'dark';
 
             RESET_LOCAL_KEYS.forEach((key) => localStorage.removeItem(key));
 
@@ -384,7 +461,19 @@
         }
 
         function showStatus(text) {
-            document.getElementById('status').textContent = text;
+            const host = document.getElementById('toastHost');
+            if (!host) return;
+
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = text;
+            host.appendChild(toast);
+
+            requestAnimationFrame(() => toast.classList.add('show'));
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 260);
+            }, 2200);
         }
 
         async function initPage() {
