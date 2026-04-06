@@ -2130,17 +2130,40 @@
         }
 
         async function syncMainTrackerToServer() {
+            const localMainValue = {
+                points: GAME_STATE.points,
+                level: GAME_STATE.level,
+                completed: GAME_STATE.completed,
+                secretFlags: GAME_STATE.secretFlags,
+                titleClicks: GAME_STATE.titleClicks,
+                equippedCosmetics: JSON.parse(localStorage.getItem('equippedCosmetics') || '{}')
+            };
+
+            const hasLocalProgress =
+                Number(localMainValue.points || 0) > 0 ||
+                Number(localMainValue.level || 1) > 1 ||
+                Object.keys(localMainValue.completed || {}).length > 0 ||
+                Object.keys(localMainValue.secretFlags || {}).length > 0 ||
+                Object.keys(localMainValue.equippedCosmetics || {}).length > 0;
+
+            const remoteState = await apiRequest('/state/main_tracker');
+            const remoteValue = remoteState?.value && typeof remoteState.value === 'object' ? remoteState.value : {};
+            const hasRemoteProgress =
+                Number(remoteValue.points || 0) > 0 ||
+                Number(remoteValue.level || 1) > 1 ||
+                Object.keys(remoteValue.completed || {}).length > 0 ||
+                Object.keys(remoteValue.secretFlags || {}).length > 0 ||
+                Object.keys(remoteValue.equippedCosmetics || {}).length > 0;
+
+            if (!hasLocalProgress && hasRemoteProgress) {
+                console.warn('[syncMainTrackerToServer] Skip empty local overwrite because remote has progress');
+                return;
+            }
+
             await apiRequest('/state/main_tracker', {
                 method: 'PUT',
                 body: JSON.stringify({
-                    value: {
-                        points: GAME_STATE.points,
-                        level: GAME_STATE.level,
-                        completed: GAME_STATE.completed,
-                        secretFlags: GAME_STATE.secretFlags,
-                        titleClicks: GAME_STATE.titleClicks,
-                        equippedCosmetics: JSON.parse(localStorage.getItem('equippedCosmetics') || '{}')
-                    }
+                    value: localMainValue
                 })
             });
         }

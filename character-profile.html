@@ -812,21 +812,42 @@
             const existingValue = existingCharacterState?.value && typeof existingCharacterState.value === 'object'
                 ? existingCharacterState.value
                 : {};
+            const localMainValue = {
+                points: GAME_STATE.points,
+                level: GAME_STATE.level,
+                completed: GAME_STATE.completed,
+                cosmetics: GAME_STATE.cosmetics,
+                equippedCosmetics: GAME_STATE.equippedCosmetics,
+                freezeTokens: parseInt(localStorage.getItem('streak_freeze_tokens') || '0')
+            };
+
+            const hasLocalProgress =
+                Number(localMainValue.points || 0) > 0 ||
+                Number(localMainValue.level || 1) > 1 ||
+                Object.keys(localMainValue.completed || {}).length > 0 ||
+                Object.keys(localMainValue.cosmetics || {}).length > 0 ||
+                Object.keys(localMainValue.equippedCosmetics || {}).length > 0 ||
+                Number(localMainValue.freezeTokens || 0) > 0;
+
+            const remoteMainState = await apiRequest('/state/main_tracker');
+            const remoteMainValue = remoteMainState?.value && typeof remoteMainState.value === 'object' ? remoteMainState.value : {};
+            const hasRemoteProgress =
+                Number(remoteMainValue.points || 0) > 0 ||
+                Number(remoteMainValue.level || 1) > 1 ||
+                Object.keys(remoteMainValue.completed || {}).length > 0 ||
+                Object.keys(remoteMainValue.cosmetics || {}).length > 0 ||
+                Object.keys(remoteMainValue.equippedCosmetics || {}).length > 0 ||
+                Number(remoteMainValue.freezeTokens || 0) > 0;
+
+            const shouldSyncMainTracker = hasLocalProgress || !hasRemoteProgress;
 
             await Promise.all([
-                apiRequest('/state/main_tracker', {
+                shouldSyncMainTracker ? apiRequest('/state/main_tracker', {
                     method: 'PUT',
                     body: JSON.stringify({
-                        value: {
-                            points: GAME_STATE.points,
-                            level: GAME_STATE.level,
-                            completed: GAME_STATE.completed,
-                            cosmetics: GAME_STATE.cosmetics,
-                            equippedCosmetics: GAME_STATE.equippedCosmetics,
-                            freezeTokens: parseInt(localStorage.getItem('streak_freeze_tokens') || '0')
-                        }
+                        value: localMainValue
                     })
-                }),
+                }) : Promise.resolve(),
                 apiRequest('/state/character_profile', {
                     method: 'PUT',
                     body: JSON.stringify({
