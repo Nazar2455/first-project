@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💰 Deal Maker</title>
+    <link rel="stylesheet" href="mobile-responsive.css">
+    <style>
+        * { box-sizing: border-box; }
+        :root {
+            --bg1: #0b1020;
+            --bg2: #1b1238;
+            --gold: #ffd86b;
+            --cyan: #5de6ff;
+            --text: #eaf1ff;
+            --muted: #a6b4d1;
+            --card: rgba(17, 24, 44, 0.88);
+            --border: rgba(255, 216, 107, 0.28);
+        }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Montserrat, Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(255, 216, 107, 0.16), transparent 35%),
+                radial-gradient(circle at bottom right, rgba(93, 230, 255, 0.10), transparent 36%),
+                linear-gradient(135deg, var(--bg1), var(--bg2));
+            padding: 18px;
+        }
+        .shell {
+            width: min(1180px, 100%);
+            margin: 0 auto;
+            display: grid;
+            gap: 18px;
+        }
+        .topbar, .panel {
+            background: rgba(12, 17, 34, 0.86);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+            backdrop-filter: blur(10px);
+        }
+        .topbar {
+            padding: 16px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .brand .icon {
+            width: 54px; height: 54px; border-radius: 16px;
+            display: grid; place-items: center;
+            background: linear-gradient(135deg, rgba(255,216,107,0.18), rgba(93,230,255,0.12));
+            border: 1px solid rgba(255,255,255,0.12);
+            font-size: 1.7rem;
+        }
+        .brand h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            line-height: 1.1;
+            color: var(--gold);
+        }
+        .brand p { margin: 4px 0 0; color: var(--muted); font-size: 0.92rem; }
+        .stats {
+            display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end;
+        }
+        .badge {
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            font-weight: 700;
+            min-width: 110px;
+            text-align: center;
+        }
+        .badge b { display: block; color: var(--gold); font-size: 1.05rem; margin-top: 4px; }
+        .grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 18px;
+        }
+        .panel { padding: 18px; }
+        .hero {
+            display: grid;
+            gap: 14px;
+        }
+        .hero h2 { margin: 0; font-size: 2rem; }
+        .hero p { margin: 0; color: var(--muted); line-height: 1.6; }
+        .deal-card {
+            background: linear-gradient(135deg, rgba(255,216,107,0.08), rgba(93,230,255,0.05));
+            border: 1px solid rgba(255,216,107,0.25);
+            border-radius: 16px;
+            padding: 16px;
+            display: grid;
+            gap: 12px;
+        }
+        .deal-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .deal-head h3 { margin: 0; font-size: 1.2rem; color: #fff1b8; }
+        .meter {
+            display: grid;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .meter-row {
+            display: flex; justify-content: space-between; font-size: 0.86rem; color: var(--muted);
+        }
+        .meter-bar {
+            height: 14px; border-radius: 999px; overflow: hidden;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .meter-fill {
+            height: 100%; width: 50%;
+            background: linear-gradient(90deg, #ff8a65, #ffd86b, #4ce2ff);
+            transition: width .35s ease;
+        }
+        .scenario {
+            font-size: 1.02rem;
+            line-height: 1.6;
+            color: #edf3ff;
+            min-height: 80px;
+        }
+        .choices { display: grid; gap: 10px; }
+        .choice {
+            text-align: left;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            border-radius: 14px;
+            padding: 14px 14px;
+            cursor: pointer;
+            transition: transform .18s ease, border-color .18s ease, background .18s ease;
+            font: inherit;
+        }
+        .choice:hover { transform: translateY(-2px); border-color: rgba(255,216,107,0.5); background: rgba(255,255,255,0.07); }
+        .choice.correct { border-color: rgba(107, 255, 173, 0.65); background: rgba(107,255,173,0.12); }
+        .choice.wrong { border-color: rgba(255,110,110,0.65); background: rgba(255,110,110,0.12); }
+        .side-stack { display: grid; gap: 18px; }
+        .list { display: grid; gap: 10px; }
+        .list-item {
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #d7e3ff;
+            line-height: 1.5;
+        }
+        .list-item strong { color: var(--gold); }
+        .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn {
+            border: 1px solid rgba(255,216,107,0.35);
+            background: linear-gradient(135deg, rgba(255,216,107,0.16), rgba(93,230,255,0.06));
+            color: #fff;
+            border-radius: 12px;
+            padding: 11px 14px;
+            cursor: pointer;
+            font-weight: 800;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn:hover { filter: brightness(1.08); }
+        .feedback {
+            min-height: 26px;
+            font-weight: 700;
+            color: var(--gold);
+        }
+        .feedback.good { color: #79ffb1; }
+        .feedback.bad { color: #ff9b9b; }
+        .progress-steps {
+            display: flex; gap: 8px; flex-wrap: wrap;
+        }
+        .step {
+            width: 14px; height: 14px; border-radius: 50%;
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .step.active { background: var(--gold); box-shadow: 0 0 0 4px rgba(255,216,107,0.12); }
+        .step.done { background: #79ffb1; }
+        .final-card {
+            display: none;
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(121,255,177,0.35);
+            background: rgba(121,255,177,0.08);
+            color: #eafff3;
+        }
+        .final-card.show { display: grid; gap: 10px; }
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: 1fr; }
+            .topbar { align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <section class="topbar">
+            <div class="brand">
+                <div class="icon">💰</div>
+                <div>
+                    <h1>Deal Maker</h1>
+                    <p>Переговоры, цены и закрытие сделок без лишней боли для клиента.</p>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="badge">Раунд<b id="roundNum">1/5</b></div>
+                <div class="badge">Баланс<b id="scoreNum">0</b></div>
+                <div class="badge">Доверие<b id="trustNum">50%</b></div>
+                <div class="badge">XP<b id="xpNum">0</b></div>
+            </div>
+        </section>
+
+        <section class="grid">
+            <article class="panel hero">
+                <div class="deal-card">
+                    <div class="deal-head">
+                        <h3 id="dealTitle">Раунд 1 — Первый контакт</h3>
+                        <div class="progress-steps" id="stepDots"></div>
+                    </div>
+                    <div class="meter">
+                        <div class="meter-row"><span>Шанс закрытия</span><span id="closeChance">50%</span></div>
+                        <div class="meter-bar"><div class="meter-fill" id="meterFill"></div></div>
+                    </div>
+                    <div class="scenario" id="scenarioText"></div>
+                    <div class="choices" id="choices"></div>
+                    <div class="feedback" id="feedback"></div>
+                    <div class="actions">
+                        <button class="btn" id="nextBtn" type="button" style="display:none;">➡️ Следующий раунд</button>
+                        <a class="btn" href="games-hub.html">⬅️ В хаб</a>
+                    </div>
+                </div>
+                <div class="final-card" id="finalCard"></div>
+            </article>
+
+            <aside class="side-stack">
+                <section class="panel">
+                    <h3 style="margin-top:0;color:#fff1b8;">Как играть</h3>
+                    <div class="list">
+                        <div class="list-item"><strong>1.</strong> Выбирай ответ, который помогает и цене, и доверию.</div>
+                        <div class="list-item"><strong>2.</strong> Слишком жадный оффер снижает шанс закрытия.</div>
+                        <div class="list-item"><strong>3.</strong> Балансируй маржу, объём и спокойный тон.</div>
+                    </div>
+                </section>
+                <section class="panel">
+                    <h3 style="margin-top:0;color:#fff1b8;">Навыки</h3>
+                    <div class="list">
+                        <div class="list-item">💼 Позиционирование и упаковка</div>
+                        <div class="list-item">🧾 Обоснование цены</div>
+                        <div class="list-item">🧠 Работа с возражениями</div>
+                        <div class="list-item">🤝 Закрытие сделки</div>
+                    </div>
+                </section>
+            </aside>
+        </section>
+    </main>
+
+    <script src="api-client.js"></script>
+    <script src="game-session-tracker.js"></script>
+    <script>
+        const API_BASE = localStorage.getItem('planApiBase') || 'http://127.0.0.1:8000/api';
+        const DEALS = [
+            {
+                title: 'Раунд 1 — Первый контакт',
+                text: 'Клиент говорит: «Сколько стоит бот?». У тебя нет контекста, но есть шанс задать правильный тон.',
+                choices: [
+                    { text: '«Сразу $500, без скидок»', score: -8, trust: -10, xp: 0, result: 'Слишком резко: клиент ещё не понял ценность.' },
+                    { text: '«Сначала уточню задачу и рамки, потом назову цену»', score: 12, trust: 12, xp: 20, result: 'Отлично: ты ведёшь разговор как консультант.' },
+                    { text: '«А сколько у вас бюджет?»', score: 4, trust: 4, xp: 10, result: 'Неплохо: но ты пока отдаёшь инициативу.' }
+                ]
+            },
+            {
+                title: 'Раунд 2 — Возражение по цене',
+                text: 'Клиент: «У конкурента дешевле». Нужно не паниковать и показать разницу в ценности.',
+                choices: [
+                    { text: '«Ну тогда идите к конкуренту»', score: -12, trust: -14, xp: 0, result: 'Сделка почти умерла. Грубый ответ ломает доверие.' },
+                    { text: '«Давайте сравним состав работ, сроки и поддержку»', score: 14, trust: 8, xp: 25, result: 'Сильный ход: переводишь разговор в ценность, а не в демпинг.' },
+                    { text: '«Могу скинуть 30% прямо сейчас»', score: -4, trust: -6, xp: 5, result: 'Слишком быстрая скидка обесценивает предложение.' }
+                ]
+            },
+            {
+                title: 'Раунд 3 — Рост чека',
+                text: 'Клиент уже заинтересован. Можно предложить доп. услуги без давления.',
+                choices: [
+                    { text: 'Добавить поддержку, аналитику и базовое обучение команды', score: 16, trust: 10, xp: 30, result: 'Кайф: апселл выглядит полезным, а не навязанным.' },
+                    { text: 'Навязать максимум функций «на всякий случай»', score: -8, trust: -8, xp: 0, result: 'Перегруз: клиент пугается и начинает тормозить.' },
+                    { text: 'Оставить только базовую версию без обсуждения', score: 6, trust: 4, xp: 10, result: 'Безопасно, но ты оставляешь деньги на столе.' }
+                ]
+            },
+            {
+                title: 'Раунд 4 — Сроки и риски',
+                text: 'Клиент хочет «вчера». Твоя задача — не обещать чудо, а продать надёжность.',
+                choices: [
+                    { text: 'Пообещать всё за 48 часов', score: -10, trust: -12, xp: 0, result: 'Слишком сладко. Риск сорвать ожидания слишком высок.' },
+                    { text: 'Разбить работу на этапы с контрольными точками', score: 15, trust: 12, xp: 25, result: 'Профессионально: клиент видит план и контроль.' },
+                    { text: 'Согласиться без уточнений и начать делать', score: 2, trust: 0, xp: 5, result: 'Можно, но потом чаще возникают проблемы.' }
+                ]
+            },
+            {
+                title: 'Раунд 5 — Закрытие',
+                text: 'Последний шаг. Нужен чёткий next step, чтобы сделка не испарилась в переписке.',
+                choices: [
+                    { text: '«Скину договор и счёт, стартуем после оплаты»', score: 18, trust: 10, xp: 35, result: 'Идеально: спокойно, чётко и по-деловому.' },
+                    { text: '«Ну, если хотите, напишите потом»', score: -8, trust: -6, xp: 0, result: 'Слишком мягко: клиент может уйти в туман.' },
+                    { text: '«Вот вам ещё 5 скидок, только купите»', score: -6, trust: -8, xp: 5, result: 'Скидочный водопад — не лучший способ закрыть.' }
+                ]
+            }
+        ];
+
+        let roundIndex = 0;
+        let score = 50;
+        let trust = 50;
+        let xp = Number(localStorage.getItem('dealMakerXP') || 0);
+        let finished = false;
+
+        async function apiRequest(path, options = {}) {
+            if (window.PlanApiClient?.request) return window.PlanApiClient.request(path, options, API_BASE);
+            try {
+                const res = await fetch(`${API_BASE}${path}`, {
+                    ...options,
+                    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }
+                });
+                if (!res.ok) return null;
+                return await res.json();
+            } catch {
+                return null;
+            }
+        }
+
+        function saveXP() {
+            localStorage.setItem('dealMakerXP', String(xp));
+            void apiRequest('/state/deal_maker', {
+                method: 'PUT',
+                body: JSON.stringify({ value: { xp, score, trust, roundIndex } })
+            });
+        }
+
+        function clamp(value, min, max) {
+            return Math.max(min, Math.min(max, value));
+        }
+
+        function renderSteps() {
+            const steps = document.getElementById('stepDots');
+            steps.innerHTML = DEALS.map((_, idx) => {
+                let cls = 'step';
+                if (idx < roundIndex) cls += ' done';
+                if (idx === roundIndex && !finished) cls += ' active';
+                return `<span class="step ${cls.replace('step ', '')}"></span>`;
+            }).join('');
+        }
+
+        function renderRound() {
+            const round = DEALS[roundIndex];
+            document.getElementById('roundNum').textContent = `${roundIndex + 1}/${DEALS.length}`;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('trustNum').textContent = `${trust}%`;
+            document.getElementById('xpNum').textContent = xp;
+            document.getElementById('dealTitle').textContent = round.title;
+            document.getElementById('scenarioText').textContent = round.text;
+            document.getElementById('closeChance').textContent = `${clamp(Math.round((score + trust) / 2), 1, 99)}%`;
+            document.getElementById('meterFill').style.width = `${clamp(Math.round((score + trust) / 2), 1, 99)}%`;
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('finalCard').classList.remove('show');
+
+            const choices = document.getElementById('choices');
+            choices.innerHTML = round.choices.map((choice, idx) => `
+                <button class="choice" type="button" data-index="${idx}">${choice.text}</button>
+            `).join('');
+            choices.querySelectorAll('.choice').forEach(btn => {
+                btn.addEventListener('click', () => chooseAnswer(Number(btn.dataset.index), btn));
+            });
+            renderSteps();
+        }
+
+        function chooseAnswer(choiceIndex, button) {
+            if (finished) return;
+            const round = DEALS[roundIndex];
+            const choice = round.choices[choiceIndex];
+            score = clamp(score + choice.score, 0, 100);
+            trust = clamp(trust + choice.trust, 0, 100);
+            xp += choice.xp;
+
+            document.getElementById('feedback').textContent = choice.result;
+            document.getElementById('feedback').className = `feedback ${choice.score >= 10 ? 'good' : (choice.score < 0 ? 'bad' : '')}`;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('trustNum').textContent = `${trust}%`;
+            document.getElementById('xpNum').textContent = xp;
+            document.getElementById('closeChance').textContent = `${clamp(Math.round((score + trust) / 2), 1, 99)}%`;
+            document.getElementById('meterFill').style.width = `${clamp(Math.round((score + trust) / 2), 1, 99)}%`;
+
+            const choiceNodes = [...document.querySelectorAll('.choice')];
+            choiceNodes.forEach(node => node.disabled = true);
+            button.classList.add(choice.score >= 10 ? 'correct' : 'wrong');
+
+            saveXP();
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+        }
+
+        function nextRound() {
+            roundIndex += 1;
+            if (roundIndex >= DEALS.length) {
+                finishGame();
+                return;
+            }
+            renderRound();
+        }
+
+        function finishGame() {
+            finished = true;
+            const bonus = score >= 70 && trust >= 55 ? 80 : 35;
+            xp += bonus;
+            saveXP();
+            document.getElementById('roundNum').textContent = `${DEALS.length}/${DEALS.length}`;
+            document.getElementById('xpNum').textContent = xp;
+            document.getElementById('feedback').textContent = score >= 70 && trust >= 55
+                ? `🏁 Сделка закрыта красиво. Бонус XP: +${bonus}`
+                : `🏁 Сделка дошла до финиша, но можно было продавать мягче. Бонус XP: +${bonus}`;
+            document.getElementById('feedback').className = `feedback ${score >= 70 && trust >= 55 ? 'good' : 'bad'}`;
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('finalCard').classList.add('show');
+            document.getElementById('finalCard').innerHTML = `
+                <h3 style="margin:0;color:#79ffb1;">Deal Maker пройден</h3>
+                <div>Финальный счёт: <strong>${score}</strong></div>
+                <div>Доверие клиента: <strong>${trust}%</strong></div>
+                <div>Итоговый XP: <strong>${xp}</strong></div>
+                <div>Ты уже умеешь: определять ценность, держать цену и закрывать сделку без скидочного цирка.</div>
+            `;
+            renderSteps();
+            document.getElementById('choices').innerHTML = '';
+        }
+
+        async function initPage() {
+            const me = await window.PlanApiClient?.ensureAuthOrRedirect?.({ next: 'deal-maker.html' });
+            if (!me) return;
+            window.PlanGameTracker?.startGameSession('deal-maker', 'Deal Maker');
+            document.getElementById('nextBtn').addEventListener('click', nextRound);
+            renderRound();
+        }
+
+        initPage();
+    </script>
+</body>
+</html>

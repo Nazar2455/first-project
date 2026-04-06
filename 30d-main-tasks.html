@@ -1980,7 +1980,7 @@
             'characterProfileAchievements', 'characterProfileEarnedAchievementXp',
             'verificationState', 'verificationDrafts', 'burnoutState',
             'gameStats', 'botBuilderXP', 'botBuilderLevel', 'dungeonXP',
-            'dungeonBestRoom', 'parserDefenseXP', 'gameXPApplied',
+            'dungeonBestRoom', 'parserDefenseXP', 'dealMakerXP', 'statsCraftXP', 'gameXPApplied',
             'planStartDate', 'streak_days', 'streak_frozen_this_week'
         ];
 
@@ -3266,9 +3266,11 @@
             const botBuilderXP = parseInt(localStorage.getItem('botBuilderXP')) || 0;
             const dungeonXP = parseInt(localStorage.getItem('dungeonXP')) || 0;
             const parserDefenseXP = parseInt(localStorage.getItem('parserDefenseXP')) || 0;
+            const dealMakerXP = parseInt(localStorage.getItem('dealMakerXP')) || 0;
+            const statsCraftXP = parseInt(localStorage.getItem('statsCraftXP')) || 0;
             
             // Комбинированный XP со скидкой (2% за каждые 100 XP)
-            const totalGameXP = Math.floor((botBuilderXP + dungeonXP + parserDefenseXP) * 0.5);
+            const totalGameXP = Math.floor((botBuilderXP + dungeonXP + parserDefenseXP + dealMakerXP + statsCraftXP) * 0.5);
             const alreadyApplied = parseInt(localStorage.getItem('gameXPApplied') || '0');
             const delta = Math.max(0, totalGameXP - alreadyApplied);
             
