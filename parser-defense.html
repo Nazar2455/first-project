@@ -317,7 +317,7 @@
             <div class="title">🛡️ Parser Defense: Оптимизация</div>
             <div class="stat-badge">💰 <span id="goldCount">200</span></div>
             <div class="stat-badge">❤️ <span id="healthCount">20</span></div>
-            <div class="stat-badge">🌊 Wave <span id="waveCount">1</span>/6</div>
+            <div class="stat-badge">🌊 Wave <span id="waveCount">1</span>/<span id="waveTotal">10</span></div>
         </div>
         <div class="topbar-right">
             <button class="btn-small" onclick="goToHub()">← Хаб</button>
@@ -379,7 +379,7 @@
                 </div>
                 <div class="info-row">
                     <span class="info-row-label">Код-челленджей:</span>
-                    <span id="codesCompleted">0/6</span>
+                    <span id="codesCompleted">0/10</span>
                 </div>
             </div>
             
@@ -479,6 +479,46 @@
                 example: 'Promise.all(urls.map(...))',
                 enemies: [{ type: 'boss', count: 1, speed: 1.0, hp: 100 }, { type: 'fast', count: 10, speed: 2.0, hp: 8 }],
                 xpReward: 250
+            },
+            {
+                num: 7,
+                concept: 'Rate limit: API режет слишком частые запросы. Нужны задержки и backoff.',
+                challenge: 'async function callWithBackoff(fn) {\n  // TODO: retry + setTimeout + attempt\n}',
+                expectedPattern: /retry|setTimeout|attempt|backoff|while|for/,
+                hint: 'Сделай retry-политику с задержкой.',
+                example: 'await new Promise(r => setTimeout(r, delay));',
+                enemies: [{ type: 'fast', count: 10, speed: 2.1, hp: 10 }, { type: 'duplicate', count: 6, speed: 1.5, hp: 14 }],
+                xpReward: 190
+            },
+            {
+                num: 8,
+                concept: 'Пагинация: данные разбиты на страницы. Нужно собрать всё без пропусков.',
+                challenge: 'async function collectAllPages(fetchPage) {\n  // TODO: while(nextPage) + concat\n}',
+                expectedPattern: /while|nextPage|concat|push|for/,
+                hint: 'Итерируй страницы, пока есть nextPage.',
+                example: 'while (cursor) { ... }',
+                enemies: [{ type: 'large', count: 4, speed: 0.95, hp: 70 }, { type: 'dirty', count: 8, speed: 1.7, hp: 14 }],
+                xpReward: 210
+            },
+            {
+                num: 9,
+                concept: 'Наблюдаемость: журналирование и алерты по ошибкам парсинга.',
+                challenge: 'function logParserError(err, ctx) {\n  // TODO: level + message + context + timestamp\n}',
+                expectedPattern: /log|error|context|timestamp|Date/,
+                hint: 'Лог должен содержать контекст и время.',
+                example: 'console.error({ level: "error", ... })',
+                enemies: [{ type: 'fast', count: 12, speed: 2.2, hp: 10 }, { type: 'duplicate', count: 10, speed: 1.55, hp: 15 }],
+                xpReward: 230
+            },
+            {
+                num: 10,
+                concept: 'МЕГА-БОСС: production-run под нагрузкой, с ретраями, валидацией и отчётностью.',
+                challenge: 'async function runParserPipeline(sources) {\n  // TODO: validate -> parse -> dedup -> retry -> report\n}',
+                expectedPattern: /async|await|retry|validate|report|try|catch/,
+                hint: 'Покажи целостный pipeline с обработкой ошибок.',
+                example: 'const clean = rows.filter(...);',
+                enemies: [{ type: 'boss', count: 1, speed: 1.2, hp: 180 }, { type: 'fast', count: 12, speed: 2.3, hp: 10 }, { type: 'large', count: 6, speed: 1.1, hp: 80 }],
+                xpReward: 320
             }
         ];
 
@@ -598,7 +638,7 @@
         }
 
         function startWave() {
-            if (currentWave > 6) return alert('🏆 Победа!');
+            if (currentWave > WAVES.length) return alert('🏆 Победа!');
             showCodeChallenge();
         }
 
@@ -708,7 +748,7 @@
                 gold += reward * 2;
                 currentWave++;
                 document.getElementById('startBtn').disabled = false;
-                document.getElementById('startBtn').textContent = currentWave > 6 ? '🏆 ГОТОВО' : '▶️ НАЧАТЬ';
+                document.getElementById('startBtn').textContent = currentWave > WAVES.length ? '🏆 ГОТОВО' : '▶️ НАЧАТЬ';
                 syncParserDefenseToServer().catch(() => {});
 
                 if (currentWave <= WAVES.length) {
@@ -778,19 +818,20 @@
 
             ctx.fillStyle = '#ff6b35';
             ctx.font = 'bold 14px Arial';
-            ctx.fillText('Wave ' + currentWave + '/6 | Враги: ' + enemies.length, 20, 30);
+            ctx.fillText('Wave ' + currentWave + '/' + WAVES.length + ' | Враги: ' + enemies.length, 20, 30);
         }
 
         function updateUI() {
             document.getElementById('goldCount').textContent = gold;
             document.getElementById('healthCount').textContent = health;
             document.getElementById('waveCount').textContent = currentWave;
+            document.getElementById('waveTotal').textContent = WAVES.length;
             document.getElementById('enemiesKilled').textContent = enemiesKilled;
             document.getElementById('xpEarned').textContent = xpEarned;
-            document.getElementById('codesCompleted').textContent = codesCompleted + '/6';
+            document.getElementById('codesCompleted').textContent = `${codesCompleted}/${WAVES.length}`;
             localStorage.setItem('parserDefenseXP', xpEarned);
 
-            document.getElementById('startBtn').textContent = currentWave > 6 ? '🏆 ГОТОВО' : (waveActive ? `🌊 Волна ${currentWave}` : '▶️ НАЧАТЬ');
+            document.getElementById('startBtn').textContent = currentWave > WAVES.length ? '🏆 ГОТОВО' : (waveActive ? `🌊 Волна ${currentWave}` : '▶️ НАЧАТЬ');
         }
 
         function goToHub() { window.location.href = 'games-hub.html'; }

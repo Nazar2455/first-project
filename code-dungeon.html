@@ -131,9 +131,10 @@
             <div class="chip">❤️ HP: <span id="hp">100</span></div>
             <div class="chip">🪙 XP: <span id="xp">0</span></div>
             <div class="chip">⚡ Stamina: <span id="stamina">100</span></div>
-            <div class="chip">🏰 Комната: <span id="room">1</span>/4</div>
+            <div class="chip">🏰 Комната: <span id="room">1</span>/<span id="roomTotal">12</span></div>
             <div class="chip">🧰 Сундуки: <span id="term">0</span></div>
             <div class="chip">⚔️ Враги: <span id="enemy">0</span></div>
+            <div class="chip">🕳️ Секреты: <span id="secretCount">0</span>/3</div>
             <div class="chip">🎯 Цель: <span id="objective">—</span></div>
         </div>
         <div style="display:flex; gap:8px;">
@@ -146,7 +147,7 @@
     <canvas id="game" width="1100" height="620"></canvas>
 
     <div class="controls">
-        <b>Управление:</b> WASD / стрелки / ЦФЫВ — движение, Space — атака, F — спец-удар, Shift — рывок, E (У) — сундук/дверь.<br>
+        <b>Управление:</b> WASD / стрелки / ЦФЫВ — движение, Space — атака, F — спец-удар, Shift — рывок, E (У) — сундук/дверь/тайный портал.<br>
         Смысл игры: в каждой комнате у тебя <b>контракт фрилансера</b>. Зачищаешь врагов, проходишь учебные терминалы, получаешь XP для основного плана.
     </div>
 
@@ -264,13 +265,21 @@
             running: false,
             quizOpen: false,
             currentTerminal: null,
-            questionQueue: buildDungeonQuestionQueue(16),
+            questionQueue: buildDungeonQuestionQueue(36),
             qIndex: 0,
             contracts: [
                 { title: 'Lead Bot MVP', goal: 'Базовая логика /start + структура проекта', reward: 60 },
                 { title: 'Parser Export', goal: 'Сбор данных + подготовка экспортируемого результата', reward: 70 },
                 { title: 'Deploy Readiness', goal: 'Стабильность + обработка ошибок', reward: 80 },
-                { title: 'Boss: First Client', goal: 'Итоговый контракт: качество + скорость + понятный результат', reward: 120 }
+                { title: 'Sales Script', goal: 'Сильный оффер + ответы на возражения', reward: 90 },
+                { title: 'Monitoring Setup', goal: 'Логи + алерты + контроль сбоев', reward: 95 },
+                { title: 'Refactor Sprint', goal: 'Шаблоны и повторное использование кода', reward: 105 },
+                { title: 'Scale Contract', goal: 'Объём задач и приоритеты без хаоса', reward: 115 },
+                { title: 'Client Onboarding', goal: 'Быстрый запуск клиента: бриф, доступы, чек-лист', reward: 125 },
+                { title: 'Automation Suite', goal: 'Связка бота с таблицами, уведомлениями и экспортом', reward: 135 },
+                { title: 'QA Gauntlet', goal: 'Тест-кейсы, обработка edge-cases, анти-падения', reward: 145 },
+                { title: 'Deploy Fortress', goal: 'Логи, healthchecks, откат и стабильный uptime', reward: 160 },
+                { title: 'Boss: First Client', goal: 'Итоговый контракт: качество + скорость + понятный результат', reward: 200 }
             ],
             message: '',
             messageT: 0,
@@ -280,29 +289,66 @@
             projectiles: [],
             currentBiome: { floorA: '#0f1833', floorB: '#15224a', accent: '#667eea', wall: '#263458', rune: '#ffd700' },
             chapters: [
-                {
-                    title: 'Пробуждение Новичка',
-                    text: 'Ты входишь в Подземелье Контрактов. Здесь выживает тот, кто умеет доводить MVP до результата.'
-                },
-                {
-                    title: 'Шахты Данных',
-                    text: 'Пауки парсинга охраняют руду данных. Извлеки структуру и не потеряй стабильность.'
-                },
-                {
-                    title: 'Башня Деплоя',
-                    text: 'Без uptime нет доверия. Подними сервис и докажи, что твой код живёт 24/7.'
-                },
-                {
-                    title: 'Тронный зал Клиента',
-                    text: 'Финальная проверка: качество, сроки и ясность. Здесь рождается первый платящий клиент.'
-                }
+                { title: 'Пробуждение Новичка', text: 'Ты входишь в Подземелье Контрактов. Здесь выживает тот, кто умеет доводить MVP до результата.' },
+                { title: 'Шахты Данных', text: 'Пауки парсинга охраняют руду данных. Извлеки структуру и не потеряй стабильность.' },
+                { title: 'Башня Деплоя', text: 'Без uptime нет доверия. Подними сервис и докажи, что твой код живёт 24/7.' },
+                { title: 'Рынок Офферов', text: 'Клиенты торгуются за ценность. Покажи выгоду, а не просто цену.' },
+                { title: 'Лабиринт Мониторинга', text: 'Ошибки приходят ночью. Выживает тот, кто видит их первым.' },
+                { title: 'Кузня Рефакторинга', text: 'Сырый код не выдержит рост. Куй структуру заранее.' },
+                { title: 'Своды Масштаба', text: 'Проект растёт. Приоритеты и декомпозиция спасают от хаоса.' },
+                { title: 'Двор Брифов', text: 'Неполный бриф убивает сроки. Точный онбординг экономит недели.' },
+                { title: 'Галерея Автоматизации', text: 'Связки между сервисами превращают бота в рабочую систему.' },
+                { title: 'Испытание QA', text: 'Код может работать в демо и падать в бою. Проверки решают.' },
+                { title: 'Цитадель Деплоя', text: 'Стабильность — это дисциплина: мониторинг, rollback и алерты.' },
+                { title: 'Тронный зал Клиента', text: 'Финальная проверка: качество, сроки и ясность. Здесь рождается первый платящий клиент.' }
             ],
             biomes: [
                 { floorA: '#0f1833', floorB: '#1b2a56', accent: '#6278d9', wall: '#263458', rune: '#ffd700' },
                 { floorA: '#13231f', floorB: '#1f3a33', accent: '#53d6a4', wall: '#2a4a42', rune: '#8effcf' },
                 { floorA: '#2a1d12', floorB: '#3a2918', accent: '#ff9f5a', wall: '#5a3d24', rune: '#ffc07d' },
-                { floorA: '#2a1120', floorB: '#421b32', accent: '#ff6f8c', wall: '#5d2d45', rune: '#ffd0dc' }
+                { floorA: '#2a1120', floorB: '#421b32', accent: '#ff6f8c', wall: '#5d2d45', rune: '#ffd0dc' },
+                { floorA: '#10263a', floorB: '#1a3a57', accent: '#6fe7ff', wall: '#254861', rune: '#a8f4ff' },
+                { floorA: '#1c1c32', floorB: '#2f2f4a', accent: '#b08cff', wall: '#44446b', rune: '#d8c9ff' },
+                { floorA: '#2a2314', floorB: '#41351f', accent: '#f7cf6a', wall: '#5e4a29', rune: '#ffe6a8' },
+                { floorA: '#2a1024', floorB: '#3a1535', accent: '#ff7fb5', wall: '#5a2a4d', rune: '#ffd5e9' },
+                { floorA: '#1c283e', floorB: '#28385e', accent: '#8fb8ff', wall: '#3a4d72', rune: '#d6e6ff' },
+                { floorA: '#1b2f29', floorB: '#2a4a3f', accent: '#7cf5c8', wall: '#3c6659', rune: '#cfffe9' },
+                { floorA: '#321f16', floorB: '#4b2f22', accent: '#ffb07f', wall: '#6a4330', rune: '#ffd6be' },
+                { floorA: '#260f2b', floorB: '#3a1946', accent: '#e089ff', wall: '#5d2b74', rune: '#f2c9ff' }
             ],
+            secretPortalsByRoom: { 2: 0, 5: 1, 8: 2 },
+            secretRooms: [
+                {
+                    title: 'Секретный рифт: Архив Скриптов',
+                    text: 'Старые скрипты ожили. Победи хранителя и унеси бонусный контракт.',
+                    reward: 140,
+                    biome: { floorA: '#1f163a', floorB: '#321f57', accent: '#d9a6ff', wall: '#4b3370', rune: '#f0d4ff' },
+                    enemy: { count: 2, hp: 135, speed: 1.55, damage: 13, r: 20 },
+                    terminals: 2
+                },
+                {
+                    title: 'Секретный рифт: Ядро Мониторинга',
+                    text: 'Тут живут баги, которые не видно днём. Закрой рифт и стабилизируй систему.',
+                    reward: 165,
+                    biome: { floorA: '#0f2b2e', floorB: '#164247', accent: '#7af3ff', wall: '#24606b', rune: '#b7f8ff' },
+                    enemy: { count: 3, hp: 150, speed: 1.65, damage: 14, r: 19 },
+                    terminals: 2
+                },
+                {
+                    title: 'Секретный рифт: Контракт Прайм',
+                    text: 'Минибосс-советник клиента проверяет тебя на скорость и качество.',
+                    reward: 210,
+                    biome: { floorA: '#30151f', floorB: '#4a1f30', accent: '#ff9bc0', wall: '#6a2f45', rune: '#ffd1e4' },
+                    enemy: { count: 1, hp: 240, speed: 1.35, damage: 18, r: 28 },
+                    terminals: 3
+                }
+            ],
+            inSecretRoom: false,
+            secretRoomId: null,
+            secretReturnRoom: null,
+            secretPortal: null,
+            secretCleared: {},
+            secretsFound: 0,
             assets: {
                 knight: null,
                 goblin: null,
@@ -387,6 +433,14 @@
         }
 
         function updateChapterUI() {
+            if (state.inSecretRoom && Number.isInteger(state.secretRoomId)) {
+                const s = state.secretRooms[state.secretRoomId];
+                document.getElementById('chapterTitle').textContent = s?.title || 'Секретный рифт';
+                document.getElementById('chapterText').textContent = s?.text || 'Скрытая зона активна.';
+                document.getElementById('contractReward').textContent = `Награда: +${s?.reward || 0} XP`;
+                return;
+            }
+
             const ch = state.chapters[state.roomIndex] || state.chapters[0];
             const c = state.contracts[state.roomIndex] || state.contracts[0];
             document.getElementById('chapterTitle').textContent = ch.title;
@@ -411,6 +465,10 @@
 
         function buildRoom(index) {
             state.roomIndex = index;
+            state.inSecretRoom = false;
+            state.secretRoomId = null;
+            state.secretReturnRoom = null;
+            state.secretPortal = null;
             state.player.x = 90;
             state.player.y = 310;
             state.currentBiome = state.biomes[index] || state.biomes[0];
@@ -433,16 +491,17 @@
                 });
             }
 
-            const enemyCount = index < 3 ? 2 + index : 1;
+            const lastRoom = state.contracts.length - 1;
+            const isBoss = index === lastRoom;
+            const enemyCount = isBoss ? 1 : Math.min(8, 2 + Math.floor(index / 2));
             state.enemies = [];
             for (let i = 0; i < enemyCount; i++) {
-                const isBoss = index === 3;
                 state.enemies.push({
                     x: 700 + Math.random() * 280,
                     y: 120 + Math.random() * 380,
                     r: isBoss ? 30 : 16,
-                    hp: isBoss ? 140 : 40 + index * 15,
-                    speed: isBoss ? 1.25 : 1.4 + index * 0.2,
+                    hp: isBoss ? 300 : 44 + index * 18,
+                    speed: isBoss ? 1.3 : 1.35 + index * 0.12,
                     damage: isBoss ? 18 : 8,
                     wanderT: 0,
                     vx: 0,
@@ -452,7 +511,7 @@
                 });
             }
 
-            const terminalsCount = index < 3 ? 2 : 1;
+            const terminalsCount = isBoss ? 3 : (index <= 1 ? 2 : 3);
             state.terminals = [];
             for (let i = 0; i < terminalsCount; i++) {
                 state.terminals.push({
@@ -466,10 +525,90 @@
                 });
             }
 
+            const portalSecretId = state.secretPortalsByRoom[index];
+            if (Number.isInteger(portalSecretId) && !state.secretCleared[portalSecretId]) {
+                state.secretPortal = {
+                    x: 94,
+                    y: 132,
+                    r: 26,
+                    secretId: portalSecretId,
+                    active: false
+                };
+            }
+
             state.door.open = false;
             const c = state.contracts[state.roomIndex];
             showMessage(`Контракт: ${c.title} • ${c.goal}`);
             updateChapterUI();
+        }
+
+        function buildSecretRoom(secretId, returnRoomIndex) {
+            const secret = state.secretRooms[secretId];
+            if (!secret) return;
+
+            state.inSecretRoom = true;
+            state.secretRoomId = secretId;
+            state.secretReturnRoom = returnRoomIndex;
+            state.secretPortal = null;
+            state.player.x = 90;
+            state.player.y = 310;
+            state.currentBiome = secret.biome;
+
+            state.walls = [
+                rect(0, 0, 1100, 20), rect(0, 600, 1100, 20), rect(0, 0, 20, 620), rect(1080, 0, 20, 620),
+                rect(210, 70, 24, 220), rect(210, 330, 24, 220), rect(440, 120, 24, 380),
+                rect(660, 70, 24, 220), rect(660, 330, 24, 220), rect(860, 220, 24, 220)
+            ];
+            state.loots = [];
+            state.particles = [];
+            state.projectiles = [];
+
+            state.decor = [];
+            const rand = createSeededRandom(90210 + secretId * 77);
+            for (let i = 0; i < 40; i++) {
+                state.decor.push({
+                    x: 40 + rand() * 1020,
+                    y: 40 + rand() * 540,
+                    type: rand() < 0.4 ? 'rock' : 'rune',
+                    s: 5 + rand() * 9
+                });
+            }
+
+            state.enemies = [];
+            for (let i = 0; i < secret.enemy.count; i++) {
+                const isMiniBoss = secret.enemy.count === 1;
+                state.enemies.push({
+                    x: 760 + Math.random() * 220,
+                    y: 140 + Math.random() * 320,
+                    r: secret.enemy.r,
+                    hp: secret.enemy.hp,
+                    speed: secret.enemy.speed,
+                    damage: secret.enemy.damage,
+                    wanderT: 0,
+                    vx: 0,
+                    vy: 0,
+                    boss: isMiniBoss,
+                    miniBoss: true,
+                    kind: isMiniBoss ? 'devil-boss' : 'devil-witch'
+                });
+            }
+
+            state.terminals = [];
+            for (let i = 0; i < secret.terminals; i++) {
+                state.terminals.push({
+                    x: 310 + i * 240,
+                    y: i % 2 === 0 ? 118 : 470,
+                    w: 44,
+                    h: 44,
+                    solved: false,
+                    chest: true,
+                    question: state.questionQueue[state.qIndex++ % state.questionQueue.length]
+                });
+            }
+
+            state.door.open = false;
+            updateChapterUI();
+            showMessage('🕳️ Найден секретный проход! Закрой рифт и вернись в маршрут.', 180);
         }
 
         function collidesCircleRect(cx, cy, r, rw) {
@@ -728,6 +867,60 @@
             });
         }
 
+        function drawStylizedHero() {
+            const x = state.player.x;
+            const y = state.player.y;
+            const ang = Math.atan2(state.player.facingY, state.player.facingX);
+            const hitAlpha = state.player.hitCd > 0 ? 0.78 : 1;
+
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(ang + Math.PI / 2);
+            ctx.globalAlpha = hitAlpha;
+
+            // тень
+            ctx.fillStyle = 'rgba(0,0,0,0.35)';
+            ctx.beginPath();
+            ctx.ellipse(0, 17, 12, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // плащ
+            ctx.fillStyle = '#5f6dff';
+            ctx.beginPath();
+            ctx.moveTo(0, 8);
+            ctx.lineTo(-11, 20);
+            ctx.lineTo(11, 20);
+            ctx.closePath();
+            ctx.fill();
+
+            // тело
+            ctx.fillStyle = '#8fd5ff';
+            ctx.fillRect(-9, -5, 18, 18);
+            ctx.strokeStyle = '#dff3ff';
+            ctx.strokeRect(-9, -5, 18, 18);
+
+            // голова/шлем
+            ctx.fillStyle = '#d9e6ff';
+            ctx.beginPath();
+            ctx.arc(0, -12, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.stroke();
+
+            // визор
+            ctx.fillStyle = '#1e2f52';
+            ctx.fillRect(-6, -13, 12, 4);
+
+            // меч
+            ctx.fillStyle = '#ffe18a';
+            ctx.fillRect(8, -2, 3, 14);
+            ctx.fillStyle = '#a7f1ff';
+            ctx.fillRect(9, -16, 2, 14);
+
+            ctx.globalAlpha = 1;
+            ctx.restore();
+        }
+
         function tryInteract() {
             if (!state.running || state.quizOpen) return;
 
@@ -741,10 +934,24 @@
                 }
             }
 
+            if (state.secretPortal?.active) {
+                const dPortal = Math.hypot(state.player.x - state.secretPortal.x, state.player.y - state.secretPortal.y);
+                if (dPortal < state.secretPortal.r + 28) {
+                    buildSecretRoom(state.secretPortal.secretId, state.roomIndex + 1);
+                    return;
+                }
+            }
+
             // Дверь
             const dDoor = Math.hypot(state.player.x - (state.door.x + 18), state.player.y - (state.door.y + 55));
             if (state.door.open && dDoor < 70) {
-                if (state.roomIndex < 3) {
+                if (state.inSecretRoom) {
+                    const nextRoom = Number.isInteger(state.secretReturnRoom) ? state.secretReturnRoom : state.roomIndex + 1;
+                    buildRoom(Math.min(nextRoom, state.contracts.length - 1));
+                    return;
+                }
+
+                if (state.roomIndex < state.contracts.length - 1) {
                     buildRoom(state.roomIndex + 1);
                 } else {
                     gameOver(true);
@@ -780,7 +987,7 @@
 
             if (index === q.answerIndex) {
                 t.solved = true;
-                const gain = 40;
+                const gain = state.inSecretRoom ? 60 : 40;
                 state.xp += gain;
                 localStorage.setItem('dungeonXP', state.xp);
                 void syncDungeonToServer();
@@ -810,6 +1017,22 @@
             const allSolved = state.terminals.every(t => t.solved);
             const allEnemiesDead = state.enemies.length === 0;
             state.door.open = allSolved && allEnemiesDead;
+
+            if (!state.inSecretRoom && state.secretPortal) {
+                state.secretPortal.active = state.door.open;
+            }
+
+            if (state.inSecretRoom && state.door.open && Number.isInteger(state.secretRoomId) && !state.secretCleared[state.secretRoomId]) {
+                const secret = state.secretRooms[state.secretRoomId];
+                state.secretCleared[state.secretRoomId] = true;
+                state.secretsFound = Object.keys(state.secretCleared).length;
+                if (secret?.reward) {
+                    state.xp += secret.reward;
+                    localStorage.setItem('dungeonXP', state.xp);
+                    void syncDungeonToServer();
+                    showMessage(`🗝️ Секрет зачищен! +${secret.reward} XP`, 170);
+                }
+            }
         }
 
         function draw() {
@@ -845,6 +1068,23 @@
             // Дверь
             ctx.fillStyle = state.door.open ? '#ffd700' : '#4a4a4a';
             ctx.fillRect(state.door.x, state.door.y, state.door.w, state.door.h);
+
+            // Секретный портал
+            if (state.secretPortal) {
+                const p = state.secretPortal;
+                const active = !!p.active;
+                const pulse = 0.8 + Math.sin(Date.now() / 220) * 0.2;
+                ctx.beginPath();
+                ctx.fillStyle = active ? `rgba(190,120,255,${0.28 * pulse})` : 'rgba(120,90,150,0.15)';
+                ctx.arc(p.x, p.y, p.r + (active ? 8 : 3), 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.strokeStyle = active ? '#dba6ff' : '#6f5a8f';
+                ctx.lineWidth = 3;
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.lineWidth = 1;
+            }
 
             // Лут
             for (const l of state.loots) {
@@ -898,7 +1138,9 @@
 
                 // HP бар
                 const bw = e.boss ? 70 : 34;
-                const max = e.boss ? 140 : (40 + state.roomIndex * 15);
+                const max = e.miniBoss
+                    ? (state.secretRooms[state.secretRoomId]?.enemy?.hp || 220)
+                    : (e.boss ? 300 : (44 + state.roomIndex * 18));
                 const p = Math.max(0, e.hp / max);
                 ctx.fillStyle = 'rgba(0,0,0,0.5)';
                 ctx.fillRect(e.x - bw / 2, e.y - e.r - 12, bw, 6);
@@ -907,24 +1149,7 @@
             }
 
             // Игрок
-            if (state.assets.loaded && state.assets.knight && state.assets.knight.complete && state.assets.knight.naturalWidth > 0) {
-                const size = 52;
-                ctx.save();
-                ctx.translate(state.player.x, state.player.y);
-                const ang = Math.atan2(state.player.facingY, state.player.facingX);
-                ctx.rotate(ang + Math.PI / 2);
-                ctx.globalAlpha = state.player.hitCd > 0 ? 0.75 : 1;
-                ctx.drawImage(state.assets.knight, -size / 2, -size / 2, size, size);
-                ctx.restore();
-                ctx.globalAlpha = 1;
-            } else {
-                ctx.beginPath();
-                ctx.fillStyle = state.player.hitCd > 0 ? '#ffcccb' : '#8cd4ff';
-                ctx.arc(state.player.x, state.player.y, state.player.r, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#d9f1ff';
-                ctx.stroke();
-            }
+            drawStylizedHero();
 
             // Направление
             ctx.strokeStyle = '#ffffff';
@@ -960,7 +1185,15 @@
                 if (d < 72) {
                     ctx.fillStyle = '#ffe28a';
                     ctx.font = '14px Montserrat';
-                    ctx.fillText('E: В следующую комнату', state.door.x - 70, state.door.y - 10);
+                    ctx.fillText(state.inSecretRoom ? 'E: Вернуться в маршрут' : 'E: В следующую комнату', state.door.x - 85, state.door.y - 10);
+                }
+            }
+            if (state.secretPortal?.active) {
+                const d = Math.hypot(state.player.x - state.secretPortal.x, state.player.y - state.secretPortal.y);
+                if (d < 72) {
+                    ctx.fillStyle = '#eec9ff';
+                    ctx.font = '14px Montserrat';
+                    ctx.fillText('E: Войти в секретный рифт', state.secretPortal.x - 88, state.secretPortal.y - 36);
                 }
             }
 
@@ -994,10 +1227,20 @@
             document.getElementById('hp').textContent = state.hp;
             document.getElementById('xp').textContent = state.xp;
             document.getElementById('stamina').textContent = Math.round(state.player.stamina);
-            document.getElementById('room').textContent = state.roomIndex + 1;
+            document.getElementById('room').textContent = state.inSecretRoom
+                ? `S${(state.secretRoomId || 0) + 1}`
+                : (state.roomIndex + 1);
+            document.getElementById('roomTotal').textContent = state.contracts.length;
             document.getElementById('term').textContent = `${state.terminals.filter(t => t.solved).length}/${state.terminals.length}`;
             document.getElementById('enemy').textContent = state.enemies.length;
-            document.getElementById('objective').textContent = state.door.open ? 'Иди к двери' : 'Очистить и взломать';
+            document.getElementById('secretCount').textContent = state.secretsFound;
+            if (state.inSecretRoom) {
+                document.getElementById('objective').textContent = state.door.open ? 'Вернись в маршрут' : 'Закрой рифт';
+            } else if (state.secretPortal?.active) {
+                document.getElementById('objective').textContent = 'Секретный рифт найден';
+            } else {
+                document.getElementById('objective').textContent = state.door.open ? 'Иди к двери' : 'Очистить и взломать';
+            }
         }
 
         function gameLoop() {
@@ -1024,13 +1267,14 @@
             const text = document.getElementById('resultText');
 
             if (victory) {
-                const bonus = 220 + state.contracts[state.roomIndex].reward;
+                const secretsBonus = state.secretsFound * 90;
+                const bonus = 320 + state.contracts[state.roomIndex].reward + secretsBonus;
                 state.xp += bonus;
                 localStorage.setItem('dungeonXP', state.xp);
-                localStorage.setItem('dungeonBestRoom', '4');
+                localStorage.setItem('dungeonBestRoom', String(state.contracts.length));
                 void syncDungeonToServer();
                 title.textContent = '🏆 Победа в Code Dungeon!';
-                text.textContent = `Ты закрыл контракт Гильдии и получил +${bonus} XP. Теперь открой план и закрой 1 реальную задачу дня.`;
+                text.textContent = `Ты закрыл контракт Гильдии и получил +${bonus} XP (секреты: ${state.secretsFound}/3). Теперь открой план и закрой 1 реальную задачу дня.`;
             } else {
                 const best = Math.max(parseInt(localStorage.getItem('dungeonBestRoom') || '0'), state.roomIndex + 1);
                 localStorage.setItem('dungeonBestRoom', String(best));
@@ -1048,15 +1292,21 @@
             state.hp = 100;
             state.player.stamina = 100;
             state.running = true;
-            state.questionQueue = buildDungeonQuestionQueue(16);
+            state.questionQueue = buildDungeonQuestionQueue(36);
             state.qIndex = 0;
+            state.secretsFound = 0;
+            state.secretCleared = {};
+            state.inSecretRoom = false;
+            state.secretRoomId = null;
+            state.secretReturnRoom = null;
+            state.secretPortal = null;
             buildRoom(0);
         }
 
         function startDungeon() {
             document.getElementById('introOverlay').style.display = 'none';
             state.running = true;
-            showMessage('Контракт принят. Удачи в забеге!');
+            showMessage('Контракт принят. Ищи рунические проходы — там минибоссы и бонус XP!');
         }
 
         window.restartRun = restartRun;
