@@ -3026,6 +3026,9 @@
                     localStorage.setItem(storageKey, JSON.stringify({ theoryMs: rounded, practiceMs: 0, gamingMs: 0 }));
                 }
             });
+
+            void syncCourseToServer();
+            void syncWeeklyStatsToServer();
         }
 
         function startTaskTheorySession(day, key, title) {
@@ -3058,6 +3061,11 @@
 
         window.addEventListener('pagehide', stopTaskTheorySession);
         window.addEventListener('beforeunload', stopTaskTheorySession);
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopTaskTheorySession();
+            }
+        });
 
         function openTaskQuest(key) {
             const meta = TASK_DETAILS[key];

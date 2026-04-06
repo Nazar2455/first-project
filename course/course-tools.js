@@ -99,12 +99,15 @@
 
   const STORAGE_KEY = 'course_days_read_v1';
   const THEORY_MS_KEY = 'course_theory_time_ms';
+  const PRACTICE_MS_KEY = 'course_practice_time_ms';
   const PRACTICE_COMPLETED_PREFIX = 'practice_completed_';
   const DAILY_STATS_KEY = 'course_daily_learning_stats_v1';
   const PRACTICE_CHECKS_KEY = 'course_practice_checks_v1';
   const API_BASE = localStorage.getItem('planApiBase') || 'http://127.0.0.1:8000/api';
 
   let theorySessionStartedAt = null;
+  let practiceSessionStartedAt = null;
+  let learningTrackingInitialized = false;
 
   function readNumber(key) {
     const value = Number(localStorage.getItem(key) || 0);
@@ -122,6 +125,20 @@
     if (day) {
       addDailyLearningTime(day, 'theoryMs', Math.round(ms));
     }
+  }
+
+  function getPracticeMs() {
+    return readNumber(PRACTICE_MS_KEY);
+  }
+
+  function addPracticeMs(ms) {
+    if (!Number.isFinite(ms) || ms <= 0) return;
+    localStorage.setItem(PRACTICE_MS_KEY, String(getPracticeMs() + Math.round(ms)));
+    const day = detectCurrentDay();
+    if (day) {
+      addDailyLearningTime(day, 'practiceMs', Math.round(ms));
+    }
+    addWeeklyPracticeTime(ms);
   }
 
   function loadDailyLearningStats() {
@@ -158,6 +175,8 @@
           body: JSON.stringify({
             value: {
               ...current,
+              theoryMs: getTheoryMs(),
+              practiceMs: getPracticeMs(),
               dailyLearningStats: dailyStats
             }
           })
@@ -175,6 +194,8 @@
         body: JSON.stringify({
           value: {
             ...current,
+            theoryMs: getTheoryMs(),
+            practiceMs: getPracticeMs(),
             dailyLearningStats: dailyStats
           }
         })
@@ -230,6 +251,48 @@
 
     window.addEventListener('beforeunload', stopTheorySession);
     window.addEventListener('pagehide', stopTheorySession);
+  }
+
+  function startPracticeSession() {
+    if (practiceSessionStartedAt !== null) return;
+    practiceSessionStartedAt = Date.now();
+  }
+
+  function stopPracticeSession() {
+    if (practiceSessionStartedAt === null) return;
+    const elapsed = Date.now() - practiceSessionStartedAt;
+    practiceSessionStartedAt = null;
+    addPracticeMs(elapsed);
+  }
+
+  function initPracticeTracking() {
+    const day = detectCurrentDay();
+    if (!day) return;
+
+    startPracticeSession();
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stopPracticeSession();
+      } else {
+        startPracticeSession();
+      }
+    });
+
+    window.addEventListener('beforeunload', stopPracticeSession);
+    window.addEventListener('pagehide', stopPracticeSession);
+  }
+
+  function initLearningTracking() {
+    if (learningTrackingInitialized) return;
+    learningTrackingInitialized = true;
+
+    if (isPracticePage()) {
+      initPracticeTracking();
+      return;
+    }
+
+    initTheoryTracking();
   }
 
   function getLearningStats(totalDays) {
@@ -938,6 +1001,8 @@
   }
 
   function initModulePage(day) {
+    initLearningTracking();
+
     const btn = document.getElementById('readToggleBtn');
     if (btn && day) {
       refreshReadButton(btn, day);
@@ -1040,6 +1105,23 @@
       localStorage.setItem(storageKey, JSON.stringify(existing));
     } catch {
       const stats = { theoryMs: Math.round(ms), practiceMs: 0, gamingMs: 0 };
+      localStorage.setItem(storageKey, JSON.stringify(stats));
+    }
+  }
+
+  function addWeeklyPracticeTime(ms) {
+    if (!Number.isFinite(ms) || ms <= 0) return;
+
+    const week = getISOWeekNumber();
+    const weekKey = formatWeekNumber(week.year, week.week);
+    const storageKey = `weekly_stats_${weekKey}`;
+
+    try {
+      const existing = JSON.parse(localStorage.getItem(storageKey) || '{"theoryMs":0,"practiceMs":0,"gamingMs":0}');
+      existing.practiceMs = (existing.practiceMs || 0) + Math.round(ms);
+      localStorage.setItem(storageKey, JSON.stringify(existing));
+    } catch {
+      const stats = { theoryMs: 0, practiceMs: Math.round(ms), gamingMs: 0 };
       localStorage.setItem(storageKey, JSON.stringify(stats));
     }
   }
