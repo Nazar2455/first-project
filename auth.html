@@ -125,7 +125,7 @@
                После входа ты автоматически попадёшь в основной план.</p>
             <p class="small">Если уже авторизован — страница сама перенаправит тебя в проект.</p>
             <div class="actions" style="margin-top:14px;">
-                <button class="btn secondary" id="goMainBtn" type="button">Открыть основной план</button>
+                <a class="btn secondary" id="goMainBtn" href="30d-main-tasks.html">Открыть основной план</a>
             </div>
             <div class="status" id="meStatus"></div>
         </section>
@@ -206,12 +206,18 @@
                 return;
             }
 
-            const me = await window.PlanApiClient.me();
+            setMeStatus('Проверяю текущую сессию...', '');
+            let me = await window.PlanApiClient.me();
+            if (!me?.email) {
+                setMeStatus('Сервер может просыпаться. Повторяю проверку...', '');
+                await new Promise((resolve) => setTimeout(resolve, 1200));
+                me = await window.PlanApiClient.me();
+            }
             if (me?.email) {
                 setMeStatus(`Уже вошёл как ${me.email}. Перенаправляю...`, 'ok');
                 setTimeout(() => { window.location.href = mainUrl; }, 700);
             } else {
-                setMeStatus('Токен есть, но сессия недействительна. Выполни вход заново.', 'error');
+                setMeStatus('Сессия не подтверждена. Можно войти вручную или открыть основной план.', 'error');
             }
         }
 
@@ -252,7 +258,7 @@
         document.getElementById('registerBtn').addEventListener('click', handleRegister);
         document.getElementById('loginBtn').addEventListener('click', handleLogin);
         document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-        document.getElementById('goMainBtn').addEventListener('click', () => { window.location.href = mainUrl; });
+        document.getElementById('goMainBtn').setAttribute('href', mainUrl);
 
         checkCurrentSessionAndRedirect();
     </script>

@@ -808,6 +808,10 @@
         async function syncProfileToServer() {
             const achievements = JSON.parse(localStorage.getItem('characterProfileAchievements') || '[]');
             const earnedAchievementXp = parseInt(localStorage.getItem('characterProfileEarnedAchievementXp') || '0');
+            const existingCharacterState = await apiRequest('/state/character_profile');
+            const existingValue = existingCharacterState?.value && typeof existingCharacterState.value === 'object'
+                ? existingCharacterState.value
+                : {};
 
             await Promise.all([
                 apiRequest('/state/main_tracker', {
@@ -827,6 +831,7 @@
                     method: 'PUT',
                     body: JSON.stringify({
                         value: {
+                            ...existingValue,
                             level: GAME_STATE.level,
                             xp: GAME_STATE.points,
                             achievements,

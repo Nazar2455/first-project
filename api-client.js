@@ -209,37 +209,62 @@
         return url.toString();
     }
 
+    function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
     async function request(path, options = {}, base = getPlanApiBase()) {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 3000);
         const userId = getPlanUserId();
         const authToken = getAuthToken();
+        const method = String(options.method || 'GET').toUpperCase();
+        const isAuthPath = String(path || '').startsWith('/auth/');
+        const maxAttempts = isAuthPath ? 3 : 1;
+        const timeoutMs = isAuthPath ? 15000 : 8000;
 
-        try {
-            const headers = {
-                'Content-Type': 'application/json',
-                ...(options.headers || {})
-            };
-            if (userId) {
-                headers['X-User-ID'] = userId;
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    ...(options.headers || {})
+                };
+                if (userId) {
+                    headers['X-User-ID'] = userId;
+                }
+                if (authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+
+                const response = await fetch(buildUrl(path, base), {
+                    ...options,
+                    headers,
+                    signal: controller.signal
+                });
+
+                if (!response.ok) {
+                    const canRetry = attempt < maxAttempts && response.status >= 500 && method === 'GET';
+                    if (canRetry) {
+                        await sleep(800 * attempt);
+                        continue;
+                    }
+                    return null;
+                }
+
+                return await response.json();
+            } catch (_) {
+                if (attempt < maxAttempts && method === 'GET') {
+                    await sleep(800 * attempt);
+                    continue;
+                }
+                return null;
+            } finally {
+                clearTimeout(timeout);
             }
-            if (authToken) {
-                headers['Authorization'] = `Bearer ${authToken}`;
-            }
-
-            const response = await fetch(buildUrl(path, base), {
-                ...options,
-                headers,
-                signal: controller.signal
-            });
-
-            if (!response.ok) return null;
-            return await response.json();
-        } catch (_) {
-            return null;
-        } finally {
-            clearTimeout(timeout);
         }
+
+        return null;
     }
 
     async function register({ email, password, display_name }, base = getPlanApiBase()) {
@@ -285,9 +310,13 @@
             return null;
         }
 
-        const meData = await me(base);
+        let meData = await me(base);
         if (!meData || !meData.email) {
-            clearAuth();
+            await sleep(1200);
+            meData = await me(base);
+        }
+
+        if (!meData || !meData.email) {
             window.location.href = target;
             return null;
         }

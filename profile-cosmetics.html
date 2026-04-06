@@ -960,13 +960,17 @@
             if (characterState?.value && typeof characterState.value === 'object') {
                 const incoming = characterState.value;
                 if (typeof incoming.theoryMs === 'number') {
-                    localStorage.setItem(THEORY_MS_KEY, String(incoming.theoryMs));
+                    const localTheory = readNumber(THEORY_MS_KEY);
+                    localStorage.setItem(THEORY_MS_KEY, String(Math.max(localTheory, incoming.theoryMs)));
                 }
                 if (typeof incoming.practiceMs === 'number') {
-                    localStorage.setItem(PRACTICE_MS_KEY, String(incoming.practiceMs));
+                    const localPractice = readNumber(PRACTICE_MS_KEY);
+                    localStorage.setItem(PRACTICE_MS_KEY, String(Math.max(localPractice, incoming.practiceMs)));
                 }
                 if (incoming.dailyLearningStats && typeof incoming.dailyLearningStats === 'object') {
-                    localStorage.setItem(DAILY_STATS_KEY, JSON.stringify(incoming.dailyLearningStats));
+                    const localDaily = loadDailyLearningStats();
+                    const mergedDaily = mergeDailyLearningStats(localDaily, incoming.dailyLearningStats);
+                    localStorage.setItem(DAILY_STATS_KEY, JSON.stringify(mergedDaily));
                 }
             }
 
@@ -1389,6 +1393,20 @@
             } catch {
                 return {};
             }
+        }
+
+        function mergeDailyLearningStats(localStats, incomingStats) {
+            const merged = { ...(localStats || {}) };
+            Object.entries(incomingStats || {}).forEach(([day, row]) => {
+                const current = merged[day] && typeof merged[day] === 'object' ? merged[day] : {};
+                const next = row && typeof row === 'object' ? row : {};
+                merged[day] = {
+                    theoryMs: Math.max(Number(current.theoryMs || 0), Number(next.theoryMs || 0)),
+                    practiceMs: Math.max(Number(current.practiceMs || 0), Number(next.practiceMs || 0)),
+                    gamingMs: Math.max(Number(current.gamingMs || 0), Number(next.gamingMs || 0))
+                };
+            });
+            return merged;
         }
 
         function toMinutes(ms) {

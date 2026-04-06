@@ -2178,6 +2178,20 @@
             });
         }
 
+        function mergeDailyLearningStats(localStats, incomingStats) {
+            const merged = { ...(localStats || {}) };
+            Object.entries(incomingStats || {}).forEach(([day, row]) => {
+                const current = merged[day] && typeof merged[day] === 'object' ? merged[day] : {};
+                const next = row && typeof row === 'object' ? row : {};
+                merged[day] = {
+                    theoryMs: Math.max(Number(current.theoryMs || 0), Number(next.theoryMs || 0)),
+                    practiceMs: Math.max(Number(current.practiceMs || 0), Number(next.practiceMs || 0)),
+                    gamingMs: Math.max(Number(current.gamingMs || 0), Number(next.gamingMs || 0))
+                };
+            });
+            return merged;
+        }
+
         async function hydrateCourseFromServer() {
             const data = await apiRequest('/state/character_profile');
             if (!data?.value || typeof data.value !== 'object') return;
@@ -2187,10 +2201,12 @@
                 localStorage.setItem('course_days_read_v1', JSON.stringify(incoming.readDays));
             }
             if (typeof incoming.theoryMs === 'number') {
-                localStorage.setItem('course_theory_time_ms', String(incoming.theoryMs));
+                const localTheory = parseInt(localStorage.getItem('course_theory_time_ms') || '0');
+                localStorage.setItem('course_theory_time_ms', String(Math.max(localTheory, incoming.theoryMs)));
             }
             if (typeof incoming.practiceMs === 'number') {
-                localStorage.setItem('course_practice_time_ms', String(incoming.practiceMs));
+                const localPractice = parseInt(localStorage.getItem('course_practice_time_ms') || '0');
+                localStorage.setItem('course_practice_time_ms', String(Math.max(localPractice, incoming.practiceMs)));
             }
             if (incoming.superEggs && typeof incoming.superEggs === 'object') {
                 localStorage.setItem('course_super_eggs_found_v1', JSON.stringify(incoming.superEggs));
@@ -2202,7 +2218,9 @@
                 localStorage.setItem('course_ultra_week_secret_v1', JSON.stringify(incoming.ultraSecret));
             }
             if (incoming.dailyLearningStats && typeof incoming.dailyLearningStats === 'object') {
-                localStorage.setItem('course_daily_learning_stats_v1', JSON.stringify(incoming.dailyLearningStats));
+                const localDaily = JSON.parse(localStorage.getItem('course_daily_learning_stats_v1') || '{}');
+                const mergedDaily = mergeDailyLearningStats(localDaily, incoming.dailyLearningStats);
+                localStorage.setItem('course_daily_learning_stats_v1', JSON.stringify(mergedDaily));
             }
             if (incoming.planStartDate) {
                 localStorage.setItem('planStartDate', incoming.planStartDate);
