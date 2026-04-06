@@ -8,7 +8,8 @@
   }
 
   function getCourseTheme() {
-    return (localStorage.getItem(THEME_KEY) || 'dark') === 'light' ? 'light' : 'dark';
+    localStorage.setItem(THEME_KEY, 'dark');
+    return 'dark';
   }
 
   function ensureCourseGlobalStyle() {
@@ -87,7 +88,8 @@
 
   function applyCoursePreferences() {
     ensureCourseGlobalStyle();
-    document.body.classList.toggle('light-theme', getCourseTheme() === 'light');
+    getCourseTheme();
+    document.body.classList.remove('light-theme');
     localizeCourseCommonUi();
   }
 

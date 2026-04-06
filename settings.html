@@ -179,8 +179,7 @@
                 <h3 data-i18n="themeTitle">🎨 Тема</h3>
                 <p class="muted" data-i18n="themeDesc">Выбери визуальный режим интерфейса.</p>
                 <div class="row" style="margin-top:10px;">
-                    <button class="pill" id="themeDark" onclick="setTheme('dark')" data-i18n="dark">Тёмная</button>
-                    <button class="pill" id="themeLight" onclick="setTheme('light')" data-i18n="light">Светлая</button>
+                    <span class="pill active" id="themeDark" data-i18n="darkOnly">Тёмная (фиксированная)</span>
                 </div>
             </div>
 
@@ -252,9 +251,8 @@
                 title: '⚙️ Настройки',
                 backBtn: '← Назад',
                 themeTitle: '🎨 Тема',
-                themeDesc: 'Выбери визуальный режим интерфейса.',
-                dark: 'Тёмная',
-                light: 'Светлая',
+                themeDesc: 'В проекте используется только тёмная тема.',
+                darkOnly: 'Тёмная (фиксированная)',
                 langTitle: '🌍 Язык',
                 langDesc: 'Выбери язык интерфейса.',
                 accountTitle: '🔐 Аккаунт',
@@ -271,9 +269,8 @@
                 title: '⚙️ Налаштування',
                 backBtn: '← Назад',
                 themeTitle: '🎨 Тема',
-                themeDesc: 'Обери візуальний режим інтерфейсу.',
-                dark: 'Темна',
-                light: 'Світла',
+                themeDesc: 'У проєкті використовується лише темна тема.',
+                darkOnly: 'Темна (фіксована)',
                 langTitle: '🌍 Мова',
                 langDesc: 'Обери мову інтерфейсу.',
                 accountTitle: '🔐 Акаунт',
@@ -290,9 +287,8 @@
                 title: '⚙️ Settings',
                 backBtn: '← Back',
                 themeTitle: '🎨 Theme',
-                themeDesc: 'Choose interface appearance mode.',
-                dark: 'Dark',
-                light: 'Light',
+                themeDesc: 'Only dark theme is used in this project.',
+                darkOnly: 'Dark (fixed)',
                 langTitle: '🌍 Language',
                 langDesc: 'Choose interface language.',
                 accountTitle: '🔐 Account',
@@ -318,10 +314,9 @@
         }
 
         function applyTheme() {
-            const theme = localStorage.getItem(APP_THEME_KEY) || 'dark';
-            document.body.classList.toggle('light-theme', theme === 'light');
-            document.getElementById('themeDark').classList.toggle('active', theme === 'dark');
-            document.getElementById('themeLight').classList.toggle('active', theme === 'light');
+            localStorage.setItem(APP_THEME_KEY, 'dark');
+            document.body.classList.remove('light-theme');
+            document.getElementById('themeDark')?.classList.add('active');
         }
 
         function applyLanguage() {
@@ -335,8 +330,8 @@
             document.getElementById('langSelect').value = lang;
         }
 
-        function setTheme(theme) {
-            localStorage.setItem(APP_THEME_KEY, theme);
+        function setTheme() {
+            localStorage.setItem(APP_THEME_KEY, 'dark');
             applyTheme();
             showStatus(t('statusSaved'));
         }
@@ -352,7 +347,7 @@
 
             const preserveApiBase = localStorage.getItem('planApiBase');
             const preserveLang = localStorage.getItem(APP_LANG_KEY) || 'ru';
-            const preserveTheme = localStorage.getItem(APP_THEME_KEY) || 'dark';
+            const preserveTheme = 'dark';
 
             RESET_LOCAL_KEYS.forEach((key) => localStorage.removeItem(key));
 
