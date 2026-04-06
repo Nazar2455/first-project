@@ -239,6 +239,22 @@
             min-height: 10px;
         }
 
+        .bar[data-type="theory"] {
+            background: linear-gradient(180deg, #4dae64, #3a8a50);
+        }
+
+        .bar[data-type="practice"] {
+            background: linear-gradient(180deg, #ffd700, #ffb700);
+        }
+
+        .bar[data-type="gaming"] {
+            background: linear-gradient(180deg, #56c2ff, #3f7bff);
+        }
+
+        .bar[data-type="total"] {
+            background: linear-gradient(180deg, #f093fb, #764ba2);
+        }
+
         .bar:hover {
             filter: brightness(1.2);
             transform: scaleY(1.05);
@@ -713,16 +729,16 @@
                         <div class="bar-label">🧪 Практика</div>
                     </div>
                     <div class="chart-bar">
-                        <div class="bar" style="height: 0%;" data-type="reading">
-                            <span class="bar-value" id="val-reading">0д</span>
+                        <div class="bar" style="height: 0%;" data-type="gaming">
+                            <span class="bar-value" id="val-gaming">0ч</span>
                         </div>
-                        <div class="bar-label">📘 Дней</div>
+                        <div class="bar-label">🎮 Игры</div>
                     </div>
                     <div class="chart-bar">
-                        <div class="bar" style="height: 0%;" data-type="streak">
-                            <span class="bar-value" id="val-streak">0🔥</span>
+                        <div class="bar" style="height: 0%;" data-type="total">
+                            <span class="bar-value" id="val-total">0ч</span>
                         </div>
-                        <div class="bar-label">🔥 Серия</div>
+                        <div class="bar-label">⏳ Времени всего</div>
                     </div>
                 </div>
             </div>
@@ -744,6 +760,10 @@
                 <div class="stat-card">
                     <div class="stat-card-label">🧪 Практика (часы)</div>
                     <div class="stat-card-value" id="practiceHours">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">🎮 Игры (часы)</div>
+                    <div class="stat-card-value" id="gamingHours">0</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-card-label">⏳ Всего времени</div>
@@ -862,6 +882,12 @@
 
             if (characterState?.value && typeof characterState.value === 'object') {
                 const incoming = characterState.value;
+                if (typeof incoming.theoryMs === 'number') {
+                    localStorage.setItem(THEORY_MS_KEY, String(incoming.theoryMs));
+                }
+                if (typeof incoming.practiceMs === 'number') {
+                    localStorage.setItem(PRACTICE_MS_KEY, String(incoming.practiceMs));
+                }
                 if (incoming.dailyLearningStats && typeof incoming.dailyLearningStats === 'object') {
                     localStorage.setItem(DAILY_STATS_KEY, JSON.stringify(incoming.dailyLearningStats));
                 }
@@ -968,19 +994,35 @@
             const theoryMs = readNumber(THEORY_MS_KEY);
             const practiceMs = readNumber(PRACTICE_MS_KEY);
             const dailyStats = loadDailyLearningStats();
-            const gamingMs = Object.values(dailyStats).reduce((sum, row) => {
+            let gamingMs = Object.values(dailyStats).reduce((sum, row) => {
                 const value = row && typeof row === 'object' ? Number(row.gamingMs || 0) : 0;
                 return sum + (Number.isFinite(value) ? value : 0);
             }, 0);
+
+            if (gamingMs <= 0) {
+                try {
+                    const gameStats = JSON.parse(localStorage.getItem('gameStats') || '{}');
+                    gamingMs = Object.values(gameStats || {}).reduce((sum, row) => {
+                        if (!row || typeof row !== 'object') return sum;
+                        const val = Number(row.playtimeMs || row.playTimeMs || row.minutesPlayedMs || 0);
+                        return sum + (Number.isFinite(val) ? val : 0);
+                    }, 0);
+                } catch {
+                    gamingMs = 0;
+                }
+            }
+
             const totalMs = theoryMs + practiceMs + gamingMs;
             const theoryHours = Number((theoryMs / 3600000).toFixed(1));
             const practiceHours = Number((practiceMs / 3600000).toFixed(1));
+            const gamingHours = Number((gamingMs / 3600000).toFixed(1));
             const totalHours = Number((totalMs / 3600000).toFixed(1));
 
             return {
                 readDays: Object.keys(readMap).length,
                 theoryHours,
                 practiceHours,
+                gamingHours,
                 totalHours,
                 totalMs
             };
@@ -1615,6 +1657,7 @@
             document.getElementById('readDays').textContent = learning.readDays;
             document.getElementById('theoryHours').textContent = learning.theoryHours;
             document.getElementById('practiceHours').textContent = learning.practiceHours;
+            document.getElementById('gamingHours').textContent = learning.gamingHours;
             document.getElementById('totalTime').textContent = learning.totalHours;
 
             saveProfileState();
@@ -1643,20 +1686,19 @@
 
         function renderTimeChart() {
             const learning = getLearningStats();
-            const completedDayStats = getCompletedDayStats();
 
             const maxValue = Math.max(
                 learning.theoryHours || 1,
                 learning.practiceHours || 1,
-                learning.readDays || 1,
-                completedDayStats.streakDays || 1
+                learning.gamingHours || 1,
+                learning.totalHours || 1
             );
 
             // Update bars
             const theory = document.querySelector('.bar[data-type="theory"]');
             const practice = document.querySelector('.bar[data-type="practice"]');
-            const reading = document.querySelector('.bar[data-type="reading"]');
-            const streak = document.querySelector('.bar[data-type="streak"]');
+            const gaming = document.querySelector('.bar[data-type="gaming"]');
+            const total = document.querySelector('.bar[data-type="total"]');
 
             if (theory) {
                 const height = (learning.theoryHours / maxValue) * 100;
@@ -1668,15 +1710,15 @@
                 practice.style.height = Math.max(height, 10) + '%';
                 document.getElementById('val-practice').textContent = learning.practiceHours + 'ч';
             }
-            if (reading) {
-                const height = (learning.readDays / maxValue) * 100;
-                reading.style.height = Math.max(height, 10) + '%';
-                document.getElementById('val-reading').textContent = learning.readDays + 'д';
+            if (gaming) {
+                const height = (learning.gamingHours / maxValue) * 100;
+                gaming.style.height = Math.max(height, 10) + '%';
+                document.getElementById('val-gaming').textContent = learning.gamingHours + 'ч';
             }
-            if (streak) {
-                const height = (completedDayStats.streakDays / maxValue) * 100;
-                streak.style.height = Math.max(height, 10) + '%';
-                document.getElementById('val-streak').textContent = completedDayStats.streakDays + '🔥';
+            if (total) {
+                const height = (learning.totalHours / maxValue) * 100;
+                total.style.height = Math.max(height, 10) + '%';
+                document.getElementById('val-total').textContent = learning.totalHours + 'ч';
             }
         }
 
