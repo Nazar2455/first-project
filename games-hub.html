@@ -18,6 +18,10 @@
             padding: 20px;
             gap: 20px;
         }
+        body.light-theme {
+            background: linear-gradient(135deg, #f5f8ff, #eef3ff, #e9f0ff);
+            color: #1f2a44;
+        }
         .navbar {
             width: min(1200px, 96vw);
             display: flex;
@@ -28,6 +32,18 @@
             border-radius: 12px;
             padding: 15px 20px;
             backdrop-filter: blur(8px);
+        }
+        body.light-theme .navbar,
+        body.light-theme .game-card,
+        body.light-theme .footer {
+            background: rgba(255, 255, 255, 0.92) !important;
+            color: #1f2a44;
+            border-color: rgba(71, 96, 170, 0.25) !important;
+        }
+        body.light-theme .game-desc,
+        body.light-theme .header p,
+        body.light-theme .footer p {
+            color: #2f3d63;
         }
         .title {
             font-size: 1.8em;
@@ -169,20 +185,22 @@
         }
     </style>
     <link rel="stylesheet" href="mobile-responsive.css">
+    <script src="app-settings.js"></script>
 </head>
 <body>
     <div class="navbar">
-        <div class="title">🎮 Аркадная Гильдия</div>
+        <div class="title" data-i18n="navTitle">🎮 Аркадная Гильдия</div>
         <div class="nav-buttons">
-            <a class="btn" href="30d-main-tasks.html">📋 План</a>
-            <a class="btn" href="task-verification.html">✅ Проверка</a>
-            <a class="btn" href="character-profile.html">👤 Профиль</a>
+            <a class="btn" href="30d-main-tasks.html" data-i18n="btnPlan">📋 План</a>
+            <a class="btn" href="task-verification.html" data-i18n="btnCheck">✅ Проверка</a>
+            <a class="btn" href="character-profile.html" data-i18n="btnProfile">👤 Профиль</a>
+            <a class="btn" href="settings.html" data-i18n="btnSettings">⚙️ Настройки</a>
         </div>
     </div>
 
     <div class="header">
-        <h1>🕹️ Выбери игру для фарма XP</h1>
-        <p>Каждая игра учит реальным навыкам для фриланса: MVP, парсинг, оптимизацию, код-челленджи с практикой.</p>
+        <h1 data-i18n="headerTitle">🕹️ Выбери игру для фарма XP</h1>
+        <p data-i18n="headerDesc">Каждая игра учит реальным навыкам для фриланса: MVP, парсинг, оптимизацию, код-челленджи с практикой.</p>
     </div>
 
     <div class="games-grid">
@@ -248,12 +266,48 @@
     </div>
 
     <div class="footer">
-        <p>💡 Совместный XP через все игры идёт в основной план. Начни с Code Dungeon, затем Bot Builder, Parser Defense, Deal Maker и Stats Craft.</p>
+        <p data-i18n="footerTip">💡 Совместный XP через все игры идёт в основной план. Начни с Code Dungeon, затем Bot Builder, Parser Defense, Deal Maker и Stats Craft.</p>
     </div>
 
     <script src="api-client.js"></script>
     <script src="game-session-tracker.js"></script>
     <script>
+        const HUB_I18N = {
+            ru: {
+                navTitle: '🎮 Аркадная Гильдия',
+                btnPlan: '📋 План',
+                btnCheck: '✅ Проверка',
+                btnProfile: '👤 Профиль',
+                btnSettings: '⚙️ Настройки',
+                headerTitle: '🕹️ Выбери игру для фарма XP',
+                headerDesc: 'Каждая игра учит реальным навыкам для фриланса: MVP, парсинг, оптимизацию, код-челленджи с практикой.',
+                footerTip: '💡 Совместный XP через все игры идёт в основной план. Начни с Code Dungeon, затем Bot Builder, Parser Defense, Deal Maker и Stats Craft.'
+            },
+            uk: {
+                navTitle: '🎮 Аркадна Гільдія',
+                btnPlan: '📋 План',
+                btnCheck: '✅ Перевірка',
+                btnProfile: '👤 Профіль',
+                btnSettings: '⚙️ Налаштування',
+                headerTitle: '🕹️ Обери гру для фарму XP',
+                headerDesc: 'Кожна гра прокачує реальні фриланс-навички: MVP, парсинг, оптимізація та практичні код-челенджі.',
+                footerTip: '💡 Спільний XP з усіх ігор іде в основний план. Почни з Code Dungeon, далі Bot Builder, Parser Defense, Deal Maker та Stats Craft.'
+            },
+            en: {
+                navTitle: '🎮 Arcade Guild',
+                btnPlan: '📋 Plan',
+                btnCheck: '✅ Check',
+                btnProfile: '👤 Profile',
+                btnSettings: '⚙️ Settings',
+                headerTitle: '🕹️ Choose a game to farm XP',
+                headerDesc: 'Each game teaches real freelance skills: MVP, parsing, optimization, and practical coding challenges.',
+                footerTip: '💡 Shared XP from all games goes to your main plan. Start with Code Dungeon, then Bot Builder, Parser Defense, Deal Maker, and Stats Craft.'
+            }
+        };
+
+        window.PlanSettings?.applyThemeClass(document.body);
+        window.PlanSettings?.translate(HUB_I18N);
+
         const API_BASE = localStorage.getItem('planApiBase') || 'http://127.0.0.1:8000/api';
 
         async function apiRequest(path, options = {}) {

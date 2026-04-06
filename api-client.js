@@ -1,6 +1,158 @@
 (function () {
     if (window.PlanApiClient) return;
 
+    const LANG_KEY = 'planLang';
+    const THEME_KEY = 'planTheme';
+
+    function ensurePlanSettings() {
+        if (window.PlanSettings) return window.PlanSettings;
+
+        function getLang() {
+            const lang = localStorage.getItem(LANG_KEY) || 'ru';
+            return ['ru', 'uk', 'en'].includes(lang) ? lang : 'ru';
+        }
+
+        function setLang(lang) {
+            const safe = ['ru', 'uk', 'en'].includes(lang) ? lang : 'ru';
+            localStorage.setItem(LANG_KEY, safe);
+            return safe;
+        }
+
+        function getTheme() {
+            return (localStorage.getItem(THEME_KEY) || 'dark') === 'light' ? 'light' : 'dark';
+        }
+
+        function setTheme(theme) {
+            const safe = theme === 'light' ? 'light' : 'dark';
+            localStorage.setItem(THEME_KEY, safe);
+            return safe;
+        }
+
+        function applyThemeClass(target = document.body) {
+            if (!target) return;
+            target.classList.toggle('light-theme', getTheme() === 'light');
+        }
+
+        function translate(translations = {}) {
+            const lang = getLang();
+            const dict = translations[lang] || translations.ru || {};
+            document.documentElement.lang = lang;
+            document.querySelectorAll('[data-i18n]').forEach((el) => {
+                const key = el.getAttribute('data-i18n');
+                if (!key) return;
+                const value = dict[key];
+                if (typeof value === 'string') el.textContent = value;
+            });
+            return lang;
+        }
+
+        window.PlanSettings = { getLang, setLang, getTheme, setTheme, applyThemeClass, translate };
+        return window.PlanSettings;
+    }
+
+    function ensureGlobalLightThemeStyle() {
+        if (document.getElementById('plan-global-light-theme-style')) return;
+        const style = document.createElement('style');
+        style.id = 'plan-global-light-theme-style';
+        style.textContent = `
+            body.light-theme {
+                background: linear-gradient(135deg, #f5f8ff, #eef3ff, #e9f0ff) !important;
+                color: #1f2a44 !important;
+            }
+            body.light-theme .navbar,
+            body.light-theme .topbar,
+            body.light-theme .panel,
+            body.light-theme .card,
+            body.light-theme .module,
+            body.light-theme .quest,
+            body.light-theme .profile-container,
+            body.light-theme .level-section,
+            body.light-theme .chart-container,
+            body.light-theme .timeline-container,
+            body.light-theme .weekly-stats-container,
+            body.light-theme .hero,
+            body.light-theme .day-card,
+            body.light-theme .progress-wrapper,
+            body.light-theme .secrets-panel {
+                background: rgba(255,255,255,0.92) !important;
+                color: #1f2a44 !important;
+                border-color: rgba(71, 96, 170, 0.25) !important;
+            }
+            body.light-theme p,
+            body.light-theme .hint,
+            body.light-theme .small,
+            body.light-theme .stat-label,
+            body.light-theme .bar-label,
+            body.light-theme .task-text,
+            body.light-theme .day-info-text,
+            body.light-theme .upgrade-desc,
+            body.light-theme .xp-text,
+            body.light-theme label {
+                color: #2f3d63 !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    function applyCommonTextLocalization() {
+        const settings = ensurePlanSettings();
+        const lang = settings.getLang();
+        document.documentElement.lang = lang;
+        if (lang === 'ru') return;
+
+        const maps = {
+            uk: {
+                '⚙️ Настройки': '⚙️ Налаштування',
+                '⚙️ НАСТРОЙКИ': '⚙️ НАЛАШТУВАННЯ',
+                '← Назад': '← Назад',
+                '← Назад на главную': '← Назад на головну',
+                '⬅️ Назад в план': '⬅️ Назад до плану',
+                '👤 Профиль': '👤 Профіль',
+                '✅ Проверка': '✅ Перевірка',
+                '📋 План': '📋 План',
+                'Выйти': 'Вийти',
+                'Сбросить всё': 'Скинути все'
+            },
+            en: {
+                '⚙️ Настройки': '⚙️ Settings',
+                '⚙️ НАСТРОЙКИ': '⚙️ SETTINGS',
+                '← Назад': '← Back',
+                '← Назад на главную': '← Back to main',
+                '⬅️ Назад в план': '⬅️ Back to plan',
+                '👤 Профиль': '👤 Profile',
+                '✅ Проверка': '✅ Check',
+                '📋 План': '📋 Plan',
+                'Выйти': 'Logout',
+                'Сбросить всё': 'Reset all'
+            }
+        };
+
+        const dict = maps[lang] || {};
+        if (!Object.keys(dict).length) return;
+
+        const elements = document.querySelectorAll('button, a, span, h1, h2, h3, p, .stat-value, .title, .navbar-title, .topbar-title');
+        elements.forEach((el) => {
+            if (el.hasAttribute('data-i18n')) return;
+            const raw = (el.textContent || '').trim();
+            if (!raw) return;
+            const mapped = dict[raw];
+            if (mapped) el.textContent = mapped;
+        });
+    }
+
+    function autoApplyAppPreferences() {
+        const settings = ensurePlanSettings();
+        ensureGlobalLightThemeStyle();
+        settings.applyThemeClass(document.body);
+        applyCommonTextLocalization();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', autoApplyAppPreferences, { once: true });
+    } else {
+        autoApplyAppPreferences();
+    }
+
     const PROD_API_BASE = 'https://first-project-1-ec9k.onrender.com/api';
     const FALLBACK_BASE = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
         ? 'http://127.0.0.1:8000/api'

@@ -1,4 +1,102 @@
 (function () {
+  const LANG_KEY = 'planLang';
+  const THEME_KEY = 'planTheme';
+
+  function getCourseLang() {
+    const lang = localStorage.getItem(LANG_KEY) || 'ru';
+    return ['ru', 'uk', 'en'].includes(lang) ? lang : 'ru';
+  }
+
+  function getCourseTheme() {
+    return (localStorage.getItem(THEME_KEY) || 'dark') === 'light' ? 'light' : 'dark';
+  }
+
+  function ensureCourseGlobalStyle() {
+    if (document.getElementById('course-global-light-style')) return;
+    const style = document.createElement('style');
+    style.id = 'course-global-light-style';
+    style.textContent = `
+      body.light-theme {
+        background: linear-gradient(135deg, #f5f8ff, #eef3ff, #e9f0ff) !important;
+        color: #1f2a44 !important;
+      }
+      body.light-theme .card,
+      body.light-theme .section,
+      body.light-theme .hero,
+      body.light-theme .topbar,
+      body.light-theme .course-top-tools {
+        background: rgba(255,255,255,0.92) !important;
+        color: #1f2a44 !important;
+        border-color: rgba(71,96,170,0.25) !important;
+      }
+      body.light-theme p,
+      body.light-theme li,
+      body.light-theme .hint,
+      body.light-theme .small,
+      body.light-theme label {
+        color: #2f3d63 !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function localizeCourseCommonUi() {
+    const lang = getCourseLang();
+    document.documentElement.lang = lang;
+    if (lang === 'ru') return;
+
+    const maps = {
+      uk: {
+        'К модулям': 'До модулів',
+        'Открыть модуль': 'Відкрити модуль',
+        '🧪 Практика': '🧪 Практика',
+        '📖 Не отмечено': '📖 Не відмічено',
+        '📘 Отметить день как прочитанный': '📘 Відмітити день як прочитаний',
+        '✅ День отмечен как прочитанный': '✅ День відмічено як прочитаний',
+        '🧪 Отметить практику выполненной': '🧪 Відмітити практику виконаною',
+        '✅ Практика выполнена': '✅ Практику виконано'
+      },
+      en: {
+        'К модулям': 'To modules',
+        'Открыть модуль': 'Open module',
+        '🧪 Практика': '🧪 Practice',
+        '📖 Не отмечено': '📖 Not marked',
+        '📘 Отметить день как прочитанный': '📘 Mark day as read',
+        '✅ День отмечен как прочитанный': '✅ Day marked as read',
+        '🧪 Отметить практику выполненной': '🧪 Mark practice completed',
+        '✅ Практика выполнена': '✅ Practice completed'
+      }
+    };
+
+    const dict = maps[lang] || {};
+    if (!Object.keys(dict).length) return;
+
+    const elements = document.querySelectorAll('button, a, span, h1, h2, h3, p, .course-progress-pill, .badge');
+    elements.forEach((el) => {
+      if (el.hasAttribute('data-i18n')) return;
+      const txt = (el.textContent || '').trim();
+      if (!txt) return;
+      if (dict[txt]) {
+        el.textContent = dict[txt];
+      } else if (txt.startsWith('Открыть модуль ')) {
+        const day = txt.replace('Открыть модуль ', '');
+        el.textContent = lang === 'uk' ? `Відкрити модуль ${day}` : `Open module ${day}`;
+      }
+    });
+  }
+
+  function applyCoursePreferences() {
+    ensureCourseGlobalStyle();
+    document.body.classList.toggle('light-theme', getCourseTheme() === 'light');
+    localizeCourseCommonUi();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyCoursePreferences, { once: true });
+  } else {
+    applyCoursePreferences();
+  }
+
   const STORAGE_KEY = 'course_days_read_v1';
   const THEORY_MS_KEY = 'course_theory_time_ms';
   const PRACTICE_COMPLETED_PREFIX = 'practice_completed_';

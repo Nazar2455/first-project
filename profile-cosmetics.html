@@ -19,6 +19,32 @@
             overflow-x: hidden;
         }
 
+        body.light-theme {
+            background: linear-gradient(135deg, #f5f8ff, #eef3ff, #e9f0ff);
+            color: #1f2a44;
+        }
+
+        body.light-theme .topbar,
+        body.light-theme .profile-hero,
+        body.light-theme .chart-container,
+        body.light-theme .timeline-container,
+        body.light-theme .weekly-stats-container,
+        body.light-theme .achievement,
+        body.light-theme .stat-card {
+            background: rgba(255, 255, 255, 0.92) !important;
+            border-color: rgba(71, 96, 170, 0.25) !important;
+            color: #1f2a44;
+        }
+
+        body.light-theme .tab-btn,
+        body.light-theme .bar-label,
+        body.light-theme .stat-card-label,
+        body.light-theme .achievement-desc,
+        body.light-theme .xp-text,
+        body.light-theme .weekly-stats-table td {
+            color: #2f3d63;
+        }
+
         .topbar {
             display: flex;
             justify-content: space-between;
@@ -667,15 +693,16 @@
         }
     </style>
     <link rel="stylesheet" href="mobile-responsive.css">
+    <script src="app-settings.js"></script>
 </head>
 <body>
     <div class="topbar">
         <div class="topbar-left">
-            <div class="topbar-title">👤 Профиль обучения</div>
-            <div class="stat-badge">⚡ <span id="currencyDisplay">0</span> ХП</div>
+            <div class="topbar-title" data-i18n="topbarTitle">👤 Профиль обучения</div>
+            <div class="stat-badge">⚡ <span id="currencyDisplay">0</span> <span data-i18n="xpLabel">ХП</span></div>
         </div>
         <div style="display: flex; gap: 10px;">
-            <button class="btn-back goblin-mini-btn" onclick="goToGoblin()" title="Открыть профиль гоблина">
+            <button class="btn-back goblin-mini-btn" onclick="goToGoblin()" title="Открыть профиль гоблина" data-i18n="toGoblin">
                 <svg class="goblin-mini-icon" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <ellipse cx="58" cy="142" rx="26" ry="52" fill="#4dae64"/>
                     <ellipse cx="242" cy="142" rx="26" ry="52" fill="#4dae64"/>
@@ -686,15 +713,17 @@
                     <circle cx="188" cy="140" r="10" fill="#141414"/>
                     <path d="M102 193 Q150 234 198 193" stroke="#1b5e36" stroke-width="8" fill="none" stroke-linecap="round"/>
                 </svg>
-                К гоблину
+                <span data-i18n="toGoblinText">К гоблину</span>
             </button>
-            <button class="btn-back" onclick="goBack()">← Назад на главную</button>
+            <button class="btn-back" onclick="goBack()" data-i18n="backMain">← Назад на главную</button>
         </div>
     </div>
 
     <div class="container">
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('profile', this)">� Статистика</button>            <button class="tab-btn" onclick="switchTab('weekly-stats', this)">📈 Неделя</button>            <button class="tab-btn" onclick="switchTab('achievements', this)">🏆 Ачивки</button>
+            <button class="tab-btn active" onclick="switchTab('profile', this)" data-i18n="tabStats">📊 Статистика</button>
+            <button class="tab-btn" onclick="switchTab('weekly-stats', this)" data-i18n="tabWeek">📈 Неделя</button>
+            <button class="tab-btn" onclick="switchTab('achievements', this)" data-i18n="tabAchv">🏆 Ачивки</button>
         </div>
 
         <!-- ===== СТАТИСТИКА ТАБА ===== -->
@@ -714,7 +743,7 @@
 
             <!-- Интерактивный График Активности -->
             <div class="chart-container">
-                <div class="chart-title">📊 Распределение времени</div>
+                <div class="chart-title" data-i18n="chartTitle">📊 Распределение времени</div>
                 <div class="chart-bars" id="timeChart">
                     <div class="chart-bar">
                         <div class="bar" style="height: 0%;" data-type="theory">
@@ -785,10 +814,10 @@
         <!-- ===== НЕДЕЛЬНАЯ СТАТИСТИКА ТАБА ===== -->
         <div id="weekly-stats" class="tab-content">
             <div class="weekly-stats-container">
-                <h2 style="color: #ffed4e; margin-bottom: 20px;">📅 Статистика по неделям</h2>
+                <h2 style="color: #ffed4e; margin-bottom: 20px;" data-i18n="weeklyTitle">📅 Статистика по неделям</h2>
                 <div class="stats-mode-switch">
-                    <button class="stats-mode-btn active" id="statsModeWeek" onclick="setStatsMode('week')">По неделям</button>
-                    <button class="stats-mode-btn" id="statsModeDay" onclick="setStatsMode('day')">По дням</button>
+                    <button class="stats-mode-btn active" id="statsModeWeek" onclick="setStatsMode('week')" data-i18n="modeWeek">По неделям</button>
+                    <button class="stats-mode-btn" id="statsModeDay" onclick="setStatsMode('day')" data-i18n="modeDay">По дням</button>
                 </div>
                 <div id="weekly-stats-content"></div>
             </div>
@@ -802,6 +831,54 @@
 
     <script src="api-client.js"></script>
     <script>
+        const PROFILE_I18N = {
+            ru: {
+                topbarTitle: '👤 Профиль обучения',
+                xpLabel: 'ХП',
+                toGoblin: 'Открыть профиль гоблина',
+                toGoblinText: 'К гоблину',
+                backMain: '← Назад на главную',
+                tabStats: '📊 Статистика',
+                tabWeek: '📈 Неделя',
+                tabAchv: '🏆 Ачивки',
+                chartTitle: '📊 Распределение времени',
+                weeklyTitle: '📅 Статистика по неделям',
+                modeWeek: 'По неделям',
+                modeDay: 'По дням'
+            },
+            uk: {
+                topbarTitle: '👤 Профіль навчання',
+                xpLabel: 'ХП',
+                toGoblin: 'Відкрити профіль гобліна',
+                toGoblinText: 'До гобліна',
+                backMain: '← Назад на головну',
+                tabStats: '📊 Статистика',
+                tabWeek: '📈 Тиждень',
+                tabAchv: '🏆 Ачивки',
+                chartTitle: '📊 Розподіл часу',
+                weeklyTitle: '📅 Статистика по тижнях',
+                modeWeek: 'По тижнях',
+                modeDay: 'По днях'
+            },
+            en: {
+                topbarTitle: '👤 Learning profile',
+                xpLabel: 'XP',
+                toGoblin: 'Open goblin profile',
+                toGoblinText: 'To Goblin',
+                backMain: '← Back to main',
+                tabStats: '📊 Stats',
+                tabWeek: '📈 Week',
+                tabAchv: '🏆 Achievements',
+                chartTitle: '📊 Time distribution',
+                weeklyTitle: '📅 Weekly statistics',
+                modeWeek: 'By week',
+                modeDay: 'By day'
+            }
+        };
+
+        window.PlanSettings?.applyThemeClass(document.body);
+        window.PlanSettings?.translate(PROFILE_I18N);
+
         // ===== СОСТОЯНИЕ ===== 
         const READ_DAYS_KEY = 'course_days_read_v1';
         const THEORY_MS_KEY = 'course_theory_time_ms';

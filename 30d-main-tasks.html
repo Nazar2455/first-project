@@ -18,6 +18,33 @@
             position: relative;
             overflow-x: hidden;
         }
+
+        body.light-theme {
+            background: linear-gradient(135deg, #f5f8ff, #eef3ff, #e9f0ff);
+            color: #1f2a44;
+        }
+
+        body.light-theme .navbar,
+        body.light-theme .day-card,
+        body.light-theme .progress-wrapper,
+        body.light-theme .current-day-banner,
+        body.light-theme .secrets-panel,
+        body.light-theme .progress-chart-container,
+        body.light-theme .export-section,
+        body.light-theme .journey-tracker {
+            background: rgba(255, 255, 255, 0.92) !important;
+            color: #1f2a44;
+            border-color: rgba(71, 96, 170, 0.25) !important;
+        }
+
+        body.light-theme .task-text,
+        body.light-theme .header p,
+        body.light-theme .day-label,
+        body.light-theme .day-info-text,
+        body.light-theme .progress-label,
+        body.light-theme .quest-sub {
+            color: #2f3d63 !important;
+        }
         
         body::before {
             content: '';
@@ -1711,7 +1738,7 @@
     <div class="container">
         <!-- NAVBAR -->
         <div class="navbar">
-            <div class="navbar-title">⚡ 30 дней = $1000+</div>
+            <div class="navbar-title" id="navbarTitleText">⚡ 30 дней = $1000+</div>
             <div class="navbar-stats">
                 <div class="stat-badge" onclick="openProfile()">
                     <span>👤</span>
@@ -1719,27 +1746,23 @@
                 </div>
                 <div class="stat-badge" onclick="window.location.href='games-hub.html'" title="Аркадный гильдии - множество игр">
                     <span>🕹️</span>
-                    <span class="stat-value">ХАБ</span>
+                    <span class="stat-value" id="navHubText">ХАБ</span>
                 </div>
                 <div class="stat-badge" onclick="openCourseGuide()" title="Дневные учебные модули: подробно, от простого к сложному">
                     <span>📚</span>
-                    <span class="stat-value">КУРС</span>
+                    <span class="stat-value" id="navCourseText">КУРС</span>
                 </div>
                 <div class="stat-badge" onclick="openVerification()" title="Проверка выполнения и дополнительные квесты">
                     <span>✅</span>
-                    <span class="stat-value">CHECK</span>
+                    <span class="stat-value" id="navCheckText">CHECK</span>
                 </div>
-                <div class="stat-badge" onclick="resetProgress()" title="Полный сброс прогресса (локально + сервер)">
-                    <span>🧹</span>
-                    <span class="stat-value">RESET</span>
+                <div class="stat-badge" onclick="openSettings()" title="Настройки">
+                    <span>⚙️</span>
+                    <span class="stat-value" id="navSettingsText">НАСТРОЙКИ</span>
                 </div>
                 <div class="stat-badge" id="authUserBadge" title="Текущий пользователь">
                     <span>📧</span>
                     <span class="stat-value">Гость</span>
-                </div>
-                <div class="stat-badge" onclick="logoutAndGoToAuth()" title="Выйти из аккаунта" style="cursor: pointer;">
-                    <span>🚪</span>
-                    <span class="stat-value">ВЫЙТИ</span>
                 </div>
                 <div class="stat-badge">
                     <span>💰</span>
@@ -1807,8 +1830,8 @@
         
         <!-- HEADER -->
         <div class="header">
-            <h1>🎮 БОТЫ + ПАРСИНГ</h1>
-            <p>Выполняй задания → Собирай очки → Расти уровнем</p>
+            <h1 id="headerMainTitle">🎮 БОТЫ + ПАРСИНГ</h1>
+            <p id="headerMainSubtitle">Выполняй задания → Собирай очки → Расти уровнем</p>
         </div>
 
         <!-- ГОБЛИН СОВЕТНИК -->
@@ -1997,8 +2020,60 @@
             'parser_defense'
         ];
 
+        const APP_LANG_KEY = 'planLang';
+        const APP_THEME_KEY = 'planTheme';
+        const I18N = {
+            ru: {
+                navbarTitleText: '⚡ 30 дней = $1000+',
+                navHubText: 'ХАБ',
+                navCourseText: 'КУРС',
+                navCheckText: 'CHECK',
+                navSettingsText: 'НАСТРОЙКИ',
+                headerMainTitle: '🎮 БОТЫ + ПАРСИНГ',
+                headerMainSubtitle: 'Выполняй задания → Собирай очки → Расти уровнем'
+            },
+            uk: {
+                navbarTitleText: '⚡ 30 днів = $1000+',
+                navHubText: 'ХАБ',
+                navCourseText: 'КУРС',
+                navCheckText: 'ПЕРЕВІРКА',
+                navSettingsText: 'НАЛАШТУВАННЯ',
+                headerMainTitle: '🎮 БОТИ + ПАРСИНГ',
+                headerMainSubtitle: 'Виконуй завдання → Збирай очки → Рости рівнем'
+            },
+            en: {
+                navbarTitleText: '⚡ 30 days = $1000+',
+                navHubText: 'HUB',
+                navCourseText: 'COURSE',
+                navCheckText: 'CHECK',
+                navSettingsText: 'SETTINGS',
+                headerMainTitle: '🎮 BOTS + PARSING',
+                headerMainSubtitle: 'Complete tasks → Earn points → Level up'
+            }
+        };
+
         let API_BASE = localStorage.getItem('planApiBase') || '';
         const API_BASE_FALLBACKS = ['http://127.0.0.1:8001/api', 'http://127.0.0.1:8000/api'];
+
+        function getCurrentLanguage() {
+            const lang = localStorage.getItem(APP_LANG_KEY) || 'ru';
+            return I18N[lang] ? lang : 'ru';
+        }
+
+        function applyLanguage() {
+            const lang = getCurrentLanguage();
+            const dict = I18N[lang] || I18N.ru;
+            Object.entries(dict).forEach(([id, value]) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = value;
+            });
+            document.documentElement.lang = lang;
+        }
+
+        function applyThemePreference() {
+            const theme = localStorage.getItem(APP_THEME_KEY) || 'dark';
+            document.body.classList.toggle('light-theme', theme === 'light');
+        }
 
         async function apiRequest(path, options = {}) {
             if (window.PlanApiClient?.request) {
@@ -3313,6 +3388,10 @@
             window.location.href = 'task-verification.html';
         }
 
+        function openSettings() {
+            window.location.href = 'settings.html';
+        }
+
         function openDungeon() {
             window.location.href = 'code-dungeon.html';
         }
@@ -3740,6 +3819,9 @@
         async function initPage() {
             const me = await ensureAuthOrRedirect();
             if (!me) return;
+
+            applyThemePreference();
+            applyLanguage();
 
             // Гидратация всех данных с сервера
             await hydrateMainTrackerFromServer();

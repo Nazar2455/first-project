@@ -23,6 +23,10 @@
       text-align: center;
       padding: 24px;
     }
+    body.light-theme {
+      background: linear-gradient(135deg, #f5f8ff, #eef3ff, #e9f0ff);
+      color: #1f2a44;
+    }
     a {
       color: #ffed4e;
       font-weight: 700;
@@ -34,6 +38,11 @@
       border: 1px solid rgba(255, 215, 0, 0.35);
       background: rgba(19, 28, 46, 0.88);
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+    }
+    body.light-theme .card {
+      background: rgba(255, 255, 255, 0.92);
+      border-color: rgba(71, 96, 170, 0.25);
+      color: #1f2a44;
     }
     .btn {
       display: inline-block;
@@ -47,14 +56,41 @@
       font-weight: 700;
     }
   </style>
+  <script src="app-settings.js"></script>
   <link rel="stylesheet" href="mobile-responsive.css">
 </head>
 <body>
   <main class="card">
-    <h1>Вход в приложение</h1>
-    <p>Если редирект не сработал автоматически, откройте авторизацию или основной план вручную.</p>
-    <a class="btn" href="auth.html">Открыть вход</a>
-    <a class="btn" href="30d-main-tasks.html">Открыть основной план</a>
+    <h1 data-i18n="title">Вход в приложение</h1>
+    <p data-i18n="desc">Если редирект не сработал автоматически, откройте авторизацию или основной план вручную.</p>
+    <a class="btn" href="auth.html" data-i18n="openAuth">Открыть вход</a>
+    <a class="btn" href="30d-main-tasks.html" data-i18n="openMain">Открыть основной план</a>
   </main>
+
+  <script>
+    const INDEX_I18N = {
+      ru: {
+        title: 'Вход в приложение',
+        desc: 'Если редирект не сработал автоматически, откройте авторизацию или основной план вручную.',
+        openAuth: 'Открыть вход',
+        openMain: 'Открыть основной план'
+      },
+      uk: {
+        title: 'Вхід у застосунок',
+        desc: 'Якщо редирект не спрацював автоматично, відкрий авторизацію або основний план вручну.',
+        openAuth: 'Відкрити вхід',
+        openMain: 'Відкрити основний план'
+      },
+      en: {
+        title: 'App sign-in',
+        desc: 'If redirect did not work automatically, open auth or the main plan manually.',
+        openAuth: 'Open sign-in',
+        openMain: 'Open main plan'
+      }
+    };
+
+    window.PlanSettings?.applyThemeClass(document.body);
+    window.PlanSettings?.translate(INDEX_I18N);
+  </script>
 </body>
 </html>

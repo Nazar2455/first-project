@@ -16,6 +16,29 @@
             padding: 20px;
         }
 
+        body.light-theme {
+            background: linear-gradient(135deg, #f5f8ff, #eef3ff, #e9f0ff);
+            color: #1f2a44;
+        }
+
+        body.light-theme .topbar,
+        body.light-theme .panel,
+        body.light-theme .module,
+        body.light-theme .quest {
+            background: rgba(255, 255, 255, 0.92) !important;
+            color: #1f2a44;
+            border-color: rgba(71, 96, 170, 0.25) !important;
+        }
+
+        body.light-theme .hint,
+        body.light-theme .small,
+        body.light-theme .module-title,
+        body.light-theme .req label,
+        body.light-theme input[type="text"],
+        body.light-theme textarea {
+            color: #2f3d63;
+        }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -222,21 +245,23 @@
             .title { font-size: 1.1em; }
         }
     </style>
+    <script src="app-settings.js"></script>
     <link rel="stylesheet" href="mobile-responsive.css">
 </head>
 <body>
 <div class="container">
     <div class="topbar">
-        <div class="title">✅ Страница проверки выполнения</div>
+        <div class="title" data-i18n="title">✅ Страница проверки выполнения</div>
         <div class="top-stats">
-            <div class="badge">LVL: <span id="lvl">1</span></div>
-            <div class="badge">Монеты: <span id="coins">0</span></div>
-            <div class="badge">Проверено модулей: <span id="verifiedCount">0</span></div>
+            <div class="badge"><span data-i18n="lvl">LVL</span>: <span id="lvl">1</span></div>
+            <div class="badge"><span data-i18n="coins">Монеты</span>: <span id="coins">0</span></div>
+            <div class="badge"><span data-i18n="verified">Проверено модулей</span>: <span id="verifiedCount">0</span></div>
         </div>
         <div class="row">
-            <button class="btn alt" onclick="goMain()">⬅️ Назад в план</button>
-            <button class="btn alt" onclick="goDungeon()">🎮 Code Dungeon</button>
-            <button class="btn alt" onclick="goProfile()">👤 Профиль</button>
+            <button class="btn alt" onclick="goMain()" data-i18n="backPlan">⬅️ Назад в план</button>
+            <button class="btn alt" onclick="goDungeon()" data-i18n="toDungeon">🎮 Code Dungeon</button>
+            <button class="btn alt" onclick="goProfile()" data-i18n="toProfile">👤 Профиль</button>
+            <button class="btn alt" onclick="goSettings()" data-i18n="toSettings">⚙️ Настройки</button>
         </div>
     </div>
 
@@ -315,6 +340,42 @@
 
 <script src="api-client.js"></script>
 <script>
+const VERIFY_I18N = {
+    ru: {
+        title: '✅ Страница проверки выполнения',
+        lvl: 'LVL',
+        coins: 'Монеты',
+        verified: 'Проверено модулей',
+        backPlan: '⬅️ Назад в план',
+        toDungeon: '🎮 Code Dungeon',
+        toProfile: '👤 Профиль',
+        toSettings: '⚙️ Настройки'
+    },
+    uk: {
+        title: '✅ Сторінка перевірки виконання',
+        lvl: 'LVL',
+        coins: 'Монети',
+        verified: 'Перевірено модулів',
+        backPlan: '⬅️ Назад до плану',
+        toDungeon: '🎮 Code Dungeon',
+        toProfile: '👤 Профіль',
+        toSettings: '⚙️ Налаштування'
+    },
+    en: {
+        title: '✅ Task verification page',
+        lvl: 'LVL',
+        coins: 'Coins',
+        verified: 'Verified modules',
+        backPlan: '⬅️ Back to plan',
+        toDungeon: '🎮 Code Dungeon',
+        toProfile: '👤 Profile',
+        toSettings: '⚙️ Settings'
+    }
+};
+
+window.PlanSettings?.applyThemeClass(document.body);
+window.PlanSettings?.translate(VERIFY_I18N);
+
 const GAME_STATE = {
     points: parseInt(localStorage.getItem('points') || '0'),
     level: parseInt(localStorage.getItem('level') || '1'),
@@ -920,6 +981,7 @@ function initBurnoutInputs() {
 function goMain() { window.location.href = '30d-main-tasks.html'; }
 function goDungeon() { window.location.href = 'code-dungeon.html'; }
 function goProfile() { window.location.href = 'character-profile.html'; }
+function goSettings() { window.location.href = 'settings.html'; }
 
 async function initPage() {
     const me = await window.PlanApiClient?.ensureAuthOrRedirect?.({ next: 'task-verification.html' });

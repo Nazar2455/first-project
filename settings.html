@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚙️ Настройки</title>
+    <style>
+        * { box-sizing: border-box; }
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0f0f1e, #1a0a2e, #16213e);
+            color: #fff;
+            padding: 20px;
+        }
+
+        body.light-theme {
+            background: linear-gradient(135deg, #f5f8ff, #eef3ff, #e9f0ff);
+            color: #1f2a44;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(20, 30, 50, 0.9);
+            border: 2px solid #ffd700;
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        body.light-theme .header,
+        body.light-theme .card {
+            background: rgba(255, 255, 255, 0.92);
+            border-color: rgba(71, 96, 170, 0.25);
+            color: #1f2a44;
+        }
+
+        .title {
+            font-size: 1.6em;
+            font-weight: 800;
+            color: #ffd700;
+        }
+
+        .muted {
+            color: #b0c4de;
+            font-size: 0.9em;
+        }
+
+        body.light-theme .muted {
+            color: #3a4b74;
+        }
+
+        .btn {
+            border: 2px solid #ffd700;
+            background: rgba(255, 215, 0, 0.15);
+            color: #ffd700;
+            border-radius: 10px;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background: rgba(255, 215, 0, 0.25);
+        }
+
+        .btn-danger {
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 107, 107, 0.2);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: rgba(20, 30, 50, 0.9);
+            border: 2px solid rgba(255, 215, 0, 0.25);
+            border-radius: 12px;
+            padding: 18px;
+        }
+
+        .card h3 {
+            margin: 0 0 10px;
+            color: #ffed4e;
+            font-size: 1.05em;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .pill {
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            background: rgba(255, 215, 0, 0.12);
+            color: #ffd700;
+            border-radius: 999px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .pill.active {
+            background: #ffd700;
+            color: #1a1a2e;
+        }
+
+        select {
+            width: 100%;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 215, 0, 0.35);
+            background: rgba(255, 255, 255, 0.08);
+            color: inherit;
+            padding: 10px;
+            font-family: inherit;
+            font-weight: 600;
+        }
+
+        .status {
+            margin-top: 12px;
+            min-height: 22px;
+            color: #9be7a7;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        body.light-theme .title {
+            color: #3f63c8;
+        }
+
+        body.light-theme .pill {
+            color: #3f63c8;
+            border-color: rgba(63, 99, 200, 0.35);
+            background: rgba(63, 99, 200, 0.1);
+        }
+
+        body.light-theme .pill.active {
+            color: #fff;
+            background: #3f63c8;
+        }
+    </style>
+    <link rel="stylesheet" href="mobile-responsive.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <div class="title" data-i18n="title">⚙️ Настройки</div>
+                <div class="muted" id="userEmail">—</div>
+            </div>
+            <button class="btn" onclick="goBack()" data-i18n="backBtn">← Назад</button>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3 data-i18n="themeTitle">🎨 Тема</h3>
+                <p class="muted" data-i18n="themeDesc">Выбери визуальный режим интерфейса.</p>
+                <div class="row" style="margin-top:10px;">
+                    <button class="pill" id="themeDark" onclick="setTheme('dark')" data-i18n="dark">Тёмная</button>
+                    <button class="pill" id="themeLight" onclick="setTheme('light')" data-i18n="light">Светлая</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 data-i18n="langTitle">🌍 Язык</h3>
+                <p class="muted" data-i18n="langDesc">Выбери язык интерфейса.</p>
+                <div style="margin-top:10px;">
+                    <select id="langSelect" onchange="setLanguage(this.value)">
+                        <option value="ru">Русский</option>
+                        <option value="uk">Українська</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 data-i18n="accountTitle">🔐 Аккаунт</h3>
+                <p class="muted" data-i18n="accountDesc">Управление сессией.</p>
+                <div class="row" style="margin-top:10px;">
+                    <button class="btn btn-danger" onclick="logout()" data-i18n="logout">Выйти</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 data-i18n="resetTitle">🧹 Сброс прогресса</h3>
+                <p class="muted" data-i18n="resetDesc">Удаляет прогресс локально и на сервере (без выхода из аккаунта).</p>
+                <div class="row" style="margin-top:10px;">
+                    <button class="btn btn-danger" onclick="resetProgress()" data-i18n="resetBtn">Сбросить всё</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="status" id="status"></div>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script>
+        const APP_LANG_KEY = 'planLang';
+        const APP_THEME_KEY = 'planTheme';
+
+        const RESET_LOCAL_KEYS = [
+            'points', 'level', 'completed', 'secretFlags', 'titleClicks',
+            'achievements', 'cosmetics', 'profileCosmetics', 'profile_state',
+            'characterProfileAchievements', 'characterProfileEarnedAchievementXp',
+            'verificationState', 'verificationDrafts', 'burnoutState',
+            'gameStats', 'botBuilderXP', 'botBuilderLevel', 'dungeonXP',
+            'dungeonBestRoom', 'parserDefenseXP', 'dealMakerXP', 'statsCraftXP', 'gameXPApplied',
+            'planStartDate', 'streak_days', 'streak_frozen_this_week',
+            'course_theory_time_ms', 'course_practice_time_ms', 'course_daily_learning_stats_v1',
+            'course_days_read_v1', 'course_super_eggs_found_v1', 'course_ultra_week_secret_v1',
+            'day_fragments_v1'
+        ];
+
+        const RESET_SERVER_KEYS = [
+            'main_tracker',
+            'verification',
+            'burnout',
+            'character_profile',
+            'profile_cosmetics',
+            'shop_achievements',
+            'code_dungeon',
+            'bot_builder',
+            'game_stats',
+            'parser_defense'
+        ];
+
+        const I18N = {
+            ru: {
+                title: '⚙️ Настройки',
+                backBtn: '← Назад',
+                themeTitle: '🎨 Тема',
+                themeDesc: 'Выбери визуальный режим интерфейса.',
+                dark: 'Тёмная',
+                light: 'Светлая',
+                langTitle: '🌍 Язык',
+                langDesc: 'Выбери язык интерфейса.',
+                accountTitle: '🔐 Аккаунт',
+                accountDesc: 'Управление сессией.',
+                logout: 'Выйти',
+                resetTitle: '🧹 Сброс прогресса',
+                resetDesc: 'Удаляет прогресс локально и на сервере (без выхода из аккаунта).',
+                resetBtn: 'Сбросить всё',
+                statusSaved: '✅ Настройки сохранены',
+                statusReset: '🧹 Прогресс сброшен',
+                statusLogout: '👋 Выход из аккаунта...'
+            },
+            uk: {
+                title: '⚙️ Налаштування',
+                backBtn: '← Назад',
+                themeTitle: '🎨 Тема',
+                themeDesc: 'Обери візуальний режим інтерфейсу.',
+                dark: 'Темна',
+                light: 'Світла',
+                langTitle: '🌍 Мова',
+                langDesc: 'Обери мову інтерфейсу.',
+                accountTitle: '🔐 Акаунт',
+                accountDesc: 'Керування сесією.',
+                logout: 'Вийти',
+                resetTitle: '🧹 Скидання прогресу',
+                resetDesc: 'Видаляє прогрес локально та на сервері (без виходу з акаунта).',
+                resetBtn: 'Скинути все',
+                statusSaved: '✅ Налаштування збережено',
+                statusReset: '🧹 Прогрес скинуто',
+                statusLogout: '👋 Вихід з акаунта...'
+            },
+            en: {
+                title: '⚙️ Settings',
+                backBtn: '← Back',
+                themeTitle: '🎨 Theme',
+                themeDesc: 'Choose interface appearance mode.',
+                dark: 'Dark',
+                light: 'Light',
+                langTitle: '🌍 Language',
+                langDesc: 'Choose interface language.',
+                accountTitle: '🔐 Account',
+                accountDesc: 'Session management.',
+                logout: 'Logout',
+                resetTitle: '🧹 Reset progress',
+                resetDesc: 'Clears progress locally and on server (without logout).',
+                resetBtn: 'Reset all',
+                statusSaved: '✅ Settings saved',
+                statusReset: '🧹 Progress reset',
+                statusLogout: '👋 Logging out...'
+            }
+        };
+
+        function getLang() {
+            const lang = localStorage.getItem(APP_LANG_KEY) || 'ru';
+            return I18N[lang] ? lang : 'ru';
+        }
+
+        function t(key) {
+            const lang = getLang();
+            return I18N[lang]?.[key] || I18N.ru[key] || key;
+        }
+
+        function applyTheme() {
+            const theme = localStorage.getItem(APP_THEME_KEY) || 'dark';
+            document.body.classList.toggle('light-theme', theme === 'light');
+            document.getElementById('themeDark').classList.toggle('active', theme === 'dark');
+            document.getElementById('themeLight').classList.toggle('active', theme === 'light');
+        }
+
+        function applyLanguage() {
+            const lang = getLang();
+            document.documentElement.lang = lang;
+            document.querySelectorAll('[data-i18n]').forEach((el) => {
+                const key = el.getAttribute('data-i18n');
+                const value = t(key);
+                if (value) el.textContent = value;
+            });
+            document.getElementById('langSelect').value = lang;
+        }
+
+        function setTheme(theme) {
+            localStorage.setItem(APP_THEME_KEY, theme);
+            applyTheme();
+            showStatus(t('statusSaved'));
+        }
+
+        function setLanguage(lang) {
+            localStorage.setItem(APP_LANG_KEY, lang);
+            applyLanguage();
+            showStatus(t('statusSaved'));
+        }
+
+        async function resetProgress() {
+            if (!confirm(t('resetDesc'))) return;
+
+            const preserveApiBase = localStorage.getItem('planApiBase');
+            const preserveLang = localStorage.getItem(APP_LANG_KEY) || 'ru';
+            const preserveTheme = localStorage.getItem(APP_THEME_KEY) || 'dark';
+
+            RESET_LOCAL_KEYS.forEach((key) => localStorage.removeItem(key));
+
+            if (preserveApiBase) localStorage.setItem('planApiBase', preserveApiBase);
+            localStorage.setItem(APP_LANG_KEY, preserveLang);
+            localStorage.setItem(APP_THEME_KEY, preserveTheme);
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            localStorage.setItem('planStartDate', today.toISOString());
+
+            await Promise.all(
+                RESET_SERVER_KEYS.map((key) =>
+                    window.PlanApiClient?.request?.(`/state/${key}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ value: {} })
+                    })
+                )
+            );
+
+            showStatus(t('statusReset'));
+        }
+
+        function logout() {
+            showStatus(t('statusLogout'));
+            if (window.PlanApiClient?.clearAuth) {
+                window.PlanApiClient.clearAuth();
+            }
+            window.location.href = 'auth.html';
+        }
+
+        function goBack() {
+            window.location.href = '30d-main-tasks.html';
+        }
+
+        function showStatus(text) {
+            document.getElementById('status').textContent = text;
+        }
+
+        async function initPage() {
+            const me = await window.PlanApiClient?.ensureAuthOrRedirect?.({ next: 'settings.html' });
+            if (!me) return;
+            document.getElementById('userEmail').textContent = me.email || '—';
+            applyTheme();
+            applyLanguage();
+        }
+
+        initPage();
+    </script>
+</body>
+</html>

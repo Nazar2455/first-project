@@ -18,6 +18,29 @@
             position: relative;
             overflow-x: hidden;
         }
+
+        body.light-theme {
+            background: linear-gradient(135deg, #f5f8ff, #eef3ff, #e9f0ff);
+            color: #1f2a44;
+        }
+
+        body.light-theme .navbar,
+        body.light-theme .profile-container,
+        body.light-theme .level-section,
+        body.light-theme .lore-progress-section,
+        body.light-theme .stat-box,
+        body.light-theme .upgrade-card {
+            background: rgba(255, 255, 255, 0.92) !important;
+            color: #1f2a44;
+            border-color: rgba(71, 96, 170, 0.25) !important;
+        }
+
+        body.light-theme .stat-label,
+        body.light-theme .xp-text,
+        body.light-theme .upgrade-desc,
+        body.light-theme .lore-item {
+            color: #2f3d63;
+        }
         
         body::before {
             content: '';
@@ -527,6 +550,7 @@
             .stats-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
+    <script src="app-settings.js"></script>
     <link rel="stylesheet" href="pixel-theme.css">
     <link rel="stylesheet" href="mobile-responsive.css">
 </head>
@@ -534,9 +558,9 @@
     <div class="container">
         <!-- NAVBAR -->
         <div class="navbar">
-            <div style="font-size: 1.5em; font-weight: 800;">👹 ПРОФИЛЬ ГОБЛИНА</div>
+            <div style="font-size: 1.5em; font-weight: 800;" data-i18n="navTitle">👹 ПРОФИЛЬ ГОБЛИНА</div>
             <div>
-                <span class="nav-link" onclick="goToTasks()">← Вернуться к заданиям</span>
+                <span class="nav-link" onclick="goToTasks()" data-i18n="backTasks">← Вернуться к заданиям</span>
             </div>
         </div>
         
@@ -638,10 +662,11 @@
             
             <!-- CONTROLS -->
             <div class="controls">
-                <button class="btn btn-primary" onclick="goToShop()">🏪 Магазин</button>
-                <button class="btn" onclick="goToAchievements()">🏆 Ачивки</button>
-                <button class="btn" onclick="goToTasks()">📋 Задания</button>
-                <button class="btn" onclick="showLoreModal()">📖 Лор гоблина</button>
+                <button class="btn btn-primary" onclick="goToShop()" data-i18n="btnShop">🏪 Магазин</button>
+                <button class="btn" onclick="goToAchievements()" data-i18n="btnAchv">🏆 Ачивки</button>
+                <button class="btn" onclick="goToTasks()" data-i18n="btnTasks">📋 Задания</button>
+                <button class="btn" onclick="showLoreModal()" data-i18n="btnLore">📖 Лор гоблина</button>
+                <button class="btn" onclick="goToSettings()" data-i18n="btnSettings">⚙️ Настройки</button>
             </div>
 
             <!-- LORE PROGRESS -->
@@ -662,6 +687,39 @@
     
     <script src="api-client.js"></script>
     <script>
+        const CHARACTER_I18N = {
+            ru: {
+                navTitle: '👹 ПРОФИЛЬ ГОБЛИНА',
+                backTasks: '← Вернуться к заданиям',
+                btnShop: '🏪 Магазин',
+                btnAchv: '🏆 Ачивки',
+                btnTasks: '📋 Задания',
+                btnLore: '📖 Лор гоблина',
+                btnSettings: '⚙️ Настройки'
+            },
+            uk: {
+                navTitle: '👹 ПРОФІЛЬ ГОБЛІНА',
+                backTasks: '← Повернутись до завдань',
+                btnShop: '🏪 Магазин',
+                btnAchv: '🏆 Ачивки',
+                btnTasks: '📋 Завдання',
+                btnLore: '📖 Лор гобліна',
+                btnSettings: '⚙️ Налаштування'
+            },
+            en: {
+                navTitle: '👹 GOBLIN PROFILE',
+                backTasks: '← Back to tasks',
+                btnShop: '🏪 Shop',
+                btnAchv: '🏆 Achievements',
+                btnTasks: '📋 Tasks',
+                btnLore: '📖 Goblin lore',
+                btnSettings: '⚙️ Settings'
+            }
+        };
+
+        window.PlanSettings?.applyThemeClass(document.body);
+        window.PlanSettings?.translate(CHARACTER_I18N);
+
         // Загрузить состояние с main-tasks.html
         const COSMETICS = [
             { id: 'helm_gold', name: '👑 Корона Золота', desc: 'Легендарная корона', cost: 1000, type: 'cosmetic' },
@@ -941,6 +999,10 @@
         
         function goToAchievements() {
             window.location.href = 'shop-achievements.html#achievements';
+        }
+
+        function goToSettings() {
+            window.location.href = 'settings.html';
         }
 
         const LORE_CHAPTERS = [

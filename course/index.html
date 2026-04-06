@@ -14,6 +14,21 @@
             min-height: 100vh;
             padding: 20px;
         }
+        body.light-theme {
+            background: linear-gradient(135deg, #f5f8ff, #eef3ff, #e9f0ff);
+            color: #1f2a44;
+        }
+        body.light-theme .hero,
+        body.light-theme .card {
+            background: rgba(255, 255, 255, 0.92) !important;
+            border-color: rgba(71, 96, 170, 0.25) !important;
+            color: #1f2a44;
+        }
+        body.light-theme .hero p,
+        body.light-theme .card p,
+        body.light-theme .list li {
+            color: #2f3d63;
+        }
         .wrap { max-width: 1100px; margin: 0 auto; }
         .hero {
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.14), rgba(102, 126, 234, 0.14));
@@ -61,15 +76,17 @@
             font-weight: 700;
         }
     </style>
+    <script src="../app-settings.js"></script>
     <link rel="stylesheet" href="course-tools.css" />
 </head>
 <body>
     <div class="wrap">
         <section class="hero">
-            <h1>🎓 Подробный курс по модулям</h1>
-            <p>Теперь это основной формат обучения: <strong>по дням, отдельными страницами</strong>. Каждый модуль построен как урок: теория простыми словами → маленькие примеры → большие рабочие блоки → практика → проверка.</p>
+            <h1 data-i18n="heroTitle">🎓 Подробный курс по модулям</h1>
+            <p data-i18n="heroDesc">Теперь это основной формат обучения: <strong>по дням, отдельными страницами</strong>. Каждый модуль построен как урок: теория простыми словами → маленькие примеры → большие рабочие блоки → практика → проверка.</p>
             <div class="actions">
-                <a class="btn" href="../30d-main-tasks.html">← К основному плану</a>
+                <a class="btn" href="../30d-main-tasks.html" data-i18n="backMain">← К основному плану</a>
+                <a class="btn" href="../settings.html" data-i18n="toSettings">⚙️ Настройки</a>
             </div>
             <div class="course-progress-pill" id="courseProgressText">Прочитано дней: 0/30</div>
         </section>
@@ -500,6 +517,30 @@
     </div>
     <script src="course-tools.js"></script>
     <script>
+        const COURSE_INDEX_I18N = {
+            ru: {
+                heroTitle: '🎓 Подробный курс по модулям',
+                heroDesc: 'Теперь это основной формат обучения: по дням, отдельными страницами. Каждый модуль построен как урок: теория простыми словами → маленькие примеры → большие рабочие блоки → практика → проверка.',
+                backMain: '← К основному плану',
+                toSettings: '⚙️ Настройки'
+            },
+            uk: {
+                heroTitle: '🎓 Детальний курс по модулях',
+                heroDesc: 'Тепер це основний формат навчання: по днях, окремими сторінками. Кожен модуль побудовано як урок: теорія простими словами → маленькі приклади → великі робочі блоки → практика → перевірка.',
+                backMain: '← До основного плану',
+                toSettings: '⚙️ Налаштування'
+            },
+            en: {
+                heroTitle: '🎓 Detailed modular course',
+                heroDesc: 'This is now the core learning format: day by day, on separate pages. Each module is structured as a lesson: simple theory → small examples → larger working blocks → practice → verification.',
+                backMain: '← Back to main plan',
+                toSettings: '⚙️ Settings'
+            }
+        };
+
+        window.PlanSettings?.applyThemeClass(document.body);
+        window.PlanSettings?.translate(COURSE_INDEX_I18N);
+
         CourseTools.updateIndexProgress(30);
     </script>
 </body>
