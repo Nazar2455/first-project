@@ -339,19 +339,32 @@
                 apiRequest('/state/code_dungeon')
             ]);
 
+            let xpFromServer = 0;
+            let bestRoomFromServer = 0;
+
             if (mainState?.value && typeof mainState.value === 'object') {
                 const incoming = mainState.value;
-                if (typeof incoming.points === 'number') localStorage.setItem('points', String(incoming.points));
+                if (typeof incoming.points === 'number') {
+                    localStorage.setItem('points', String(incoming.points));
+                    xpFromServer = Math.max(xpFromServer, incoming.points);
+                }
                 if (typeof incoming.level === 'number') localStorage.setItem('level', String(incoming.level));
             }
 
             if (dungeonState?.value && typeof dungeonState.value === 'object') {
                 const incoming = dungeonState.value;
-                if (typeof incoming.xp === 'number') localStorage.setItem('dungeonXP', String(incoming.xp));
-                if (typeof incoming.bestRoom === 'number') localStorage.setItem('dungeonBestRoom', String(incoming.bestRoom));
+                if (typeof incoming.xp === 'number') {
+                    localStorage.setItem('dungeonXP', String(incoming.xp));
+                    xpFromServer = Math.max(xpFromServer, incoming.xp);
+                }
+                if (typeof incoming.bestRoom === 'number') {
+                    localStorage.setItem('dungeonBestRoom', String(incoming.bestRoom));
+                    bestRoomFromServer = incoming.bestRoom;
+                }
             }
 
-            state.xp = parseInt(localStorage.getItem('dungeonXP') || localStorage.getItem('points') || '0');
+            // Синхронизируем state с данными с сервера
+            state.xp = xpFromServer || parseInt(localStorage.getItem('dungeonXP') || localStorage.getItem('points') || '0');
         }
 
         async function syncDungeonToServer() {
@@ -372,9 +385,18 @@
             { id: 'ward', title: '✨ Руна защиты', cost: 17, desc: 'Снижение входящего урона на 2', apply: () => { state.player.flatDamageReduction += 2; } }
         ];
 
+        // Auto-save прогресса каждые 5 сек
+        setInterval(() => {
+            if (state.running && state.xp > 0) {
+                localStorage.setItem('dungeonXP', state.xp);
+                localStorage.setItem('dungeonBestRoom', String(state.contracts.length));
+                void syncDungeonToServer();
+            }
+        }, 5000);
+
         const state = {
             hp: 100,
-            xp: parseInt(localStorage.getItem('points') || '0'),
+            xp: parseInt(localStorage.getItem('dungeonXP') || localStorage.getItem('points') || '0'),
             roomIndex: 0,
             running: false,
             quizOpen: false,
@@ -1595,18 +1617,49 @@
 
         function drawTexturedWalls() {
             const b = state.currentBiome;
-            state.walls.forEach(w => {
+            state.walls.forEach((w, idx) => {
+                // Базовый色
                 ctx.fillStyle = b.wall;
                 ctx.fillRect(w.x, w.y, w.w, w.h);
-                // Кирпичная текстура
-                ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+                
+                // Многослойная кирпичная текстура
+                ctx.strokeStyle = 'rgba(0,0,0,0.35)';
                 for (let yy = w.y + 10; yy < w.y + w.h; yy += 12) {
                     ctx.beginPath();
                     ctx.moveTo(w.x, yy);
                     ctx.lineTo(w.x + w.w, yy);
                     ctx.stroke();
                 }
-                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                
+                // Вертикальные своды
+                for (let xx = w.x + 15; xx < w.x + w.w; xx += 16) {
+                    ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(xx, w.y);
+                    ctx.lineTo(xx, w.y + w.h);
+                    ctx.stroke();
+                }
+                
+                // Шумовая текстур внутри
+                ctx.fillStyle = 'rgba(0,0,0,0.12)';
+                for (let i = 0; i < (w.w * w.h) / 400; i++) {
+                    const rx = w.x + Math.random() * w.w;
+                    const ry = w.y + Math.random() * w.h;
+                    ctx.fillRect(rx, ry, 2 + Math.random() * 3, 2 + Math.random() * 3);
+                }
+                
+                // Светлые края
+                const grad = ctx.createLinearGradient(w.x, w.y, w.x, w.y + w.h);
+                grad.addColorStop(0, 'rgba(255,255,255,0.14)');
+                grad.addColorStop(0.5, 'rgba(255,255,255,0)');
+                grad.addColorStop(1, 'rgba(0,0,0,0.18)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(w.x, w.y, w.w, w.h);
+                
+                // Чёткий контур
+                ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+                ctx.lineWidth = 1;
                 ctx.strokeRect(w.x + 0.5, w.y + 0.5, w.w - 1, w.h - 1);
             });
         }
@@ -1623,48 +1676,93 @@
             ctx.rotate(ang + Math.PI / 2);
             ctx.globalAlpha = hitAlpha;
 
+            // Внешнее сияние
+            ctx.beginPath();
+            ctx.fillStyle = 'rgba(173,220,255,0.15)';
+            ctx.arc(0, 0, 28, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Промежуточное свечение
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(173,220,255,0.3)';
+            ctx.lineWidth = 2;
+            ctx.arc(0, 0, 20, 0, Math.PI * 2);
+            ctx.stroke();
+
             // тень
-            ctx.fillStyle = 'rgba(0,0,0,0.35)';
+            ctx.fillStyle = 'rgba(0,0,0,0.4)';
             ctx.beginPath();
             ctx.ellipse(0, 17, 12, 6, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // плащ
-            ctx.fillStyle = '#5f6dff';
+            // плащ с градиентом
+            const capeGrad = ctx.createLinearGradient(0, 8, 0, 20);
+            capeGrad.addColorStop(0, '#7585ff');
+            capeGrad.addColorStop(1, '#4d5fd9');
+            ctx.fillStyle = capeGrad;
             ctx.beginPath();
             ctx.moveTo(0, 8);
             ctx.lineTo(-11, 20);
             ctx.lineTo(11, 20);
             ctx.closePath();
             ctx.fill();
+            ctx.strokeStyle = '#3d4fb0';
+            ctx.lineWidth = 1;
+            ctx.stroke();
 
-            // тело
-            ctx.fillStyle = '#8fd5ff';
+            // тело с градиентом
+            const bodyGrad = ctx.createLinearGradient(-9, -5, -9, 13);
+            bodyGrad.addColorStop(0, '#a8e6ff');
+            bodyGrad.addColorStop(1, '#6db8e8');
+            ctx.fillStyle = bodyGrad;
             ctx.fillRect(-9, -5, 18, 18);
             ctx.strokeStyle = '#dff3ff';
+            ctx.lineWidth = 1.5;
             ctx.strokeRect(-9, -5, 18, 18);
 
-            // голова/шлем
-            ctx.fillStyle = '#d9e6ff';
+            // голова/шлем с свечением
+            const helmGrad = ctx.createRadialGradient(0, -12, 2, 0, -12, 8);
+            helmGrad.addColorStop(0, '#f5f9ff');
+            helmGrad.addColorStop(1, '#d9e6ff');
+            ctx.fillStyle = helmGrad;
             ctx.beginPath();
             ctx.arc(0, -12, 8, 0, Math.PI * 2);
             ctx.fill();
             ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.5;
             ctx.stroke();
 
-            // визор
-            ctx.fillStyle = '#1e2f52';
+            // визор с эффектом
+            ctx.fillStyle = '#0a1a38';
             ctx.fillRect(-6, -13, 12, 4);
+            ctx.strokeStyle = '#2a4a6a';
+            ctx.strokeRect(-6, -13, 12, 4);
+            
+            // Отражение визора
+            ctx.fillStyle = 'rgba(173,220,255,0.25)';
+            ctx.fillRect(-5, -12.5, 4, 1.5);
 
-            // меч
-            ctx.fillStyle = '#ffe18a';
+            // меч с градиентом
+            const swordGrad = ctx.createLinearGradient(8, -2, 8, 12);
+            swordGrad.addColorStop(0, '#fff5c0');
+            swordGrad.addColorStop(1, '#ffe18a');
+            ctx.fillStyle = swordGrad;
             ctx.fillRect(8, -2, 3, 14);
+            ctx.strokeStyle = '#ffb847';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(8, -2, 3, 14);
+            
+            // Фокус спец-удара
             ctx.fillStyle = '#a7f1ff';
             ctx.fillRect(9, -16, 2, 14);
+            ctx.strokeStyle = 'rgba(167,241,255,0.8)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(9, -16, 2, 14);
 
             if (state.player.jumpT > 0) {
                 ctx.beginPath();
                 ctx.strokeStyle = 'rgba(173, 220, 255, 0.8)';
+                ctx.lineWidth = 2;
                 ctx.arc(0, 0, 20, 0, Math.PI * 2);
                 ctx.stroke();
             }
@@ -2056,30 +2154,51 @@
 
             // Враги
             for (const e of state.enemies) {
+                // Тень врага
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.beginPath();
+                ctx.ellipse(e.x, e.y + e.r + 6, e.r * 1.2, e.r * 0.4, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Мультислойная аура
+                const roleAura = e.role === 'mage'
+                    ? ['rgba(180,120,255,0.6)', 'rgba(200,140,255,0.35)']
+                    : (e.role === 'runner'
+                        ? ['rgba(120,255,180,0.6)', 'rgba(140,255,200,0.35)']
+                        : (e.role === 'brute' ? ['rgba(255,190,120,0.6)', 'rgba(255,210,140,0.35)'] : ['rgba(255,120,90,0.6)', 'rgba(255,140,110,0.4)']));
+                
+                // Внешняя аура
+                ctx.beginPath();
+                ctx.strokeStyle = e.boss ? 'rgba(255,80,120,0.4)' : roleAura[1];
+                ctx.lineWidth = 3;
+                ctx.arc(e.x, e.y, e.r + 12, 0, Math.PI * 2);
+                ctx.stroke();
+                
                 // Текстурка "черта" (спрайт + рога)
                 const img = e.boss ? state.assets.dragon : (e.kind === 'devil-witch' ? state.assets.witch : state.assets.goblin);
                 if (state.assets.loaded && img && img.complete && img.naturalWidth > 0) {
                     const size = e.boss ? 80 : 44;
                     ctx.drawImage(img, e.x - size / 2, e.y - size / 2, size, size);
-                    // красная аура черта
-                    const roleAura = e.role === 'mage'
-                        ? 'rgba(180,120,255,0.78)'
-                        : (e.role === 'runner'
-                            ? 'rgba(120,255,180,0.76)'
-                            : (e.role === 'brute' ? 'rgba(255,190,120,0.78)' : 'rgba(255,120,90,0.7)'));
-                    ctx.beginPath();
-                    ctx.strokeStyle = e.boss ? 'rgba(255,80,120,0.85)' : roleAura;
-                    ctx.arc(e.x, e.y, e.r + 4, 0, Math.PI * 2);
-                    ctx.stroke();
                 } else {
                     ctx.beginPath();
                     ctx.fillStyle = e.boss ? '#ff5f6d' : '#f18b5e';
                     ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
                     ctx.fill();
                 }
+                
+                // Внутренняя яркая аура
+                ctx.beginPath();
+                ctx.strokeStyle = e.boss ? 'rgba(255,80,120,0.85)' : roleAura[0];
+                ctx.lineWidth = 2;
+                ctx.arc(e.x, e.y, e.r + 4, 0, Math.PI * 2);
+                ctx.stroke();
 
-                // рога
-                ctx.fillStyle = '#5b1a1a';
+                // рога с градиентом
+                const hornGrad = ctx.createLinearGradient(e.x, e.y - e.r * 0.8, e.x, e.y - e.r * 1.3);
+                hornGrad.addColorStop(0, '#8b2a2a');
+                hornGrad.addColorStop(1, '#3d0d0d');
+                ctx.fillStyle = hornGrad;
+                
                 ctx.beginPath();
                 ctx.moveTo(e.x - e.r * 0.6, e.y - e.r * 0.8);
                 ctx.lineTo(e.x - e.r * 0.2, e.y - e.r * 1.3);
@@ -2091,15 +2210,24 @@
                 ctx.lineTo(e.x, e.y - e.r * 0.7);
                 ctx.fill();
 
-                // HP бар
+                // HP бар с стилем
                 const bw = e.boss ? 70 : 34;
                 const max = e.maxHp || (e.miniBoss
                     ? (state.secretRooms[state.secretRoomId]?.enemy?.hp || 220)
                     : (e.boss ? 300 : (44 + state.roomIndex * 18)));
                 const p = Math.max(0, e.hp / max);
-                ctx.fillStyle = 'rgba(0,0,0,0.5)';
-                ctx.fillRect(e.x - bw / 2, e.y - e.r - 12, bw, 6);
-                ctx.fillStyle = '#78f08a';
+                
+                // Фон HP
+                ctx.fillStyle = 'rgba(0,0,0,0.8)';
+                ctx.fillRect(e.x - bw / 2 - 2, e.y - e.r - 14, bw + 4, 8);
+                ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+                ctx.strokeRect(e.x - bw / 2 - 2, e.y - e.r - 14, bw + 4, 8);
+                
+                // HP fill c градиентом
+                const hpGrad = ctx.createLinearGradient(e.x - bw / 2, e.y - e.r - 12, e.x + bw / 2, e.y - e.r - 12);
+                hpGrad.addColorStop(0, '#78f08a');
+                hpGrad.addColorStop(1, '#45d06f');
+                ctx.fillStyle = hpGrad;
                 ctx.fillRect(e.x - bw / 2, e.y - e.r - 12, bw * p, 6);
             }
 
