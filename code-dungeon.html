@@ -69,8 +69,11 @@
         .vitals {
             width: min(1100px, 96vw);
             display: grid;
-            grid-template-columns: repeat(2, minmax(220px, 1fr));
+            grid-template-columns: repeat(3, minmax(180px, 1fr));
             gap: 10px;
+        }
+        @media (max-width: 900px) {
+            .vitals { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
         }
         .vital {
             background: rgba(16, 24, 45, 0.85);
@@ -219,6 +222,10 @@
             <div class="vital-top"><span>⚡ Выносливость</span><span id="stamina">100/100</span></div>
             <div class="vital-bar"><div class="vital-fill stamina" id="staminaFill"></div></div>
         </div>
+        <div class="vital" id="shardsCard">
+            <div class="vital-top"><span>💠 Осколки</span><span id="shardsVital">0</span></div>
+            <div class="vital-bar"><div class="vital-fill" style="background: linear-gradient(90deg, #9bd7ff, #5ab5ff); width: 100%;"></div></div>
+        </div>
     </div>
 
     <canvas id="game" width="1100" height="620"></canvas>
@@ -290,8 +297,8 @@
         const ctx = canvas.getContext('2d');
         const VIEW_W = canvas.width;
         const VIEW_H = canvas.height;
-        const WORLD_W = 1800;
-        const WORLD_H = 1200;
+        const WORLD_W = 2400;
+        const WORLD_H = 1800;
 
         function clamp(value, min, max) {
             return Math.max(min, Math.min(max, value));
@@ -706,37 +713,60 @@
         }
 
         function getRoomLayout(index, stage = 1) {
-            const gateY = Math.round(WORLD_H * 0.45);
-            const stageGateX = stage === 1 ? Math.round(WORLD_W * 0.35) : (stage === 2 ? Math.round(WORLD_W * 0.62) : Math.round(WORLD_W * 0.78));
-            const layouts = [
-                [
-                    rect(0, 0, WORLD_W, 24), rect(0, WORLD_H - 24, WORLD_W, 24), rect(0, 0, 24, WORLD_H), rect(WORLD_W - 24, 0, 24, WORLD_H),
-                    rect(Math.round(WORLD_W * 0.22), 120, 34, WORLD_H - 240),
-                    rect(Math.round(WORLD_W * 0.45), 170, 34, WORLD_H - 340),
-                    rect(Math.round(WORLD_W * 0.68), 120, 34, WORLD_H - 240),
-                    rect(stageGateX, gateY - 180, 28, 140),
-                    rect(stageGateX, gateY + 40, 28, 140)
-                ],
-                [
-                    rect(0, 0, WORLD_W, 24), rect(0, WORLD_H - 24, WORLD_W, 24), rect(0, 0, 24, WORLD_H), rect(WORLD_W - 24, 0, 24, WORLD_H),
-                    rect(Math.round(WORLD_W * 0.18), 130, 30, WORLD_H - 260),
-                    rect(Math.round(WORLD_W * 0.36), 90, 30, 260), rect(Math.round(WORLD_W * 0.36), WORLD_H - 350, 30, 260),
-                    rect(Math.round(WORLD_W * 0.56), 150, 30, WORLD_H - 300),
-                    rect(Math.round(WORLD_W * 0.78), 110, 30, 260), rect(Math.round(WORLD_W * 0.78), WORLD_H - 370, 30, 260),
-                    rect(stageGateX, gateY - 170, 26, 130), rect(stageGateX, gateY + 40, 26, 130)
-                ],
-                [
-                    rect(0, 0, WORLD_W, 24), rect(0, WORLD_H - 24, WORLD_W, 24), rect(0, 0, 24, WORLD_H), rect(WORLD_W - 24, 0, 24, WORLD_H),
-                    rect(Math.round(WORLD_W * 0.18), 100, Math.round(WORLD_W * 0.56), 28),
-                    rect(Math.round(WORLD_W * 0.18), WORLD_H - 128, Math.round(WORLD_W * 0.56), 28),
-                    rect(Math.round(WORLD_W * 0.18), 128, 28, WORLD_H - 256),
-                    rect(Math.round(WORLD_W * 0.74), 128, 28, WORLD_H - 256),
-                    rect(Math.round(WORLD_W * 0.40), 220, 300, 26), rect(Math.round(WORLD_W * 0.40), WORLD_H - 246, 300, 26),
-                    rect(Math.round(WORLD_W * 0.51), 320, 28, WORLD_H - 640),
-                    rect(stageGateX, gateY - 160, 24, 120), rect(stageGateX, gateY + 40, 24, 120)
-                ]
+            const border = 24;
+            const walls = [
+                rect(0, 0, WORLD_W, border), rect(0, WORLD_H - border, WORLD_W, border),
+                rect(0, 0, border, WORLD_H), rect(WORLD_W - border, 0, border, WORLD_H)
             ];
-            return layouts[index % layouts.length].map(w => ({ ...w }));
+
+            const variant = (index + stage) % 4;
+
+            if (variant === 0) {
+                const coreZones = [
+                    { x: Math.round(WORLD_W * 0.2), y: Math.round(WORLD_H * 0.15), w: 380, h: 320 },
+                    { x: Math.round(WORLD_W * 0.55), y: Math.round(WORLD_H * 0.2), w: 380, h: 280 },
+                    { x: Math.round(WORLD_W * 0.15), y: Math.round(WORLD_H * 0.65), w: 360, h: 300 },
+                    { x: Math.round(WORLD_W * 0.65), y: Math.round(WORLD_H * 0.6), w: 380, h: 310 }
+                ];
+                coreZones.forEach(z => {
+                    walls.push(rect(z.x - 20, z.y, 20, z.h), rect(z.x + z.w, z.y, 20, z.h));
+                    walls.push(rect(z.x, z.y - 20, z.w, 20), rect(z.x, z.y + z.h, z.w, 20));
+                });
+                walls.push(rect(Math.round(WORLD_W * 0.48), 120, 28, WORLD_H - 240));
+                walls.push(rect(Math.round(WORLD_W * 0.12), Math.round(WORLD_H * 0.48), WORLD_W - 200, 26));
+            } else if (variant === 1) {
+                for (let i = 0; i < 5; i++) {
+                    const x = 120 + i * Math.round(WORLD_W * 0.16);
+                    const h = Math.round(WORLD_H * (0.3 + Math.random() * 0.4));
+                    walls.push(rect(x, 80, 30, h));
+                    walls.push(rect(x, WORLD_H - 80 - h, 30, h));
+                }
+                walls.push(rect(Math.round(WORLD_W * 0.25), Math.round(WORLD_H * 0.4), Math.round(WORLD_W * 0.5), 40));
+            } else if (variant === 2) {
+                const centerX = Math.round(WORLD_W * 0.5);
+                const centerY = Math.round(WORLD_H * 0.5);
+                walls.push(rect(centerX - 200, centerY - 150, 400, 300));
+                walls.push(rect(centerX - 180, centerY - 130, 360, 260));
+                for (let i = 0; i < 4; i++) {
+                    const ang = (Math.PI * 2 / 4) * i;
+                    const px = centerX + Math.cos(ang) * 280;
+                    const py = centerY + Math.sin(ang) * 280;
+                    walls.push(rect(px - 60, py - 40, 120, 80));
+                }
+            } else {
+                walls.push(rect(Math.round(WORLD_W * 0.08), 100, Math.round(WORLD_W * 0.35), 40));
+                walls.push(rect(Math.round(WORLD_W * 0.57), 100, Math.round(WORLD_W * 0.35), 40));
+                walls.push(rect(Math.round(WORLD_W * 0.08), WORLD_H - 140, Math.round(WORLD_W * 0.35), 40));
+                walls.push(rect(Math.round(WORLD_W * 0.57), WORLD_H - 140, Math.round(WORLD_W * 0.35), 40));
+                for (let i = 0; i < 3; i++) {
+                    walls.push(rect(Math.round(WORLD_W * (0.15 + i * 0.28)), Math.round(WORLD_H * 0.35), 28, Math.round(WORLD_H * 0.3)));
+                }
+            }
+
+            const gateY = Math.round(WORLD_H * (0.35 + Math.random() * 0.3));
+            const gateX = WORLD_W - 100;
+            walls.push(rect(gateX, gateY - 120, 28, 100), rect(gateX, gateY + 20, 28, 100));
+            return walls.map(w => ({ ...w }));
         }
 
         function pointInWall(x, y, r = 0) {
@@ -814,11 +844,11 @@
         }
 
         function makeTrapPack(index, rand) {
-            const count = 3 + Math.floor(index / 3);
+            const count = 8 + Math.floor(index / 2) + Math.floor(Math.random() * 4);
             const traps = [];
             for (let i = 0; i < count; i++) {
                 const roll = rand();
-                const type = roll < 0.34 ? 'lava' : (roll < 0.67 ? 'spike' : (roll < 0.85 ? 'pit' : 'poison'));
+                const type = roll < 0.32 ? 'lava' : (roll < 0.64 ? 'spike' : (roll < 0.82 ? 'pit' : 'poison'));
                 traps.push({
                     x: 140 + rand() * (WORLD_W - 280),
                     y: 110 + rand() * (WORLD_H - 220),
@@ -834,14 +864,18 @@
 
         function makeInteractives(index, rand) {
             const result = [];
-            if (index % 3 === 0) {
-                result.push({ type: 'fountain', x: 160 + rand() * 180, y: Math.round(WORLD_H * 0.52) + rand() * 140, r: 20, used: false });
+            for (let i = 0; i < 2; i++) {
+                if (rand() < 0.6) {
+                    result.push({ type: 'fountain', x: 160 + rand() * (WORLD_W - 320), y: 120 + rand() * (WORLD_H - 240), r: 20, used: false });
+                }
             }
-            if (index % 4 === 1) {
-                result.push({ type: 'vines', x: WORLD_W - 220 - rand() * 180, y: 140 + rand() * (WORLD_H - 300), r: 22, used: false });
+            for (let i = 0; i < 2; i++) {
+                if (rand() < 0.5) {
+                    result.push({ type: 'vines', x: 160 + rand() * (WORLD_W - 320), y: 120 + rand() * (WORLD_H - 240), r: 22, used: false });
+                }
             }
-            if (index % 3 === 2) {
-                result.push({ type: 'checkpoint', x: Math.round(WORLD_W * 0.5), y: Math.round(WORLD_H * 0.2) + rand() * 120, r: 20, used: false });
+            if (index % 3 !== 0) {
+                result.push({ type: 'checkpoint', x: Math.round(WORLD_W * 0.15) + rand() * Math.round(WORLD_W * 0.7), y: 100 + rand() * (WORLD_H - 200), r: 20, used: false });
             }
             return result;
         }
@@ -868,20 +902,26 @@
             state.interactives = makeInteractives(index, rand);
 
             state.decor = [];
-            for (let i = 0; i < 84; i++) {
+            for (let i = 0; i < 240; i++) {
+                const type = rand() < 0.45 ? 'rock' : (rand() < 0.85 ? 'rune' : (rand() < 0.95 ? 'crystal' : 'pillar'));
                 state.decor.push({
                     x: 40 + rand() * (WORLD_W - 80),
                     y: 40 + rand() * (WORLD_H - 80),
-                    type: rand() < 0.5 ? 'rock' : 'rune',
-                    s: 4 + rand() * 8
+                    type,
+                    s: type === 'pillar' ? 12 + rand() * 20 : (type === 'crystal' ? 6 + rand() * 10 : (4 + rand() * 8))
                 });
             }
 
             const level = index + 1;
             const lastRoom = state.contracts.length - 1;
             const isBoss = index === lastRoom || (level % state.bossRoomEvery === 0);
-            const enemyCount = isBoss ? 1 : Math.min(11, 3 + Math.floor(index / 2));
+            const isEliteRoom = !isBoss && (index % 7 === 2 || index % 11 === 5);
+            state.eliteRoom = isEliteRoom;
+            
+            const baseFactor = isEliteRoom ? 1.5 : 1;
+            const enemyCount = isBoss ? 1 : Math.min(22, Math.round((6 + Math.floor(index / 1.5) + Math.floor(Math.random() * 3)) * baseFactor));
             state.enemies = [];
+            
             for (let i = 0; i < enemyCount; i++) {
                 if (isBoss) {
                     state.enemies.push(spawnEnemyByRole('boss', index, { isBoss: true }));
@@ -889,8 +929,20 @@
                 }
 
                 const roll = Math.random();
-                const role = roll < 0.36 ? 'swordsman' : (roll < 0.62 ? 'mage' : (roll < 0.84 ? 'runner' : 'brute'));
-                state.enemies.push(spawnEnemyByRole(role, index));
+                let role = roll < 0.36 ? 'swordsman' : (roll < 0.62 ? 'mage' : (roll < 0.84 ? 'runner' : 'brute'));
+                
+                if (isEliteRoom && rand() < 0.4) {
+                    role = 'brute';
+                }
+                
+                const enemy = spawnEnemyByRole(role, index);
+                if (isEliteRoom) {
+                    enemy.hp = Math.round(enemy.hp * 1.3);
+                    enemy.maxHp = enemy.hp;
+                    enemy.damage = Math.round(enemy.damage * 1.2);
+                    enemy.speed = Math.min(3.5, enemy.speed * 1.15);
+                }
+                state.enemies.push(enemy);
             }
 
             for (const e of state.enemies) {
@@ -899,7 +951,7 @@
                 e.y = spot.y;
             }
 
-            const terminalsCount = isBoss ? 3 : (index <= 1 ? 2 : (index >= 8 ? 4 : 3));
+            const terminalsCount = isBoss ? 4 : (index <= 1 ? 3 : (index >= 10 ? 7 : (4 + Math.floor(index / 4))));
             state.terminals = [];
             for (let i = 0; i < terminalsCount; i++) {
                 const spot = findFreeSpot(rand, 24);
@@ -926,9 +978,16 @@
                 obj.y = spot.y;
             });
 
-            if (level > 1 && level % 4 === 0 && !state.merchantVisitedRooms[index]) {
-                const m = findFreeSpot(rand, 24);
-                state.merchant = { x: m.x, y: m.y, r: 20 };
+            if (level > 1 && level % 3 === 0 && !state.merchantVisitedRooms[index]) {
+                for (let t = 0; t < (level % 5 === 0 ? 2 : 1); t++) {
+                    const m = findFreeSpot(rand, 24);
+                    if (!state.merchant) {
+                        state.merchant = { x: m.x, y: m.y, r: 20 };
+                    } else if (!state.merchantExtra) {
+                        state.merchantExtra = [state.merchant, { x: m.x, y: m.y, r: 20 }];
+                        state.merchant = state.merchantExtra[0];
+                    }
+                }
             }
 
             const portalSecretId = state.secretPortalsByRoom[index];
@@ -1499,11 +1558,31 @@
                 if (d.type === 'rock') {
                     ctx.fillStyle = 'rgba(255,255,255,0.06)';
                     ctx.fillRect(d.x, d.y, d.s, d.s);
-                } else {
+                } else if (d.type === 'rune') {
                     ctx.strokeStyle = b.accent + '44';
                     ctx.beginPath();
                     ctx.arc(d.x, d.y, d.s * 0.7, 0, Math.PI * 2);
                     ctx.stroke();
+                } else if (d.type === 'crystal') {
+                    ctx.fillStyle = '#9bd7ff';
+                    ctx.globalAlpha = 0.4;
+                    ctx.beginPath();
+                    ctx.moveTo(d.x, d.y - d.s);
+                    ctx.lineTo(d.x + d.s * 0.6, d.y + d.s * 0.3);
+                    ctx.lineTo(d.x, d.y + d.s);
+                    ctx.lineTo(d.x - d.s * 0.6, d.y + d.s * 0.3);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                } else if (d.type === 'pillar') {
+                    ctx.fillStyle = b.wall;
+                    ctx.globalAlpha = 0.5;
+                    ctx.fillRect(d.x - d.s * 0.3, d.y - d.s * 0.5, d.s * 0.6, d.s);
+                    ctx.globalAlpha = 1;
+                    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(d.x - d.s * 0.3, d.y - d.s * 0.5, d.s * 0.6, d.s);
+                    ctx.lineWidth = 1;
                 }
             }
 
@@ -2138,9 +2217,10 @@
 
             document.getElementById('xp').textContent = state.xp;
             document.getElementById('shards').textContent = state.shards;
+            document.getElementById('shardsVital').textContent = state.shards;
             document.getElementById('room').textContent = state.inSecretRoom
                 ? `S${(state.secretRoomId || 0) + 1}`
-                : `${state.roomIndex + 1}.${state.floorStage}`;
+                : `${state.roomIndex + 1}.${state.floorStage}${state.eliteRoom ? ' ⚡' : ''}`;
             document.getElementById('roomTotal').textContent = state.contracts.length;
             const termText = `${state.terminals.filter(t => t.solved).length}/${state.terminals.length}`;
             document.getElementById('term').textContent = termText;
