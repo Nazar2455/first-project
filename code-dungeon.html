@@ -130,11 +130,13 @@
         <div class="stats">
             <div class="chip">❤️ HP: <span id="hp">100</span></div>
             <div class="chip">🪙 XP: <span id="xp">0</span></div>
+            <div class="chip">💠 Осколки: <span id="shards">0</span></div>
             <div class="chip">⚡ Stamina: <span id="stamina">100</span></div>
             <div class="chip">🏰 Комната: <span id="room">1</span>/<span id="roomTotal">12</span></div>
             <div class="chip">🧰 Сундуки: <span id="term">0</span></div>
             <div class="chip">⚔️ Враги: <span id="enemy">0</span></div>
             <div class="chip">🕳️ Секреты: <span id="secretCount">0</span>/3</div>
+            <div class="chip">🧿 Артефакты: <span id="artifactCount">0</span></div>
             <div class="chip">🎯 Цель: <span id="objective">—</span></div>
         </div>
         <div style="display:flex; gap:8px;">
@@ -188,6 +190,19 @@
             <div style="margin-top:12px; display:flex; gap:8px;">
                 <button class="answer" onclick="restartRun()">🔁 Запустить снова</button>
                 <a class="answer" href="30d-main-tasks.html" style="text-decoration:none; display:inline-block;">⬅️ Вернуться в план</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="merchantOverlay">
+        <div class="card">
+            <h2>🧙 Торговец рун</h2>
+            <p>Покупай артефакты за осколки из сундуков. Каждый артефакт даёт постоянный бонус до конца забега.</p>
+            <div class="small" id="merchantBalance">Осколки: 0</div>
+            <div class="answers" id="merchantItems"></div>
+            <div class="small" id="merchantHint">Совет: сначала возьми «Руну живучести» или «Руну фокуса».</div>
+            <div style="margin-top:10px; display:flex; gap:8px;">
+                <button class="answer" onclick="closeMerchant()">Закрыть лавку</button>
             </div>
         </div>
     </div>
@@ -258,6 +273,15 @@
             });
         }
 
+        const MERCHANT_ITEMS = [
+            { id: 'vitality', title: '🛡️ Руна живучести', cost: 18, desc: '+25 max HP и мгновенно +25 HP', apply: () => { state.player.maxHp += 25; state.hp = Math.min(state.player.maxHp, state.hp + 25); } },
+            { id: 'focus', title: '⚔️ Руна фокуса', cost: 16, desc: '+9 урона обычной атаки', apply: () => { state.player.attackDamage += 9; } },
+            { id: 'sprint', title: '💨 Руна рывка', cost: 14, desc: '+0.55 к скорости, +15 max stamina', apply: () => { state.player.speed += 0.55; state.player.maxStamina += 15; state.player.stamina = Math.min(state.player.maxStamina, state.player.stamina + 10); } },
+            { id: 'echo', title: '🌩️ Руна эха', cost: 20, desc: 'Спец-удар наносит +20 урона', apply: () => { state.player.specialDamage += 20; } },
+            { id: 'economy', title: '💠 Руна добычи', cost: 12, desc: '+1 осколок с каждого сундука', apply: () => { state.player.shardBonus += 1; } },
+            { id: 'ward', title: '✨ Руна защиты', cost: 17, desc: 'Снижение входящего урона на 2', apply: () => { state.player.flatDamageReduction += 2; } }
+        ];
+
         const state = {
             hp: 100,
             xp: parseInt(localStorage.getItem('points') || '0'),
@@ -283,10 +307,16 @@
             ],
             message: '',
             messageT: 0,
+            shards: 0,
+            artifacts: [],
+            merchantVisitedRooms: {},
             loots: [],
             particles: [],
             decor: [],
             projectiles: [],
+            enemyProjectiles: [],
+            traps: [],
+            interactives: [],
             currentBiome: { floorA: '#0f1833', floorB: '#15224a', accent: '#667eea', wall: '#263458', rune: '#ffd700' },
             chapters: [
                 { title: 'Пробуждение Новичка', text: 'Ты входишь в Подземелье Контрактов. Здесь выживает тот, кто умеет доводить MVP до результата.' },
@@ -349,6 +379,8 @@
             secretPortal: null,
             secretCleared: {},
             secretsFound: 0,
+            secretQuestsDone: {},
+            bossRoomEvery: 5,
             assets: {
                 knight: null,
                 goblin: null,
@@ -356,12 +388,55 @@
                 dragon: null,
                 loaded: false
             },
-            player: { x: 90, y: 310, r: 14, speed: 3.1, dashMult: 1.9, stamina: 100, attackCd: 0, hitCd: 0, facingX: 1, facingY: 0 },
+            player: {
+                x: 90,
+                y: 310,
+                r: 14,
+                speed: 3.1,
+                dashMult: 1.9,
+                stamina: 100,
+                maxStamina: 100,
+                maxHp: 100,
+                attackCd: 0,
+                hitCd: 0,
+                trapCd: 0,
+                attackDamage: 30,
+                specialDamage: 45,
+                shardBonus: 0,
+                flatDamageReduction: 0,
+                facingX: 1,
+                facingY: 0
+            },
             walls: [],
             enemies: [],
             terminals: [],
+            merchant: null,
             door: { x: 1035, y: 260, w: 35, h: 110, open: false }
         };
+
+        function tryCompleteSecretQuest(id) {
+            if (state.secretQuestsDone[id]) return;
+            state.secretQuestsDone[id] = true;
+            if (id === 'collector') {
+                state.xp += 120;
+                state.shards += 8;
+                showMessage('📜 Секретный квест: Коллекционер закрыт! +120 XP, +8 оск.', 170);
+            } else if (id === 'riftmaster') {
+                state.xp += 150;
+                showMessage('📜 Секретный квест: Мастер рифтов закрыт! +150 XP', 170);
+            }
+            localStorage.setItem('dungeonXP', state.xp);
+            void syncDungeonToServer();
+        }
+
+        function updateSecretQuestProgress() {
+            if (state.shards >= 25) {
+                tryCompleteSecretQuest('collector');
+            }
+            if (state.secretsFound >= 2) {
+                tryCompleteSecretQuest('riftmaster');
+            }
+        }
 
         function createSeededRandom(seed) {
             let t = seed >>> 0;
@@ -463,23 +538,122 @@
             }
         }
 
+        function getRoomLayout(index) {
+            const layouts = [
+                [
+                    rect(0, 0, 1100, 20), rect(0, 600, 1100, 20), rect(0, 0, 20, 620), rect(1080, 0, 20, 620),
+                    rect(260, 80, 30, 180), rect(260, 360, 30, 180), rect(520, 140, 30, 340), rect(780, 80, 30, 180), rect(780, 360, 30, 180)
+                ],
+                [
+                    rect(0, 0, 1100, 20), rect(0, 600, 1100, 20), rect(0, 0, 20, 620), rect(1080, 0, 20, 620),
+                    rect(180, 110, 24, 400), rect(360, 70, 24, 210), rect(360, 350, 24, 210), rect(560, 130, 24, 360),
+                    rect(760, 70, 24, 210), rect(760, 350, 24, 210), rect(930, 120, 24, 380)
+                ],
+                [
+                    rect(0, 0, 1100, 20), rect(0, 600, 1100, 20), rect(0, 0, 20, 620), rect(1080, 0, 20, 620),
+                    rect(240, 70, 620, 26), rect(240, 524, 620, 26), rect(240, 96, 26, 430), rect(834, 96, 26, 430),
+                    rect(450, 170, 200, 24), rect(450, 426, 200, 24), rect(540, 224, 24, 170)
+                ]
+            ];
+            return layouts[index % layouts.length].map(w => ({ ...w }));
+        }
+
+        function spawnEnemyByRole(role, index, options = {}) {
+            const level = index + 1;
+            const isBoss = !!options.isBoss;
+            const base = {
+                swordsman: { hp: 56 + level * 14, speed: 1.45 + level * 0.04, damage: 10 + Math.floor(level / 2), r: 17, kind: 'devil-imp' },
+                mage: { hp: 42 + level * 10, speed: 1.2 + level * 0.03, damage: 8 + Math.floor(level / 3), r: 16, kind: 'devil-witch', ranged: true, shootCd: 55 },
+                runner: { hp: 34 + level * 8, speed: 2.1 + level * 0.06, damage: 7 + Math.floor(level / 4), r: 14, kind: 'devil-imp' }
+            };
+
+            const cfg = base[role] || base.swordsman;
+            if (isBoss) {
+                const bossVariant = level % 10 === 0 ? 'archmage' : (level % 5 === 0 ? 'warlord' : 'overlord');
+                return {
+                    x: 760 + Math.random() * 220,
+                    y: 150 + Math.random() * 320,
+                    r: 30,
+                    hp: 250 + level * 28,
+                    maxHp: 250 + level * 28,
+                    speed: 1.35 + Math.min(0.35, level * 0.01),
+                    damage: 18 + Math.floor(level / 3),
+                    wanderT: 0,
+                    vx: 0,
+                    vy: 0,
+                    boss: true,
+                    kind: 'devil-boss',
+                    role: 'boss',
+                    bossVariant,
+                    shootCd: 70,
+                    dashCd: 120
+                };
+            }
+
+            return {
+                x: 700 + Math.random() * 280,
+                y: 120 + Math.random() * 380,
+                r: cfg.r,
+                hp: cfg.hp,
+                maxHp: cfg.hp,
+                speed: cfg.speed,
+                damage: cfg.damage,
+                wanderT: 0,
+                vx: 0,
+                vy: 0,
+                boss: false,
+                kind: cfg.kind,
+                role,
+                ranged: !!cfg.ranged,
+                shootCd: cfg.shootCd || 999
+            };
+        }
+
+        function makeTrapPack(index, rand) {
+            const count = 2 + Math.floor(index / 3);
+            const traps = [];
+            for (let i = 0; i < count; i++) {
+                const isLava = i % 2 === 0;
+                traps.push({
+                    x: 180 + rand() * 760,
+                    y: 110 + rand() * 390,
+                    r: isLava ? 20 + rand() * 12 : 16 + rand() * 10,
+                    type: isLava ? 'lava' : 'spike',
+                    damage: isLava ? 7 + Math.floor(index / 4) : 5 + Math.floor(index / 5)
+                });
+            }
+            return traps;
+        }
+
+        function makeInteractives(index, rand) {
+            const result = [];
+            if (index % 3 === 0) {
+                result.push({ type: 'fountain', x: 140 + rand() * 120, y: 290 + rand() * 120, r: 20, used: false });
+            }
+            if (index % 4 === 1) {
+                result.push({ type: 'vines', x: 900 - rand() * 120, y: 140 + rand() * 280, r: 22, used: false });
+            }
+            return result;
+        }
+
         function buildRoom(index) {
             state.roomIndex = index;
             state.inSecretRoom = false;
             state.secretRoomId = null;
             state.secretReturnRoom = null;
             state.secretPortal = null;
+            state.merchant = null;
             state.player.x = 90;
             state.player.y = 310;
             state.currentBiome = state.biomes[index] || state.biomes[0];
             const rand = createSeededRandom(1337 + index * 97);
-            state.walls = [
-                rect(0, 0, 1100, 20), rect(0, 600, 1100, 20), rect(0, 0, 20, 620), rect(1080, 0, 20, 620),
-                rect(260, 80, 30, 180), rect(260, 360, 30, 180), rect(520, 140, 30, 340), rect(780, 80, 30, 180), rect(780, 360, 30, 180)
-            ];
+            state.walls = getRoomLayout(index);
             state.loots = [];
             state.particles = [];
             state.projectiles = [];
+            state.enemyProjectiles = [];
+            state.traps = makeTrapPack(index, rand);
+            state.interactives = makeInteractives(index, rand);
 
             state.decor = [];
             for (let i = 0; i < 30; i++) {
@@ -491,31 +665,27 @@
                 });
             }
 
+            const level = index + 1;
             const lastRoom = state.contracts.length - 1;
-            const isBoss = index === lastRoom;
-            const enemyCount = isBoss ? 1 : Math.min(8, 2 + Math.floor(index / 2));
+            const isBoss = index === lastRoom || (level % state.bossRoomEvery === 0);
+            const enemyCount = isBoss ? 1 : Math.min(11, 3 + Math.floor(index / 2));
             state.enemies = [];
             for (let i = 0; i < enemyCount; i++) {
-                state.enemies.push({
-                    x: 700 + Math.random() * 280,
-                    y: 120 + Math.random() * 380,
-                    r: isBoss ? 30 : 16,
-                    hp: isBoss ? 300 : 44 + index * 18,
-                    speed: isBoss ? 1.3 : 1.35 + index * 0.12,
-                    damage: isBoss ? 18 : 8,
-                    wanderT: 0,
-                    vx: 0,
-                    vy: 0,
-                    boss: isBoss,
-                    kind: isBoss ? 'devil-boss' : (Math.random() < 0.5 ? 'devil-imp' : 'devil-witch')
-                });
+                if (isBoss) {
+                    state.enemies.push(spawnEnemyByRole('boss', index, { isBoss: true }));
+                    break;
+                }
+
+                const roll = Math.random();
+                const role = roll < 0.45 ? 'swordsman' : (roll < 0.72 ? 'mage' : 'runner');
+                state.enemies.push(spawnEnemyByRole(role, index));
             }
 
-            const terminalsCount = isBoss ? 3 : (index <= 1 ? 2 : 3);
+            const terminalsCount = isBoss ? 3 : (index <= 1 ? 2 : (index >= 8 ? 4 : 3));
             state.terminals = [];
             for (let i = 0; i < terminalsCount; i++) {
                 state.terminals.push({
-                    x: 330 + i * 330,
+                    x: 250 + i * Math.min(250, Math.max(160, 700 / terminalsCount)),
                     y: i % 2 === 0 ? 120 : 460,
                     w: 44,
                     h: 44,
@@ -523,6 +693,10 @@
                     chest: true,
                     question: state.questionQueue[state.qIndex++ % state.questionQueue.length]
                 });
+            }
+
+            if (level > 1 && level % 4 === 0 && !state.merchantVisitedRooms[index]) {
+                state.merchant = { x: 138, y: 492, r: 20 };
             }
 
             const portalSecretId = state.secretPortalsByRoom[index];
@@ -538,7 +712,8 @@
 
             state.door.open = false;
             const c = state.contracts[state.roomIndex];
-            showMessage(`Контракт: ${c.title} • ${c.goal}`);
+            const levelTag = isBoss ? '👑 БОСС-УРОВЕНЬ' : `Уровень ${level}`;
+            showMessage(`${levelTag}: ${c.title} • ${c.goal}`);
             updateChapterUI();
         }
 
@@ -562,6 +737,13 @@
             state.loots = [];
             state.particles = [];
             state.projectiles = [];
+            state.enemyProjectiles = [];
+            state.traps = [
+                { x: 360, y: 310, r: 22, type: 'lava', damage: 9 },
+                { x: 560, y: 210, r: 18, type: 'spike', damage: 7 },
+                { x: 760, y: 410, r: 20, type: 'lava', damage: 9 }
+            ];
+            state.interactives = [{ type: 'fountain', x: 120, y: 140, r: 18, used: false }];
 
             state.decor = [];
             const rand = createSeededRandom(90210 + secretId * 77);
@@ -582,6 +764,7 @@
                     y: 140 + Math.random() * 320,
                     r: secret.enemy.r,
                     hp: secret.enemy.hp,
+                    maxHp: secret.enemy.hp,
                     speed: secret.enemy.speed,
                     damage: secret.enemy.damage,
                     wanderT: 0,
@@ -589,7 +772,11 @@
                     vy: 0,
                     boss: isMiniBoss,
                     miniBoss: true,
-                    kind: isMiniBoss ? 'devil-boss' : 'devil-witch'
+                    kind: isMiniBoss ? 'devil-boss' : 'devil-witch',
+                    role: isMiniBoss ? 'boss' : 'mage',
+                    ranged: !isMiniBoss,
+                    shootCd: isMiniBoss ? 70 : 60,
+                    dashCd: isMiniBoss ? 115 : 999
                 });
             }
 
@@ -642,7 +829,7 @@
             if (dash && (dx !== 0 || dy !== 0)) {
                 state.player.stamina = Math.max(0, state.player.stamina - 0.9);
             } else {
-                state.player.stamina = Math.min(100, state.player.stamina + 0.35);
+                state.player.stamina = Math.min(state.player.maxStamina, state.player.stamina + 0.35);
             }
 
             let blocked = false;
@@ -656,6 +843,44 @@
             }
         }
 
+        function updateHazardsAndInteractives() {
+            if (!state.running || state.quizOpen) return;
+
+            if (state.player.trapCd > 0) state.player.trapCd -= 1;
+
+            for (const trap of state.traps) {
+                const d = Math.hypot(state.player.x - trap.x, state.player.y - trap.y);
+                if (d < state.player.r + trap.r - 2 && state.player.trapCd <= 0) {
+                    const raw = trap.damage;
+                    const dmg = Math.max(1, raw - (state.player.flatDamageReduction || 0));
+                    state.hp = Math.max(0, state.hp - dmg);
+                    state.player.trapCd = 24;
+                    spawnParticles(state.player.x, state.player.y, trap.type === 'lava' ? '#ff9b6f' : '#d8d8d8', 8, 2);
+                    showMessage(`${trap.type === 'lava' ? 'Лава' : 'Шипы'}: -${dmg} HP`, 50);
+                    if (state.hp <= 0) {
+                        gameOver(false);
+                        return;
+                    }
+                }
+            }
+
+            for (const obj of state.interactives) {
+                if (obj.used) continue;
+                const d = Math.hypot(state.player.x - obj.x, state.player.y - obj.y);
+                if (d < state.player.r + obj.r + 4 && isDown('interact')) {
+                    if (obj.type === 'fountain') {
+                        state.hp = Math.min(state.player.maxHp, state.hp + 26);
+                        state.player.stamina = Math.min(state.player.maxStamina, state.player.stamina + 22);
+                        showMessage('⛲ Фонтан восстановил силы (+HP/+Stamina)', 100);
+                    } else if (obj.type === 'vines') {
+                        state.enemies.forEach(e => { e.speed = Math.max(0.9, e.speed * 0.8); });
+                        showMessage('🌿 Лианы замедлили врагов', 100);
+                    }
+                    obj.used = true;
+                }
+            }
+        }
+
         function updateEnemies() {
             const survivors = [];
             for (const e of state.enemies) {
@@ -663,16 +888,98 @@
                 const dy = state.player.y - e.y;
                 const d = Math.hypot(dx, dy);
 
-                if (d < 260) {
-                    e.vx = (dx / (d || 1)) * e.speed;
-                    e.vy = (dy / (d || 1)) * e.speed;
+                if (e.role === 'mage') {
+                    const desired = d < 180 ? -1 : (d > 260 ? 1 : 0.25);
+                    e.vx = (dx / (d || 1)) * e.speed * desired;
+                    e.vy = (dy / (d || 1)) * e.speed * desired;
+
+                    e.shootCd -= 1;
+                    if (d < 360 && e.shootCd <= 0) {
+                        const spd = 4.2;
+                        state.enemyProjectiles.push({
+                            x: e.x,
+                            y: e.y,
+                            vx: (dx / (d || 1)) * spd,
+                            vy: (dy / (d || 1)) * spd,
+                            life: 100,
+                            r: 6,
+                            dmg: e.damage + 2,
+                            color: '#bb88ff'
+                        });
+                        e.shootCd = 58;
+                    }
+                } else if (e.role === 'runner') {
+                    if (d < 320) {
+                        e.vx = (dx / (d || 1)) * e.speed * 1.2;
+                        e.vy = (dy / (d || 1)) * e.speed * 1.2;
+                    } else {
+                        e.wanderT -= 1;
+                        if (e.wanderT <= 0) {
+                            const ang = Math.random() * Math.PI * 2;
+                            e.vx = Math.cos(ang) * e.speed;
+                            e.vy = Math.sin(ang) * e.speed;
+                            e.wanderT = 28 + Math.random() * 40;
+                        }
+                    }
+                } else if (e.role === 'boss') {
+                    if (d < 420) {
+                        e.vx = (dx / (d || 1)) * e.speed;
+                        e.vy = (dy / (d || 1)) * e.speed;
+                    }
+
+                    e.shootCd -= 1;
+                    if (d < 450 && e.shootCd <= 0) {
+                        if (e.bossVariant === 'archmage') {
+                            for (let i = 0; i < 8; i++) {
+                                const ang = (Math.PI * 2 / 8) * i;
+                                state.enemyProjectiles.push({
+                                    x: e.x,
+                                    y: e.y,
+                                    vx: Math.cos(ang) * 4.2,
+                                    vy: Math.sin(ang) * 4.2,
+                                    life: 105,
+                                    r: 6,
+                                    dmg: e.damage + 3,
+                                    color: '#b58bff'
+                                });
+                            }
+                            e.shootCd = 90;
+                        } else {
+                            for (let i = -1; i <= 1; i++) {
+                                const ang = Math.atan2(dy, dx) + i * 0.25;
+                                state.enemyProjectiles.push({
+                                    x: e.x,
+                                    y: e.y,
+                                    vx: Math.cos(ang) * (e.bossVariant === 'warlord' ? 5.4 : 4.9),
+                                    vy: Math.sin(ang) * (e.bossVariant === 'warlord' ? 5.4 : 4.9),
+                                    life: 120,
+                                    r: 7,
+                                    dmg: e.damage + 4,
+                                    color: e.bossVariant === 'warlord' ? '#ff9a7b' : '#ff7ba0'
+                                });
+                            }
+                            e.shootCd = 75;
+                        }
+                    }
+
+                    e.dashCd -= 1;
+                    if (d < 220 && e.dashCd <= 0) {
+                        e.vx = (dx / (d || 1)) * (e.speed * 3.2);
+                        e.vy = (dy / (d || 1)) * (e.speed * 3.2);
+                        e.dashCd = 130;
+                    }
                 } else {
-                    e.wanderT -= 1;
-                    if (e.wanderT <= 0) {
-                        const ang = Math.random() * Math.PI * 2;
-                        e.vx = Math.cos(ang) * e.speed * 0.7;
-                        e.vy = Math.sin(ang) * e.speed * 0.7;
-                        e.wanderT = 40 + Math.random() * 70;
+                    if (d < 280) {
+                        e.vx = (dx / (d || 1)) * e.speed;
+                        e.vy = (dy / (d || 1)) * e.speed;
+                    } else {
+                        e.wanderT -= 1;
+                        if (e.wanderT <= 0) {
+                            const ang = Math.random() * Math.PI * 2;
+                            e.vx = Math.cos(ang) * e.speed * 0.7;
+                            e.vy = Math.sin(ang) * e.speed * 0.7;
+                            e.wanderT = 40 + Math.random() * 70;
+                        }
                     }
                 }
 
@@ -686,7 +993,8 @@
 
                 const hitDist = state.player.r + e.r + 2;
                 if (Math.hypot(state.player.x - e.x, state.player.y - e.y) < hitDist && state.player.hitCd <= 0) {
-                    state.hp -= e.damage;
+                    const dmg = Math.max(1, e.damage - (state.player.flatDamageReduction || 0));
+                    state.hp -= dmg;
                     state.player.hitCd = 30;
                     spawnParticles(state.player.x, state.player.y, '#ff9e9e', 10, 2.6);
                     if (state.hp <= 0) {
@@ -702,13 +1010,48 @@
                         x: e.x,
                         y: e.y,
                         r: 8,
-                        type: Math.random() < 0.25 ? 'heal' : 'xp',
-                        value: e.boss ? 50 : 20
+                        type: Math.random() < 0.22 ? 'heal' : (Math.random() < 0.45 ? 'shard' : 'xp'),
+                        value: e.boss ? 50 : (e.role === 'runner' ? 16 : (e.role === 'mage' ? 24 : 20))
                     });
                 }
             }
 
             state.enemies = survivors;
+        }
+
+        function updateEnemyProjectiles() {
+            const next = [];
+            for (const p of state.enemyProjectiles) {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 1;
+
+                let dead = false;
+                for (const w of state.walls) {
+                    if (collidesCircleRect(p.x, p.y, p.r, w)) {
+                        dead = true;
+                        break;
+                    }
+                }
+
+                if (!dead) {
+                    const d = Math.hypot(state.player.x - p.x, state.player.y - p.y);
+                    if (d < state.player.r + p.r && state.player.hitCd <= 0) {
+                        const dmg = Math.max(1, p.dmg - (state.player.flatDamageReduction || 0));
+                        state.hp = Math.max(0, state.hp - dmg);
+                        state.player.hitCd = 22;
+                        spawnParticles(state.player.x, state.player.y, '#ff9ed8', 8, 2.2);
+                        dead = true;
+                        if (state.hp <= 0) {
+                            gameOver(false);
+                            return;
+                        }
+                    }
+                }
+
+                if (!dead && p.life > 0) next.push(p);
+            }
+            state.enemyProjectiles = next;
         }
 
         function updateLoot() {
@@ -717,8 +1060,13 @@
                 const d = Math.hypot(state.player.x - l.x, state.player.y - l.y);
                 if (d < state.player.r + l.r + 3) {
                     if (l.type === 'heal') {
-                        state.hp = Math.min(100, state.hp + 12);
+                        state.hp = Math.min(state.player.maxHp, state.hp + 12);
                         showMessage('+12 HP');
+                    } else if (l.type === 'shard') {
+                        const gain = Math.max(1, Math.round(l.value / 10));
+                        state.shards += gain;
+                        showMessage(`+${gain} оск.`);
+                        updateSecretQuestProgress();
                     } else {
                         state.xp += l.value;
                         localStorage.setItem('dungeonXP', state.xp);
@@ -740,7 +1088,7 @@
             for (const e of state.enemies) {
                 const d = Math.hypot(ax - e.x, ay - e.y);
                 if (d < e.r + 36) {
-                    e.hp -= 30;
+                    e.hp -= state.player.attackDamage;
                     spawnParticles(e.x, e.y, '#ffd36f', 7, 2.2);
                 }
             }
@@ -761,7 +1109,7 @@
                 vy: state.player.facingY * spd,
                 life: 48,
                 r: 8,
-                dmg: 45
+                dmg: state.player.specialDamage
             });
             spawnParticles(state.player.x, state.player.y, '#8fd8ff', 16, 3);
             showMessage('⚡ Руна-удар!', 60);
@@ -921,6 +1269,52 @@
             ctx.restore();
         }
 
+        function renderMerchantItems() {
+            const host = document.getElementById('merchantItems');
+            host.innerHTML = '';
+
+            MERCHANT_ITEMS.forEach(item => {
+                const owned = state.artifacts.includes(item.id);
+                const btn = document.createElement('button');
+                btn.className = 'answer';
+                btn.disabled = owned;
+                btn.textContent = `${item.title} • ${item.cost} оск. — ${item.desc}${owned ? ' (Куплено)' : ''}`;
+                btn.onclick = () => buyMerchantItem(item.id);
+                host.appendChild(btn);
+            });
+            document.getElementById('merchantBalance').textContent = `Осколки: ${state.shards}`;
+        }
+
+        function openMerchant() {
+            state.quizOpen = true;
+            renderMerchantItems();
+            document.getElementById('merchantOverlay').style.display = 'flex';
+        }
+
+        function closeMerchant() {
+            document.getElementById('merchantOverlay').style.display = 'none';
+            state.quizOpen = false;
+        }
+
+        function buyMerchantItem(itemId) {
+            const item = MERCHANT_ITEMS.find(i => i.id === itemId);
+            if (!item) return;
+            if (state.artifacts.includes(item.id)) {
+                showMessage('Этот артефакт уже куплен', 70);
+                return;
+            }
+            if (state.shards < item.cost) {
+                showMessage('Недостаточно осколков', 70);
+                return;
+            }
+
+            state.shards -= item.cost;
+            state.artifacts.push(item.id);
+            item.apply();
+            renderMerchantItems();
+            showMessage(`🧿 Получен артефакт: ${item.title}`, 130);
+        }
+
         function tryInteract() {
             if (!state.running || state.quizOpen) return;
 
@@ -938,6 +1332,15 @@
                 const dPortal = Math.hypot(state.player.x - state.secretPortal.x, state.player.y - state.secretPortal.y);
                 if (dPortal < state.secretPortal.r + 28) {
                     buildSecretRoom(state.secretPortal.secretId, state.roomIndex + 1);
+                    return;
+                }
+            }
+
+            if (state.merchant) {
+                const dMerchant = Math.hypot(state.player.x - state.merchant.x, state.player.y - state.merchant.y);
+                if (dMerchant < state.merchant.r + 26) {
+                    state.merchantVisitedRooms[state.roomIndex] = true;
+                    openMerchant();
                     return;
                 }
             }
@@ -988,10 +1391,13 @@
             if (index === q.answerIndex) {
                 t.solved = true;
                 const gain = state.inSecretRoom ? 60 : 40;
+                const shardGain = 2 + state.player.shardBonus + (state.inSecretRoom ? 1 : 0);
                 state.xp += gain;
+                state.shards += shardGain;
                 localStorage.setItem('dungeonXP', state.xp);
                 void syncDungeonToServer();
-                hint.textContent = '✅ Верно! ' + q.tip + ` (+${gain} XP)`;
+                updateSecretQuestProgress();
+                hint.textContent = '✅ Верно! ' + q.tip + ` (+${gain} XP, +${shardGain} оск.)`;
             } else {
                 state.hp = Math.max(0, state.hp - 12);
                 hint.textContent = '❌ Не совсем. ' + q.tip + ' (-12 HP)';
@@ -1031,6 +1437,7 @@
                     localStorage.setItem('dungeonXP', state.xp);
                     void syncDungeonToServer();
                     showMessage(`🗝️ Секрет зачищен! +${secret.reward} XP`, 170);
+                    updateSecretQuestProgress();
                 }
             }
         }
@@ -1069,6 +1476,35 @@
             ctx.fillStyle = state.door.open ? '#ffd700' : '#4a4a4a';
             ctx.fillRect(state.door.x, state.door.y, state.door.w, state.door.h);
 
+            // Ловушки
+            for (const trap of state.traps) {
+                ctx.beginPath();
+                ctx.fillStyle = trap.type === 'lava' ? 'rgba(255,120,60,0.42)' : 'rgba(210,210,210,0.28)';
+                ctx.arc(trap.x, trap.y, trap.r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = trap.type === 'lava' ? '#ff9b70' : '#d6d6d6';
+                ctx.stroke();
+            }
+
+            // Интерактивы
+            for (const obj of state.interactives) {
+                if (obj.type === 'fountain') {
+                    ctx.beginPath();
+                    ctx.fillStyle = obj.used ? 'rgba(120,160,180,0.35)' : 'rgba(110,220,255,0.4)';
+                    ctx.arc(obj.x, obj.y, obj.r, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = obj.used ? '#6d94a8' : '#7ae8ff';
+                    ctx.stroke();
+                } else if (obj.type === 'vines') {
+                    ctx.beginPath();
+                    ctx.fillStyle = obj.used ? 'rgba(80,130,90,0.3)' : 'rgba(95,200,120,0.4)';
+                    ctx.arc(obj.x, obj.y, obj.r, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = obj.used ? '#4f8659' : '#81f0a4';
+                    ctx.stroke();
+                }
+            }
+
             // Секретный портал
             if (state.secretPortal) {
                 const p = state.secretPortal;
@@ -1089,7 +1525,7 @@
             // Лут
             for (const l of state.loots) {
                 ctx.beginPath();
-                ctx.fillStyle = l.type === 'heal' ? '#56e58a' : '#ffe28a';
+                ctx.fillStyle = l.type === 'heal' ? '#56e58a' : (l.type === 'shard' ? '#9bd7ff' : '#ffe28a');
                 ctx.arc(l.x, l.y, l.r, 0, Math.PI * 2);
                 ctx.fill();
             }
@@ -1104,6 +1540,29 @@
                 ctx.stroke();
             }
 
+            // Снаряды врагов
+            for (const p of state.enemyProjectiles) {
+                ctx.beginPath();
+                ctx.fillStyle = p.color || '#ff9bd2';
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+                ctx.stroke();
+            }
+
+            // Торговец
+            if (state.merchant) {
+                ctx.beginPath();
+                ctx.fillStyle = '#cda8ff';
+                ctx.arc(state.merchant.x, state.merchant.y, state.merchant.r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#f0dcff';
+                ctx.stroke();
+                ctx.fillStyle = '#f7edff';
+                ctx.font = '13px Montserrat';
+                ctx.fillText('🧙', state.merchant.x - 8, state.merchant.y + 4);
+            }
+
             // Враги
             for (const e of state.enemies) {
                 // Текстурка "черта" (спрайт + рога)
@@ -1112,8 +1571,11 @@
                     const size = e.boss ? 80 : 44;
                     ctx.drawImage(img, e.x - size / 2, e.y - size / 2, size, size);
                     // красная аура черта
+                    const roleAura = e.role === 'mage'
+                        ? 'rgba(180,120,255,0.78)'
+                        : (e.role === 'runner' ? 'rgba(120,255,180,0.76)' : 'rgba(255,120,90,0.7)');
                     ctx.beginPath();
-                    ctx.strokeStyle = e.boss ? 'rgba(255,80,120,0.8)' : 'rgba(255,120,90,0.7)';
+                    ctx.strokeStyle = e.boss ? 'rgba(255,80,120,0.85)' : roleAura;
                     ctx.arc(e.x, e.y, e.r + 4, 0, Math.PI * 2);
                     ctx.stroke();
                 } else {
@@ -1138,9 +1600,9 @@
 
                 // HP бар
                 const bw = e.boss ? 70 : 34;
-                const max = e.miniBoss
+                const max = e.maxHp || (e.miniBoss
                     ? (state.secretRooms[state.secretRoomId]?.enemy?.hp || 220)
-                    : (e.boss ? 300 : (44 + state.roomIndex * 18));
+                    : (e.boss ? 300 : (44 + state.roomIndex * 18)));
                 const p = Math.max(0, e.hp / max);
                 ctx.fillStyle = 'rgba(0,0,0,0.5)';
                 ctx.fillRect(e.x - bw / 2, e.y - e.r - 12, bw, 6);
@@ -1196,6 +1658,23 @@
                     ctx.fillText('E: Войти в секретный рифт', state.secretPortal.x - 88, state.secretPortal.y - 36);
                 }
             }
+            if (state.merchant) {
+                const d = Math.hypot(state.player.x - state.merchant.x, state.player.y - state.merchant.y);
+                if (d < 72) {
+                    ctx.fillStyle = '#f1d2ff';
+                    ctx.font = '14px Montserrat';
+                    ctx.fillText('E: Лавка артефактов', state.merchant.x - 72, state.merchant.y - 28);
+                }
+            }
+            for (const obj of state.interactives) {
+                if (obj.used) continue;
+                const d = Math.hypot(state.player.x - obj.x, state.player.y - obj.y);
+                if (d < 72) {
+                    ctx.fillStyle = '#b8f4ff';
+                    ctx.font = '14px Montserrat';
+                    ctx.fillText(obj.type === 'fountain' ? 'E: Испить фонтан' : 'E: Активировать лианы', obj.x - 74, obj.y - 24);
+                }
+            }
 
             // Сообщение по центру
             if (state.messageT > 0 && state.message) {
@@ -1224,9 +1703,10 @@
         }
 
         function updateHud() {
-            document.getElementById('hp').textContent = state.hp;
+            document.getElementById('hp').textContent = `${state.hp}/${state.player.maxHp}`;
             document.getElementById('xp').textContent = state.xp;
-            document.getElementById('stamina').textContent = Math.round(state.player.stamina);
+            document.getElementById('shards').textContent = state.shards;
+            document.getElementById('stamina').textContent = `${Math.round(state.player.stamina)}/${state.player.maxStamina}`;
             document.getElementById('room').textContent = state.inSecretRoom
                 ? `S${(state.secretRoomId || 0) + 1}`
                 : (state.roomIndex + 1);
@@ -1234,8 +1714,11 @@
             document.getElementById('term').textContent = `${state.terminals.filter(t => t.solved).length}/${state.terminals.length}`;
             document.getElementById('enemy').textContent = state.enemies.length;
             document.getElementById('secretCount').textContent = state.secretsFound;
+            document.getElementById('artifactCount').textContent = state.artifacts.length;
             if (state.inSecretRoom) {
                 document.getElementById('objective').textContent = state.door.open ? 'Вернись в маршрут' : 'Закрой рифт';
+            } else if (state.merchant) {
+                document.getElementById('objective').textContent = 'Торговец рядом';
             } else if (state.secretPortal?.active) {
                 document.getElementById('objective').textContent = 'Секретный рифт найден';
             } else {
@@ -1246,9 +1729,11 @@
         function gameLoop() {
             if (state.running) {
                 movePlayer();
+                updateHazardsAndInteractives();
                 updateEnemies();
                 updateLoot();
                 updateProjectiles();
+                updateEnemyProjectiles();
                 updateParticles();
                 updateDoorState();
                 if (state.player.attackCd > 0) state.player.attackCd -= 1;
@@ -1262,6 +1747,9 @@
 
         function gameOver(victory) {
             state.running = false;
+            document.getElementById('quizOverlay').style.display = 'none';
+            document.getElementById('merchantOverlay').style.display = 'none';
+            state.quizOpen = false;
             const overlay = document.getElementById('resultOverlay');
             const title = document.getElementById('resultTitle');
             const text = document.getElementById('resultText');
@@ -1290,7 +1778,17 @@
         function restartRun() {
             document.getElementById('resultOverlay').style.display = 'none';
             state.hp = 100;
+            state.player.maxHp = 100;
+            state.player.maxStamina = 100;
             state.player.stamina = 100;
+            state.player.speed = 3.1;
+            state.player.attackDamage = 30;
+            state.player.specialDamage = 45;
+            state.player.shardBonus = 0;
+            state.player.flatDamageReduction = 0;
+            state.shards = 0;
+            state.artifacts = [];
+            state.merchantVisitedRooms = {};
             state.running = true;
             state.questionQueue = buildDungeonQuestionQueue(36);
             state.qIndex = 0;
@@ -1300,6 +1798,9 @@
             state.secretRoomId = null;
             state.secretReturnRoom = null;
             state.secretPortal = null;
+            state.traps = [];
+            state.interactives = [];
+            state.enemyProjectiles = [];
             buildRoom(0);
         }
 
@@ -1311,12 +1812,17 @@
 
         window.restartRun = restartRun;
         window.startDungeon = startDungeon;
+        window.closeMerchant = closeMerchant;
 
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space') doAttack();
             if (e.code === 'KeyF' || (e.key || '').toLowerCase() === 'а') doSpecialAttack();
             if (e.code === 'KeyE' || (e.key || '').toLowerCase() === 'e' || (e.key || '').toLowerCase() === 'у') tryInteract();
-            if (e.key === 'Escape' && state.quizOpen) closeQuiz();
+            if (e.key === 'Escape' && document.getElementById('merchantOverlay').style.display === 'flex') {
+                closeMerchant();
+                return;
+            }
+            if (e.key === 'Escape' && document.getElementById('quizOverlay').style.display === 'flex') closeQuiz();
         });
 
         async function initPage() {
