@@ -132,7 +132,7 @@
             <div class="chip">🪙 XP: <span id="xp">0</span></div>
             <div class="chip">💠 Осколки: <span id="shards">0</span></div>
             <div class="chip">⚡ Stamina: <span id="stamina">100</span></div>
-            <div class="chip">🏰 Комната: <span id="room">1</span>/<span id="roomTotal">12</span></div>
+            <div class="chip">🏰 Комната: <span id="room">1</span>/<span id="roomTotal">16</span></div>
             <div class="chip">🧰 Сундуки: <span id="term">0</span></div>
             <div class="chip">⚔️ Враги: <span id="enemy">0</span></div>
             <div class="chip">🕳️ Секреты: <span id="secretCount">0</span>/3</div>
@@ -149,7 +149,7 @@
     <canvas id="game" width="1100" height="620"></canvas>
 
     <div class="controls">
-        <b>Управление:</b> WASD / стрелки / ЦФЫВ — движение, Space — атака, F — спец-удар, Shift — рывок, E (У) — сундук/дверь/тайный портал.<br>
+        <b>Управление:</b> WASD / стрелки / ЦФЫВ — движение, Space — атака, F — спец-удар, C (С) — прыжок, Shift — рывок, E (У) — сундук/дверь/тайный портал.<br>
         Смысл игры: в каждой комнате у тебя <b>контракт фрилансера</b>. Зачищаешь врагов, проходишь учебные терминалы, получаешь XP для основного плана.
     </div>
 
@@ -303,7 +303,11 @@
                 { title: 'Automation Suite', goal: 'Связка бота с таблицами, уведомлениями и экспортом', reward: 135 },
                 { title: 'QA Gauntlet', goal: 'Тест-кейсы, обработка edge-cases, анти-падения', reward: 145 },
                 { title: 'Deploy Fortress', goal: 'Логи, healthchecks, откат и стабильный uptime', reward: 160 },
-                { title: 'Boss: First Client', goal: 'Итоговый контракт: качество + скорость + понятный результат', reward: 200 }
+                { title: 'Integrations Forge', goal: 'Сшивка API и безопасные вебхуки без потерь', reward: 175 },
+                { title: 'Analytics Vault', goal: 'События, воронки и отчёты по продукту', reward: 190 },
+                { title: 'Growth Engine', goal: 'A/B-гипотезы и рост ключевых метрик', reward: 210 },
+                { title: 'Legend Contract', goal: 'Серия сложных задач под реального заказчика', reward: 230 },
+                { title: 'Boss: First Client', goal: 'Итоговый контракт: качество + скорость + понятный результат', reward: 280 }
             ],
             message: '',
             messageT: 0,
@@ -330,6 +334,10 @@
                 { title: 'Галерея Автоматизации', text: 'Связки между сервисами превращают бота в рабочую систему.' },
                 { title: 'Испытание QA', text: 'Код может работать в демо и падать в бою. Проверки решают.' },
                 { title: 'Цитадель Деплоя', text: 'Стабильность — это дисциплина: мониторинг, rollback и алерты.' },
+                { title: 'Ковчег Интеграций', text: 'Сложные API не прощают хаоса. Нужны контракты и дисциплина данных.' },
+                { title: 'Хранилище Аналитики', text: 'Метрики без интерпретации — просто шум. Здесь важны выводы.' },
+                { title: 'Мотор Роста', text: 'Каждое улучшение должно быть измерено: гипотеза, тест, эффект.' },
+                { title: 'Зал Легенд', text: 'Доход приходит тем, кто выдерживает сложность и держит качество.' },
                 { title: 'Тронный зал Клиента', text: 'Финальная проверка: качество, сроки и ясность. Здесь рождается первый платящий клиент.' }
             ],
             biomes: [
@@ -344,7 +352,11 @@
                 { floorA: '#1c283e', floorB: '#28385e', accent: '#8fb8ff', wall: '#3a4d72', rune: '#d6e6ff' },
                 { floorA: '#1b2f29', floorB: '#2a4a3f', accent: '#7cf5c8', wall: '#3c6659', rune: '#cfffe9' },
                 { floorA: '#321f16', floorB: '#4b2f22', accent: '#ffb07f', wall: '#6a4330', rune: '#ffd6be' },
-                { floorA: '#260f2b', floorB: '#3a1946', accent: '#e089ff', wall: '#5d2b74', rune: '#f2c9ff' }
+                { floorA: '#260f2b', floorB: '#3a1946', accent: '#e089ff', wall: '#5d2b74', rune: '#f2c9ff' },
+                { floorA: '#122533', floorB: '#203d51', accent: '#6bcfff', wall: '#31586c', rune: '#c9ecff' },
+                { floorA: '#25192b', floorB: '#3b2746', accent: '#d39bff', wall: '#56386a', rune: '#efdcff' },
+                { floorA: '#2b2216', floorB: '#453524', accent: '#f8c37f', wall: '#654c33', rune: '#ffe5bf' },
+                { floorA: '#10211d', floorB: '#1f3d34', accent: '#75efb8', wall: '#315a4f', rune: '#d8ffe9' }
             ],
             secretPortalsByRoom: { 2: 0, 5: 1, 8: 2 },
             secretRooms: [
@@ -400,6 +412,10 @@
                 attackCd: 0,
                 hitCd: 0,
                 trapCd: 0,
+                jumpCd: 0,
+                jumpT: 0,
+                jumpVx: 0,
+                jumpVy: 0,
                 attackDamage: 30,
                 specialDamage: 45,
                 shardBonus: 0,
@@ -497,6 +513,7 @@
             if (action === 'interact') return pressed.codes.has('KeyE') || pressed.keys.has('e') || pressed.keys.has('у');
             if (action === 'attack') return pressed.codes.has('Space');
             if (action === 'dash') return pressed.codes.has('ShiftLeft') || pressed.codes.has('ShiftRight');
+            if (action === 'jump') return pressed.codes.has('KeyC') || pressed.keys.has('c') || pressed.keys.has('с');
             return false;
         }
 
@@ -564,7 +581,8 @@
             const base = {
                 swordsman: { hp: 56 + level * 14, speed: 1.45 + level * 0.04, damage: 10 + Math.floor(level / 2), r: 17, kind: 'devil-imp' },
                 mage: { hp: 42 + level * 10, speed: 1.2 + level * 0.03, damage: 8 + Math.floor(level / 3), r: 16, kind: 'devil-witch', ranged: true, shootCd: 55 },
-                runner: { hp: 34 + level * 8, speed: 2.1 + level * 0.06, damage: 7 + Math.floor(level / 4), r: 14, kind: 'devil-imp' }
+                runner: { hp: 34 + level * 8, speed: 2.1 + level * 0.06, damage: 7 + Math.floor(level / 4), r: 14, kind: 'devil-imp' },
+                brute: { hp: 92 + level * 18, speed: 1.05 + level * 0.025, damage: 14 + Math.floor(level / 2), r: 20, kind: 'devil-imp' }
             };
 
             const cfg = base[role] || base.swordsman;
@@ -610,16 +628,19 @@
         }
 
         function makeTrapPack(index, rand) {
-            const count = 2 + Math.floor(index / 3);
+            const count = 3 + Math.floor(index / 3);
             const traps = [];
             for (let i = 0; i < count; i++) {
-                const isLava = i % 2 === 0;
+                const roll = rand();
+                const type = roll < 0.34 ? 'lava' : (roll < 0.67 ? 'spike' : (roll < 0.85 ? 'pit' : 'poison'));
                 traps.push({
                     x: 180 + rand() * 760,
                     y: 110 + rand() * 390,
-                    r: isLava ? 20 + rand() * 12 : 16 + rand() * 10,
-                    type: isLava ? 'lava' : 'spike',
-                    damage: isLava ? 7 + Math.floor(index / 4) : 5 + Math.floor(index / 5)
+                    r: type === 'pit' ? 28 + rand() * 14 : (type === 'lava' ? 20 + rand() * 12 : 16 + rand() * 10),
+                    type,
+                    damage: type === 'lava'
+                        ? 7 + Math.floor(index / 4)
+                        : (type === 'pit' ? 13 + Math.floor(index / 3) : (type === 'poison' ? 6 + Math.floor(index / 5) : 5 + Math.floor(index / 5)))
                 });
             }
             return traps;
@@ -677,7 +698,7 @@
                 }
 
                 const roll = Math.random();
-                const role = roll < 0.45 ? 'swordsman' : (roll < 0.72 ? 'mage' : 'runner');
+                const role = roll < 0.36 ? 'swordsman' : (roll < 0.62 ? 'mage' : (roll < 0.84 ? 'runner' : 'brute'));
                 state.enemies.push(spawnEnemyByRole(role, index));
             }
 
@@ -798,6 +819,25 @@
             showMessage('🕳️ Найден секретный проход! Закрой рифт и вернись в маршрут.', 180);
         }
 
+        function doJump() {
+            if (!state.running || state.quizOpen) return;
+            if (state.player.jumpCd > 0 || state.player.jumpT > 0) return;
+            if (state.player.stamina < 18) {
+                showMessage('Недостаточно stamina для прыжка', 45);
+                return;
+            }
+
+            const fx = state.player.facingX || 1;
+            const fy = state.player.facingY || 0;
+            state.player.stamina = Math.max(0, state.player.stamina - 18);
+            state.player.jumpT = 13;
+            state.player.jumpCd = 50;
+            state.player.jumpVx = fx * (state.player.speed * 3.0);
+            state.player.jumpVy = fy * (state.player.speed * 3.0);
+            spawnParticles(state.player.x, state.player.y, '#9fd8ff', 14, 2.8);
+            showMessage('🪽 Прыжок!', 32);
+        }
+
         function collidesCircleRect(cx, cy, r, rw) {
             const tx = Math.max(rw.x, Math.min(cx, rw.x + rw.w));
             const ty = Math.max(rw.y, Math.min(cy, rw.y + rw.h));
@@ -808,6 +848,23 @@
 
         function movePlayer() {
             if (!state.running || state.quizOpen) return;
+
+            if (state.player.jumpCd > 0) state.player.jumpCd -= 1;
+            if (state.player.jumpT > 0) {
+                const nx = state.player.x + state.player.jumpVx;
+                const ny = state.player.y + state.player.jumpVy;
+                let blocked = false;
+                for (const w of state.walls) {
+                    if (collidesCircleRect(nx, ny, state.player.r, w)) { blocked = true; break; }
+                }
+                if (!blocked) {
+                    state.player.x = nx;
+                    state.player.y = ny;
+                }
+                state.player.jumpT -= 1;
+                return;
+            }
+
             let dx = 0, dy = 0;
             if (isDown('up')) dy -= 1;
             if (isDown('down')) dy += 1;
@@ -849,14 +906,23 @@
             if (state.player.trapCd > 0) state.player.trapCd -= 1;
 
             for (const trap of state.traps) {
+                if (state.player.jumpT > 0) continue;
                 const d = Math.hypot(state.player.x - trap.x, state.player.y - trap.y);
                 if (d < state.player.r + trap.r - 2 && state.player.trapCd <= 0) {
                     const raw = trap.damage;
                     const dmg = Math.max(1, raw - (state.player.flatDamageReduction || 0));
                     state.hp = Math.max(0, state.hp - dmg);
-                    state.player.trapCd = 24;
-                    spawnParticles(state.player.x, state.player.y, trap.type === 'lava' ? '#ff9b6f' : '#d8d8d8', 8, 2);
-                    showMessage(`${trap.type === 'lava' ? 'Лава' : 'Шипы'}: -${dmg} HP`, 50);
+                    state.player.trapCd = trap.type === 'poison' ? 18 : 24;
+                    if (trap.type === 'pit') {
+                        const backX = (state.player.facingX || 0.8) * -14;
+                        const backY = (state.player.facingY || 0.2) * -14;
+                        state.player.x = Math.min(1048, Math.max(52, state.player.x + backX));
+                        state.player.y = Math.min(568, Math.max(52, state.player.y + backY));
+                    }
+                    const trapLabel = trap.type === 'lava' ? 'Лава' : (trap.type === 'pit' ? 'Яма с шипами' : (trap.type === 'poison' ? 'Ядовитая лужа' : 'Шипы'));
+                    const trapColor = trap.type === 'lava' ? '#ff9b6f' : (trap.type === 'pit' ? '#8e8e8e' : (trap.type === 'poison' ? '#89ff9f' : '#d8d8d8'));
+                    spawnParticles(state.player.x, state.player.y, trapColor, 8, 2);
+                    showMessage(`${trapLabel}: -${dmg} HP`, 50);
                     if (state.hp <= 0) {
                         gameOver(false);
                         return;
@@ -919,6 +985,19 @@
                             e.vx = Math.cos(ang) * e.speed;
                             e.vy = Math.sin(ang) * e.speed;
                             e.wanderT = 28 + Math.random() * 40;
+                        }
+                    }
+                } else if (e.role === 'brute') {
+                    if (d < 290) {
+                        e.vx = (dx / (d || 1)) * e.speed * 0.92;
+                        e.vy = (dy / (d || 1)) * e.speed * 0.92;
+                    } else {
+                        e.wanderT -= 1;
+                        if (e.wanderT <= 0) {
+                            const ang = Math.random() * Math.PI * 2;
+                            e.vx = Math.cos(ang) * e.speed * 0.6;
+                            e.vy = Math.sin(ang) * e.speed * 0.6;
+                            e.wanderT = 38 + Math.random() * 55;
                         }
                     }
                 } else if (e.role === 'boss') {
@@ -1220,9 +1299,10 @@
             const y = state.player.y;
             const ang = Math.atan2(state.player.facingY, state.player.facingX);
             const hitAlpha = state.player.hitCd > 0 ? 0.78 : 1;
+            const jumpLift = state.player.jumpT > 0 ? 6 : 0;
 
             ctx.save();
-            ctx.translate(x, y);
+            ctx.translate(x, y - jumpLift);
             ctx.rotate(ang + Math.PI / 2);
             ctx.globalAlpha = hitAlpha;
 
@@ -1264,6 +1344,13 @@
             ctx.fillRect(8, -2, 3, 14);
             ctx.fillStyle = '#a7f1ff';
             ctx.fillRect(9, -16, 2, 14);
+
+            if (state.player.jumpT > 0) {
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(173, 220, 255, 0.8)';
+                ctx.arc(0, 0, 20, 0, Math.PI * 2);
+                ctx.stroke();
+            }
 
             ctx.globalAlpha = 1;
             ctx.restore();
@@ -1478,12 +1565,32 @@
 
             // Ловушки
             for (const trap of state.traps) {
-                ctx.beginPath();
-                ctx.fillStyle = trap.type === 'lava' ? 'rgba(255,120,60,0.42)' : 'rgba(210,210,210,0.28)';
-                ctx.arc(trap.x, trap.y, trap.r, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = trap.type === 'lava' ? '#ff9b70' : '#d6d6d6';
-                ctx.stroke();
+                if (trap.type === 'pit') {
+                    ctx.beginPath();
+                    ctx.fillStyle = 'rgba(20,20,24,0.85)';
+                    ctx.arc(trap.x, trap.y, trap.r, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#979797';
+                    ctx.stroke();
+                    for (let i = 0; i < 6; i++) {
+                        const ang = (Math.PI * 2 / 6) * i;
+                        const sx = trap.x + Math.cos(ang) * (trap.r - 4);
+                        const sy = trap.y + Math.sin(ang) * (trap.r - 4);
+                        ctx.fillStyle = '#b7b7b7';
+                        ctx.fillRect(sx - 2, sy - 2, 4, 4);
+                    }
+                } else {
+                    ctx.beginPath();
+                    ctx.fillStyle = trap.type === 'lava'
+                        ? 'rgba(255,120,60,0.42)'
+                        : (trap.type === 'poison' ? 'rgba(120,255,160,0.28)' : 'rgba(210,210,210,0.28)');
+                    ctx.arc(trap.x, trap.y, trap.r, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = trap.type === 'lava'
+                        ? '#ff9b70'
+                        : (trap.type === 'poison' ? '#93ffb5' : '#d6d6d6');
+                    ctx.stroke();
+                }
             }
 
             // Интерактивы
@@ -1573,7 +1680,9 @@
                     // красная аура черта
                     const roleAura = e.role === 'mage'
                         ? 'rgba(180,120,255,0.78)'
-                        : (e.role === 'runner' ? 'rgba(120,255,180,0.76)' : 'rgba(255,120,90,0.7)');
+                        : (e.role === 'runner'
+                            ? 'rgba(120,255,180,0.76)'
+                            : (e.role === 'brute' ? 'rgba(255,190,120,0.78)' : 'rgba(255,120,90,0.7)'));
                     ctx.beginPath();
                     ctx.strokeStyle = e.boss ? 'rgba(255,80,120,0.85)' : roleAura;
                     ctx.arc(e.x, e.y, e.r + 4, 0, Math.PI * 2);
@@ -1786,6 +1895,10 @@
             state.player.specialDamage = 45;
             state.player.shardBonus = 0;
             state.player.flatDamageReduction = 0;
+            state.player.jumpCd = 0;
+            state.player.jumpT = 0;
+            state.player.jumpVx = 0;
+            state.player.jumpVy = 0;
             state.shards = 0;
             state.artifacts = [];
             state.merchantVisitedRooms = {};
@@ -1817,6 +1930,7 @@
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space') doAttack();
             if (e.code === 'KeyF' || (e.key || '').toLowerCase() === 'а') doSpecialAttack();
+            if (e.code === 'KeyC' || (e.key || '').toLowerCase() === 'c' || (e.key || '').toLowerCase() === 'с') doJump();
             if (e.code === 'KeyE' || (e.key || '').toLowerCase() === 'e' || (e.key || '').toLowerCase() === 'у') tryInteract();
             if (e.key === 'Escape' && document.getElementById('merchantOverlay').style.display === 'flex') {
                 closeMerchant();
