@@ -334,19 +334,23 @@
         }
 
         async function hydrateDungeonFromServer() {
+            const localDungeonXP = parseInt(localStorage.getItem('dungeonXP') || '0') || 0;
+            const localMainPoints = parseInt(localStorage.getItem('points') || '0') || 0;
+            const localBestRoom = parseInt(localStorage.getItem('dungeonBestRoom') || '0') || 0;
+
             const [mainState, dungeonState] = await Promise.all([
                 apiRequest('/state/main_tracker'),
                 apiRequest('/state/code_dungeon')
             ]);
 
-            let xpFromServer = 0;
+            let mainPointsFromServer = 0;
+            let dungeonXpFromServer = 0;
             let bestRoomFromServer = 0;
 
             if (mainState?.value && typeof mainState.value === 'object') {
                 const incoming = mainState.value;
                 if (typeof incoming.points === 'number') {
-                    localStorage.setItem('points', String(incoming.points));
-                    xpFromServer = Math.max(xpFromServer, incoming.points);
+                    mainPointsFromServer = Math.max(0, Math.floor(incoming.points));
                 }
                 if (typeof incoming.level === 'number') localStorage.setItem('level', String(incoming.level));
             }
@@ -354,25 +358,47 @@
             if (dungeonState?.value && typeof dungeonState.value === 'object') {
                 const incoming = dungeonState.value;
                 if (typeof incoming.xp === 'number') {
-                    localStorage.setItem('dungeonXP', String(incoming.xp));
-                    xpFromServer = Math.max(xpFromServer, incoming.xp);
+                    dungeonXpFromServer = Math.max(0, Math.floor(incoming.xp));
                 }
                 if (typeof incoming.bestRoom === 'number') {
-                    localStorage.setItem('dungeonBestRoom', String(incoming.bestRoom));
-                    bestRoomFromServer = incoming.bestRoom;
+                    bestRoomFromServer = Math.max(0, Math.floor(incoming.bestRoom));
                 }
             }
 
-            // Синхронизируем state с данными с сервера
-            state.xp = xpFromServer || parseInt(localStorage.getItem('dungeonXP') || localStorage.getItem('points') || '0');
+            const mergedPoints = Math.max(localMainPoints, mainPointsFromServer);
+            const mergedDungeonXP = Math.max(localDungeonXP, dungeonXpFromServer, mergedPoints);
+            const mergedBestRoom = Math.max(localBestRoom, bestRoomFromServer);
+
+            localStorage.setItem('points', String(mergedPoints));
+            localStorage.setItem('dungeonXP', String(mergedDungeonXP));
+            localStorage.setItem('dungeonBestRoom', String(mergedBestRoom));
+
+            // Никогда не понижаем прогресс при гидратации
+            state.xp = Math.max(state.xp || 0, mergedDungeonXP);
         }
 
         async function syncDungeonToServer() {
-            const bestRoom = parseInt(localStorage.getItem('dungeonBestRoom') || '0');
+            const localBestRoom = parseInt(localStorage.getItem('dungeonBestRoom') || '0') || 0;
+            const localPoints = parseInt(localStorage.getItem('points') || '0') || 0;
+            const localDungeonXP = parseInt(localStorage.getItem('dungeonXP') || '0') || 0;
+            const candidateXp = Math.max(0, Math.floor(state.xp || 0), localPoints, localDungeonXP);
+
+            const remote = await apiRequest('/state/code_dungeon');
+            const remoteValue = remote?.value && typeof remote.value === 'object' ? remote.value : {};
+            const remoteXp = Math.max(0, Math.floor(Number(remoteValue.xp) || 0));
+            const remoteBestRoom = Math.max(0, Math.floor(Number(remoteValue.bestRoom) || 0));
+
+            const mergedXp = Math.max(candidateXp, remoteXp);
+            const mergedBestRoom = Math.max(localBestRoom, remoteBestRoom);
+
+            state.xp = Math.max(state.xp || 0, mergedXp);
+            localStorage.setItem('dungeonXP', String(mergedXp));
+            localStorage.setItem('dungeonBestRoom', String(mergedBestRoom));
+            localStorage.setItem('points', String(Math.max(localPoints, mergedXp)));
 
             await apiRequest('/state/code_dungeon', {
                 method: 'PUT',
-                body: JSON.stringify({ value: { xp: state.xp, bestRoom } })
+                body: JSON.stringify({ value: { xp: mergedXp, bestRoom: mergedBestRoom } })
             });
         }
 
@@ -389,7 +415,8 @@
         setInterval(() => {
             if (state.running && state.xp > 0) {
                 localStorage.setItem('dungeonXP', state.xp);
-                localStorage.setItem('dungeonBestRoom', String(state.contracts.length));
+                const safeBest = Math.max(parseInt(localStorage.getItem('dungeonBestRoom') || '0') || 0, state.roomIndex + 1);
+                localStorage.setItem('dungeonBestRoom', String(safeBest));
                 void syncDungeonToServer();
             }
         }, 5000);
