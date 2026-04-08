@@ -11,4 +11,5 @@ class StatePayload(BaseModel):
 
 class StateResponse(BaseModel):
     key: str
+    user_id: str | None = None
     value: dict[str, Any]

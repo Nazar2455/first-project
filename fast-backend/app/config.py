@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 API_PREFIX = "/api"
+DEFAULT_USER_ID = "local"
 
 ALLOWED_KEYS = {
     "main_tracker",

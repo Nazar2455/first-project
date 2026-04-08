@@ -2052,7 +2052,7 @@
             }
         };
 
-        let API_BASE = localStorage.getItem('planApiBase') || '';
+        let API_BASE = localStorage.getItem('planApiBase') || (window.PlanApiClient?.getPlanApiBase?.() || '');
         const API_BASE_FALLBACKS = ['http://127.0.0.1:8001/api', 'http://127.0.0.1:8000/api'];
 
         function getCurrentLanguage() {
@@ -2077,7 +2077,7 @@
 
         async function apiRequest(path, options = {}) {
             if (window.PlanApiClient?.request) {
-                return window.PlanApiClient.request(path, options, API_BASE);
+                return window.PlanApiClient.request(path, options, API_BASE || undefined);
             }
 
             const bases = [API_BASE, ...API_BASE_FALLBACKS].filter(Boolean);

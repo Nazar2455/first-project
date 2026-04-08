@@ -21,23 +21,48 @@ def get_connection() -> sqlite3.Connection:
 
 def init_db() -> None:
     with get_connection() as conn:
+        # legacy schema check: old table had only key/value without user_id
+        row = conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='state_store'"
+        ).fetchone()
+        if row is not None:
+            cols = [r[1] for r in conn.execute("PRAGMA table_info(state_store)").fetchall()]
+            if 'user_id' not in cols:
+                conn.execute("ALTER TABLE state_store RENAME TO state_store_legacy")
+
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS state_store (
-                key TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                key TEXT NOT NULL,
                 value TEXT NOT NULL,
-                updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+                updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (user_id, key)
             )
             """
         )
+
+        legacy_exists = conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='state_store_legacy'"
+        ).fetchone()
+        if legacy_exists is not None:
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO state_store (user_id, key, value, updated_at)
+                SELECT 'local', key, value, updated_at
+                FROM state_store_legacy
+                """
+            )
+            conn.execute("DROP TABLE state_store_legacy")
+
         conn.commit()
 
 
-def load_state(key: str) -> dict[str, Any] | None:
+def load_state(key: str, user_id: str = "local") -> dict[str, Any] | None:
     with get_connection() as conn:
         row = conn.execute(
-            "SELECT value FROM state_store WHERE key = ?",
-            (key,),
+            "SELECT value FROM state_store WHERE user_id = ? AND key = ?",
+            (user_id, key),
         ).fetchone()
 
     if row is None:
@@ -53,17 +78,17 @@ def load_state(key: str) -> dict[str, Any] | None:
     return {}
 
 
-def save_state(key: str, value: dict[str, Any]) -> None:
+def save_state(key: str, value: dict[str, Any], user_id: str = "local") -> None:
     payload = json.dumps(value, ensure_ascii=False)
     with get_connection() as conn:
         conn.execute(
             """
-            INSERT INTO state_store (key, value, updated_at)
-            VALUES (?, ?, CURRENT_TIMESTAMP)
-            ON CONFLICT(key) DO UPDATE SET
+            INSERT INTO state_store (user_id, key, value, updated_at)
+            VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(user_id, key) DO UPDATE SET
                 value = excluded.value,
                 updated_at = CURRENT_TIMESTAMP
             """,
-            (key, payload),
+            (user_id, key, payload),
         )
         conn.commit()

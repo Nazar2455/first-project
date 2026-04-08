@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from .config import ALLOWED_KEYS, API_PREFIX
+from .config import ALLOWED_KEYS, API_PREFIX, DEFAULT_USER_ID
 from .db import init_db, load_state, save_state
 from .schemas import StatePayload, StateResponse
 
@@ -71,28 +71,47 @@ def on_startup() -> None:
     init_db()
 
 
+def resolve_user_id(
+    user_id: str | None = Query(default=None),
+    x_user_id: str | None = Header(default=None, alias="X-User-ID"),
+) -> str:
+    resolved = (x_user_id or user_id or DEFAULT_USER_ID).strip()
+    return resolved or DEFAULT_USER_ID
+
+
 @app.get(f"{API_PREFIX}/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
 @app.get(f"{API_PREFIX}/state/{{key}}", response_model=StateResponse)
-def get_state(key: str) -> StateResponse:
+def get_state(
+    key: str,
+    user_id: str = Query(default=None),
+    x_user_id: str | None = Header(default=None, alias="X-User-ID"),
+) -> StateResponse:
     if key not in ALLOWED_KEYS:
         raise HTTPException(status_code=404, detail="Unknown state key")
 
-    value = load_state(key)
+    resolved_user_id = resolve_user_id(user_id=user_id, x_user_id=x_user_id)
+    value = load_state(key, resolved_user_id)
     if value is None:
         value = {}
-    return StateResponse(key=key, value=value)
+    return StateResponse(key=key, user_id=resolved_user_id, value=value)
 
 
 @app.put(f"{API_PREFIX}/state/{{key}}", response_model=StateResponse)
-def put_state(key: str, payload: StatePayload) -> StateResponse:
+def put_state(
+    key: str,
+    payload: StatePayload,
+    user_id: str = Query(default=None),
+    x_user_id: str | None = Header(default=None, alias="X-User-ID"),
+) -> StateResponse:
     if key not in ALLOWED_KEYS:
         raise HTTPException(status_code=404, detail="Unknown state key")
 
-    existing_value = load_state(key) or {}
+    resolved_user_id = resolve_user_id(user_id=user_id, x_user_id=x_user_id)
+    existing_value = load_state(key, resolved_user_id) or {}
     incoming_value = dict(payload.value or {})
     force_reset = bool(incoming_value.pop("__reset", False))
 
@@ -104,5 +123,5 @@ def put_state(key: str, payload: StatePayload) -> StateResponse:
         else:
             final_value = _safe_merge(existing_value, incoming_value)
 
-    save_state(key, final_value)
-    return StateResponse(key=key, value=final_value)
+    save_state(key, final_value, resolved_user_id)
+    return StateResponse(key=key, user_id=resolved_user_id, value=final_value)
