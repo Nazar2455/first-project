@@ -4,7 +4,7 @@ from fastapi import FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from .auth import create_access_token, decode_access_token, hash_password, is_auth_config_valid, verify_password
-from .config import ALLOWED_KEYS, API_PREFIX, CORS_ORIGINS, DEFAULT_USER_ID, ENVIRONMENT
+from .config import ALLOWED_KEYS, API_PREFIX, CORS_ORIGINS, DEFAULT_USER_ID, ENVIRONMENT, REQUIRE_USER_CONTEXT_FOR_STATE
 from .db import create_local_user, get_user_by_email, get_user_by_id, init_db, load_state, save_state
 from .schemas import (
     AuthLoginPayload,
@@ -114,7 +114,10 @@ def resolve_user_id(
     authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> str:
     auth_user_id = _resolve_auth_user_id(authorization)
-    resolved = (auth_user_id or x_user_id or user_id or DEFAULT_USER_ID).strip()
+    resolved = (auth_user_id or x_user_id or user_id or "").strip()
+    if not resolved and REQUIRE_USER_CONTEXT_FOR_STATE:
+        raise HTTPException(status_code=401, detail="User context is required for state access")
+    resolved = resolved or DEFAULT_USER_ID
     return resolved or DEFAULT_USER_ID
 
 

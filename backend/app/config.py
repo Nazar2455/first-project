@@ -48,6 +48,14 @@ ENVIRONMENT = os.getenv("ENV", "development")
 AUTH_SECRET = os.getenv("AUTH_SECRET", "dev-secret-change-me")
 ACCESS_TOKEN_EXPIRES_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRES_MINUTES", "10080"))
 
+_state_ctx_raw = os.getenv("REQUIRE_USER_CONTEXT_FOR_STATE", "").strip().lower()
+if _state_ctx_raw in {"1", "true", "yes", "on"}:
+    REQUIRE_USER_CONTEXT_FOR_STATE = True
+elif _state_ctx_raw in {"0", "false", "no", "off"}:
+    REQUIRE_USER_CONTEXT_FOR_STATE = False
+else:
+    REQUIRE_USER_CONTEXT_FOR_STATE = ENVIRONMENT == "production"
+
 RAW_CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*")
 CORS_ORIGINS = [origin.strip() for origin in RAW_CORS_ORIGINS.split(",") if origin.strip()]
 if not CORS_ORIGINS:

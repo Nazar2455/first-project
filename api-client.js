@@ -321,6 +321,10 @@
             return null;
         }
 
+        if (meData.user_id) {
+            setPlanUserId(meData.user_id);
+        }
+
         return meData;
     }
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from .config import ALLOWED_KEYS, API_PREFIX, DEFAULT_USER_ID
+from .config import ALLOWED_KEYS, API_PREFIX, DEFAULT_USER_ID, REQUIRE_USER_CONTEXT_FOR_STATE
 from .db import init_db, load_state, save_state
 from .schemas import StatePayload, StateResponse
 
@@ -75,7 +75,10 @@ def resolve_user_id(
     user_id: str | None = Query(default=None),
     x_user_id: str | None = Header(default=None, alias="X-User-ID"),
 ) -> str:
-    resolved = (x_user_id or user_id or DEFAULT_USER_ID).strip()
+    resolved = (x_user_id or user_id or "").strip()
+    if not resolved and REQUIRE_USER_CONTEXT_FOR_STATE:
+        raise HTTPException(status_code=401, detail="User context is required for state access")
+    resolved = resolved or DEFAULT_USER_ID
     return resolved or DEFAULT_USER_ID
 
 
