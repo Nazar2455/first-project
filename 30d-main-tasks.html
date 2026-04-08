@@ -3348,7 +3348,7 @@
                 RESET_SERVER_KEYS.map((key) =>
                     apiRequest(`/state/${key}`, {
                         method: 'PUT',
-                        body: JSON.stringify({ value: {} })
+                        body: JSON.stringify({ value: { __reset: true } })
                     })
                 )
             );

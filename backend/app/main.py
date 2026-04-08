@@ -15,6 +15,54 @@ from .schemas import (
     StateResponse,
 )
 
+PROTECTED_NUMERIC_FIELDS = {
+    "points",
+    "level",
+    "xp",
+    "bestRoom",
+    "titleClicks",
+    "streamDays",
+    "streak_days",
+    "sessions",
+    "wins",
+    "losses",
+    "tasksCompleted",
+    "totalTasks",
+    "botBuilderXP",
+    "parserDefenseXP",
+    "dungeonXP",
+    "dealMakerXP",
+    "statsCraftXP",
+    "coins",
+    "shards",
+    "playTime",
+    "minutesPlayed",
+    "hoursPlayed",
+}
+
+
+def _safe_merge(existing: dict, incoming: dict) -> dict:
+    if not isinstance(existing, dict):
+        existing = {}
+    if not isinstance(incoming, dict):
+        incoming = {}
+
+    merged = dict(existing)
+    for key, new_value in incoming.items():
+        old_value = existing.get(key)
+
+        if isinstance(old_value, dict) and isinstance(new_value, dict):
+            merged[key] = _safe_merge(old_value, new_value)
+            continue
+
+        if key in PROTECTED_NUMERIC_FIELDS and isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
+            merged[key] = old_value if old_value > new_value else new_value
+            continue
+
+        merged[key] = new_value
+
+    return merged
+
 app = FastAPI(title="Plan Website Backend", version="1.1.0")
 
 app.add_middleware(
@@ -170,5 +218,19 @@ def put_state(
         raise HTTPException(status_code=404, detail="Unknown state key")
 
     resolved_user_id = resolve_user_id(user_id=user_id, x_user_id=x_user_id, authorization=authorization)
-    save_state(key, payload.value, resolved_user_id)
-    return StateResponse(key=key, user_id=resolved_user_id, value=payload.value)
+    existing_value = load_state(key, resolved_user_id) or {}
+
+    incoming_value = dict(payload.value or {})
+    force_reset = bool(incoming_value.pop("__reset", False))
+
+    if force_reset:
+        final_value = {}
+    else:
+        # Блокируем случайный wipe пустым объектом, если прогресс уже есть
+        if not incoming_value and existing_value:
+            final_value = existing_value
+        else:
+            final_value = _safe_merge(existing_value, incoming_value)
+
+    save_state(key, final_value, resolved_user_id)
+    return StateResponse(key=key, user_id=resolved_user_id, value=final_value)

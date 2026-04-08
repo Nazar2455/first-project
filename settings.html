@@ -440,7 +440,7 @@
                 RESET_SERVER_KEYS.map((key) =>
                     window.PlanApiClient?.request?.(`/state/${key}`, {
                         method: 'PUT',
-                        body: JSON.stringify({ value: {} })
+                        body: JSON.stringify({ value: { __reset: true } })
                     })
                 )
             );
